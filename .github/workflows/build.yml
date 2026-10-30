@@ -27,11 +27,14 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller BaoGia_win.spec
 
-      - name: Upload Windows build
+      - name: Build installer (Setup.exe) with Inno Setup
+        run: iscc installer_win.iss
+
+      - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: BaoGiaApp-Windows
-          path: dist/Phan mem Bao gia - ITD Viet Nam/
+          name: BaoGiaApp-Windows-Setup
+          path: dist/installer/BaoGiaApp-Setup.exe
 
   build-macos:
     name: Build macOS (.app)
@@ -53,13 +56,16 @@ jobs:
       - name: Build with py2app
         run: python3 setup_mac.py py2app
 
-      - name: Zip the .app (giu nguyen quyen thuc thi + cau truc bundle)
+      - name: Create .dmg installer
         run: |
           cd dist
-          zip -r -y "BaoGiaApp-macOS.zip" "Phan mem Bao gia - ITD Viet Nam.app"
+          mkdir -p dmg_src
+          cp -R "Phan mem Bao gia - ITD Viet Nam.app" dmg_src/
+          ln -s /Applications dmg_src/Applications
+          hdiutil create -volname "BaoGiaApp" -srcfolder dmg_src -ov -format UDZO "BaoGiaApp-macOS.dmg"
 
-      - name: Upload macOS build
+      - name: Upload macOS installer
         uses: actions/upload-artifact@v4
         with:
           name: BaoGiaApp-macOS
-          path: dist/BaoGiaApp-macOS.zip
+          path: dist/BaoGiaApp-macOS.dmg
