@@ -1,0 +1,17 @@
+pywebview==5.3.2
+openpyxl==3.1.5
+python-docx==1.1.2
+Pillow==11.0.0
+pyinstaller==6.11.1
+pywin32; sys_platform == "win32"
+# pywebview tren Windows mac dinh dung backend "edgechromium" (WebView2), can pythonnet de goi WinRT/COM.
+pythonnet; sys_platform == "win32"
+
+# ---- Chi can tren macOS: pywebview dung GUI backend "cocoa" (WebKit), can cac goi PyObjC nay ----
+pyobjc-core; sys_platform == "darwin"
+pyobjc-framework-Cocoa; sys_platform == "darwin"
+pyobjc-framework-Quartz; sys_platform == "darwin"
+pyobjc-framework-WebKit; sys_platform == "darwin"
+pyobjc-framework-Security; sys_platform == "darwin"
+# py2app la cach dong goi .app CHINH THUC duoc pywebview khuyen dung tren macOS (on dinh hon PyInstaller o day)
+py2app; sys_platform == "darwin"
