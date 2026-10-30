@@ -1,0 +1,71 @@
+name: Build BaoGiaApp (Windows + macOS)
+
+# Chay tu dong moi khi push len nhanh main, HOAC bam nut "Run workflow" thu cong trong tab Actions.
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build-windows:
+    name: Build Windows (.exe)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build with PyInstaller
+        run: pyinstaller BaoGia_win.spec
+
+      - name: Build installer (Setup.exe) with Inno Setup
+        run: iscc installer_win.iss
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: BaoGiaApp-Windows-Setup
+          path: dist/installer/BaoGiaApp-Setup.exe
+
+  build-macos:
+    name: Build macOS (.app)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build with py2app
+        run: python3 setup_mac.py py2app
+
+      - name: Create .dmg installer
+        run: |
+          cd dist
+          mkdir -p dmg_src
+          cp -R "Phan mem Bao gia - ITD Viet Nam.app" dmg_src/
+          ln -s /Applications dmg_src/Applications
+          hdiutil create -volname "BaoGiaApp" -srcfolder dmg_src -ov -format UDZO "BaoGiaApp-macOS.dmg"
+
+      - name: Upload macOS installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: BaoGiaApp-macOS
+          path: dist/BaoGiaApp-macOS.dmg
