@@ -1154,7 +1154,7 @@ let detailSheets = [
 ];
 let activeDetailTab = 'd1';
 let quoteGroups = [
-  { id:'g1', mainContent:'', showMain:false, sumSubItems:false, subItems:[{detailId:'d1'}] }
+  { id:'g1', mainContent:'', showMain:false, sumSubItems:false, subItemsItalic:false, subItems:[{detailId:'d1'}] }
 ];
 let footerNotes = [
   'Giá trên đã bao gồm 8% thuế VAT.',
@@ -2148,7 +2148,7 @@ function setDiscountMode(m){
 function addGroup(){
   const usedIds = quoteGroups.flatMap(g=>g.subItems.map(it=>it.detailId));
   const unused = detailSheets.find(s=>!usedIds.includes(s.id));
-  quoteGroups.push({ id:'g'+Date.now(), mainContent:'', showMain:false, sumSubItems:false, subItems:[{detailId: unused ? unused.id : detailSheets[0].id}] });
+  quoteGroups.push({ id:'g'+Date.now(), mainContent:'', showMain:false, sumSubItems:false, subItemsItalic:false, subItems:[{detailId: unused ? unused.id : detailSheets[0].id}] });
   renderItems();
   render();
 }
@@ -2168,6 +2168,10 @@ function toggleGroupShowMain(gi){
 }
 function toggleGroupSumSubItems(gi){
   quoteGroups[gi].sumSubItems = !quoteGroups[gi].sumSubItems;
+  render();
+}
+function toggleGroupSubItemsItalic(gi){
+  quoteGroups[gi].subItemsItalic = !quoteGroups[gi].subItemsItalic;
   render();
 }
 function addSubItem(gi){
@@ -2223,6 +2227,10 @@ function renderItems(){
         <label class="checkbox-line">
           <input type="checkbox" ${g.sumSubItems?'checked':''} onchange="toggleGroupSumSubItems(${gi})">
           <span>Cộng tổng giá trị các hạng mục con vào dòng hạng mục chính này (tùy chọn — mặc định KHÔNG cộng)</span>
+        </label>
+        <label class="checkbox-line">
+          <input type="checkbox" ${g.subItemsItalic?'checked':''} onchange="toggleGroupSubItemsItalic(${gi})">
+          <span>In nghiêng các dòng hạng mục con (mặc định: chữ thẳng)</span>
         </label>
       ` : ''}
       <div class="sub-items-list">
@@ -2346,7 +2354,7 @@ function render(){
         const amt = t.roundedTotal;
         subtotal += amt;
         sumAmt += amt; sumBeforeVat += t.mainVatBase; sumVat += t.mainVatAmount;
-        return {number: gn.subNums[si], name: s ? s.name : '(chưa chọn hạng mục)', amount: amt, beforeVat: t.mainVatBase, vatAmount: t.mainVatAmount, isMain:false, detailId: it.detailId};
+        return {number: gn.subNums[si], name: s ? s.name : '(chưa chọn hạng mục)', amount: amt, beforeVat: t.mainVatBase, vatAmount: t.mainVatAmount, isMain:false, detailId: it.detailId, italic: !!g.subItemsItalic};
       });
       resolvedRows.push({
         number: `${gn.mainNum}`, name: g.mainContent || '(chưa nhập nội dung)',
@@ -2376,13 +2384,19 @@ function render(){
       const mBeforeVat = row.isSumRow ? fmt(row.beforeVat) : '';
       const mVat = row.isSumRow ? fmt(row.vatAmount) : '';
       const mAmount = row.isSumRow ? fmt(row.amount) : '';
+      // Dong hang muc chinh (co dong con ben duoi) in dam TOAN BO dong - STT, noi dung, gia tri - dong
+      // bo voi cach export_logic.py da lam tu truoc (ca Excel va Word deu in dam ca dong "isMain", xem
+      // bien `f`/`is_main` trong export_excel_file va cac run.bold trong export_docx_file).
       rowHtmlArr.push(showVatBreakdown
-        ? `<tr><td class="center fit">${row.number}</td><td><strong>${row.name}</strong></td><td class="num">${mBeforeVat}</td><td class="num">${mVat}</td><td class="num">${mAmount}</td></tr>`
-        : `<tr><td class="center fit">${row.number}</td><td><strong>${row.name}</strong></td><td class="num">${mAmount}</td></tr>`);
+        ? `<tr><td class="center fit"><strong>${row.number}</strong></td><td><strong>${row.name}</strong></td><td class="num"><strong>${mBeforeVat}</strong></td><td class="num"><strong>${mVat}</strong></td><td class="num"><strong>${mAmount}</strong></td></tr>`
+        : `<tr><td class="center fit"><strong>${row.number}</strong></td><td><strong>${row.name}</strong></td><td class="num"><strong>${mAmount}</strong></td></tr>`);
     } else {
+      // Dong hang muc con: cho phep chon in nghieng (xem checkbox "In nghieng cac dong hang muc con"
+      // trong renderItems() - g.subItemsItalic) - mac dinh chu thang nhu truoc gio.
+      const trOpen = row.italic ? '<tr style="font-style:italic;">' : '<tr>';
       rowHtmlArr.push(showVatBreakdown
-        ? `<tr><td class="center fit">${row.number}</td><td>${row.name}</td><td class="num">${fmt(row.beforeVat)}</td><td class="num">${fmt(row.vatAmount)}</td><td class="num">${fmt(row.amount)}</td></tr>`
-        : `<tr><td class="center fit">${row.number}</td><td>${row.name}</td><td class="num">${fmt(row.amount)}</td></tr>`);
+        ? `${trOpen}<td class="center fit">${row.number}</td><td>${row.name}</td><td class="num">${fmt(row.beforeVat)}</td><td class="num">${fmt(row.vatAmount)}</td><td class="num">${fmt(row.amount)}</td></tr>`
+        : `${trOpen}<td class="center fit">${row.number}</td><td>${row.name}</td><td class="num">${fmt(row.amount)}</td></tr>`);
     }
   });
   let tt = resolvedRows.length + 1;
@@ -3600,6 +3614,7 @@ function normalizeLoadedData(data){
     mainContent: g.mainContent || '',
     showMain: !!g.showMain,
     sumSubItems: !!g.sumSubItems,
+    subItemsItalic: !!g.subItemsItalic,
     subItems: (g.subItems && g.subItems.length ? g.subItems : [{detailId: fallbackDetailId}]).map(it=>({
       detailId: validDetailIds.includes(it.detailId) ? it.detailId : fallbackDetailId,
     })),

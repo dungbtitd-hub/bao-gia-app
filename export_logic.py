@@ -492,6 +492,7 @@ def export_excel_file(state, save_path):
 
     bold = Font(bold=True, name="Times New Roman", size=12)
     normal = Font(name="Times New Roman", size=12)
+    italic_normal = Font(italic=True, name="Times New Roman", size=12)
     title_font = Font(bold=True, name="Times New Roman", size=20)
     center = Alignment(horizontal="center", vertical="center")
     right = Alignment(horizontal="right", vertical="center")
@@ -603,7 +604,9 @@ def export_excel_file(state, save_path):
         # dong hang muc con ngay phia duoi no (vi tri cac dong nay xac dinh truoc duoc vi cau truc
         # items luon xep hang muc con lien tiep ngay sau hang muc chinh cua no).
         is_sum_row = is_main and bool(it.get("isSumRow"))
-        f = bold if is_main else normal
+        # Dong hang muc chinh: in dam toan dong. Dong hang muc con: chu thang (mac dinh) hoac in nghieng
+        # neu nguoi dung bat "In nghieng cac dong hang muc con" (xem g.subItemsItalic/row.italic ben ui.html).
+        f = bold if is_main else (italic_normal if it.get("italic") else normal)
         ws.cell(row=row, column=1, value=it.get("number", "")).font = f
         ws.cell(row=row, column=1).alignment = center
         ws.cell(row=row, column=2, value=it.get("name", "")).font = f
@@ -1286,6 +1289,12 @@ def export_word_file(state, save_path):
             if show_vat:
                 cells[1].merge(cells[n_cols - 1])
         else:
+            # Dong hang muc con: cho phep in nghieng toan dong neu nguoi dung bat tuy chon (xem
+            # g.subItemsItalic/row.italic ben ui.html) - mac dinh chu thang nhu truoc gio.
+            is_italic = (not is_main) and bool(it.get("italic"))
+            if is_italic:
+                stt_run.italic = True
+                name_run.italic = True
             if show_vat:
                 bv = it.get("beforeVat", None)
                 va = it.get("vatAmount", None)
@@ -1293,17 +1302,20 @@ def export_word_file(state, save_path):
                     p2 = cells[2].paragraphs[0]
                     r2 = p2.add_run(fmt_number(bv))
                     r2.bold = is_main
+                    r2.italic = is_italic
                     p2.alignment = WD_ALIGN_PARAGRAPH.RIGHT
                 if va is not None:
                     p3 = cells[3].paragraphs[0]
                     r3 = p3.add_run(fmt_number(va))
                     r3.bold = is_main
+                    r3.italic = is_italic
                     p3.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             amt = it.get("amount", None)
             if amt is not None:
                 p_last = cells[n_cols - 1].paragraphs[0]
                 r_last = p_last.add_run(fmt_number(amt))
                 r_last.bold = is_main
+                r_last.italic = is_italic
                 p_last.alignment = WD_ALIGN_PARAGRAPH.RIGHT
         r_idx += 1
 
