@@ -827,6 +827,20 @@
   .pane-actions{display:flex; justify-content:flex-end; margin-top:4px;}
   .muted{color:var(--ui-muted); font-weight:400;}
   .req{color:#b42318;}
+  /* Ô chọn dạng danh sách tự vẽ (thay danh sách xổ xuống của hệ điều hành – tránh lỗi danh sách trống chữ trên một số máy Windows) */
+  .csel{position:relative; width:100%;}
+  .csel-btn{width:100%; display:flex; align-items:center; gap:8px; padding:7px 8px; border:1px solid var(--field-border, #a8b2cb); border-radius:3px;
+    background:#fff; color:#1c2b2d; font:inherit; font-size:13px; text-align:left; cursor:pointer; min-height:33px;}
+  .csel-btn .csel-val{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .csel-btn .csel-val.ph{color:#7a8299;}
+  .csel-btn:focus{outline:none; border-color:var(--accent, #1b2a5e); box-shadow:0 0 0 2px rgba(27,42,94,0.15);}
+  .csel.missing .csel-btn{border-color:#b42318; box-shadow:0 0 0 2px rgba(180,35,24,0.12);}
+  .csel-list{position:fixed; z-index:400; background:#fff; color:#1c2b2d; border:1px solid #a8b2cb; border-radius:6px; box-shadow:0 10px 28px rgba(10,18,48,0.22);
+    max-height:320px; overflow-y:auto; padding:4px 0; font-family:Arial, Helvetica, sans-serif; font-size:13px;}
+  .csel-opt{padding:7px 12px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#1c2b2d;}
+  .csel-opt:hover, .csel-opt.hl{background:#e8ecf7;}
+  .csel-opt.sel{font-weight:700; color:#1b2a5e;}
+  .csel-opt.ph{color:#7a8299;}
   .chip{display:inline-block; font-size:10.5px; font-weight:600; border-radius:10px; padding:2px 8px; white-space:nowrap;
     color:var(--ui-muted); background:var(--ui-panel); border:1px solid var(--ui-line-soft);}
   .chip.ok{color:#1f6b3a; background:#e3f3e8; border-color:#b5dcc1;}
@@ -1486,7 +1500,8 @@ function updateQuoteTitle(){
     box.querySelector('.qt-name').textContent = base || 'Báo giá mới (chưa lưu)';
     box.title = (path ? path : 'Chưa lưu thành file') + (code ? '\nSố báo giá: ' + code : '');
   }
-  document.title = (base ? base + ' — ' : '') + 'Phần mềm Báo giá - ITD Việt Nam';
+  const newTitle = (base ? base + ' — ' : '') + 'Phần mềm Báo giá - ITD Việt Nam';
+  if (document.title !== newTitle) document.title = newTitle;
 }
 function onQuoteCodeManualEdit(){
   quoteCodeManuallyEdited = true;
@@ -4755,6 +4770,71 @@ function renderRowModal(){
 }
 
 // ---------- Loại báo giá ----------
+// ---------- Ô chọn tự vẽ gắn với 1 <select> gốc (giữ nguyên <select> để đọc/ghi giá trị như cũ) ----------
+let _cselOpen = null;
+function cselAttach(sel){
+  if (!sel || sel._csel) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'csel';
+  wrap.innerHTML = `<button type="button" class="csel-btn"><span class="csel-val"></span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"></path></svg></button>`;
+  sel.parentNode.insertBefore(wrap, sel.nextSibling);
+  sel.style.display = 'none';
+  sel._csel = wrap;
+  const btn = wrap.querySelector('.csel-btn');
+  btn.addEventListener('click', (e) => { e.stopPropagation(); if (_cselOpen && _cselOpen.sel === sel) cselClose(); else cselOpenList(sel); });
+  btn.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+      e.preventDefault();
+      const n = sel.options.length; if (!n) return;
+      const i = Math.max(0, Math.min(n - 1, sel.selectedIndex + (e.key === 'ArrowDown' ? 1 : -1)));
+      if (i !== sel.selectedIndex){ sel.selectedIndex = i; sel.dispatchEvent(new Event('change')); cselSync(sel); }
+    } else if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); cselOpenList(sel); }
+    else if (e.key === 'Escape') cselClose();
+  });
+  new MutationObserver(() => cselSync(sel)).observe(sel, { childList: true, subtree: true, attributes: true, characterData: true });
+  cselSync(sel);
+}
+function cselSync(sel){
+  const wrap = sel && sel._csel; if (!wrap) return;
+  const o = sel.options[sel.selectedIndex];
+  const v = wrap.querySelector('.csel-val');
+  v.textContent = o ? o.textContent : '';
+  v.classList.toggle('ph', !o || o.value === '');
+  wrap.classList.toggle('missing', sel.classList.contains('req-missing'));
+}
+function cselOpenList(sel){
+  cselClose();
+  const wrap = sel._csel; if (!wrap) return;
+  const r = wrap.getBoundingClientRect();
+  const list = document.createElement('div');
+  list.className = 'csel-list';
+  list.innerHTML = Array.from(sel.options).map((o, i) => `<div class="csel-opt ${i === sel.selectedIndex ? 'sel hl' : ''} ${o.value === '' ? 'ph' : ''}" data-i="${i}" title="${esc(o.textContent)}">${esc(o.textContent)}</div>`).join('');
+  document.body.appendChild(list);
+  const below = window.innerHeight - r.bottom - 8, above = r.top - 8;
+  const h = Math.min(list.scrollHeight, 320);
+  list.style.left = r.left + 'px';
+  list.style.minWidth = r.width + 'px';
+  list.style.maxWidth = Math.max(r.width, Math.min(560, window.innerWidth - r.left - 8)) + 'px';
+  if (below >= Math.min(h, 200) || below >= above){ list.style.top = (r.bottom + 2) + 'px'; list.style.maxHeight = Math.max(120, Math.min(320, below)) + 'px'; }
+  else { list.style.top = Math.max(4, r.top - 2 - Math.min(h, above)) + 'px'; list.style.maxHeight = Math.min(320, above) + 'px'; }
+  list.addEventListener('mousedown', (e) => e.preventDefault());
+  list.addEventListener('click', (e) => {
+    const it = e.target.closest('.csel-opt'); if (!it) return;
+    const i = +it.dataset.i;
+    cselClose();
+    if (i !== sel.selectedIndex){ sel.selectedIndex = i; sel.dispatchEvent(new Event('change')); }
+    cselSync(sel);
+    const b = sel._csel && sel._csel.querySelector('.csel-btn'); if (b) b.focus();
+  });
+  const cur = list.querySelector('.sel'); if (cur) cur.scrollIntoView({ block: 'nearest' });
+  _cselOpen = { sel, list };
+}
+function cselClose(){ if (_cselOpen){ _cselOpen.list.remove(); _cselOpen = null; } }
+document.addEventListener('mousedown', (e) => { if (_cselOpen && !e.target.closest('.csel-list') && !(_cselOpen.sel._csel && _cselOpen.sel._csel.contains(e.target))) cselClose(); }, true);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cselClose(); });
+window.addEventListener('resize', cselClose);
+document.addEventListener('scroll', (e) => { if (_cselOpen && !(e.target.closest && e.target.closest('.csel-list'))) cselClose(); }, true);
+
 function renderTypeSelect(){
   const sel = document.getElementById('quoteType');
   if (!sel) return;
@@ -4763,6 +4843,8 @@ function renderTypeSelect(){
   if (cur && !opts.includes(cur)) opts.push(cur);
   sel.innerHTML = `<option value="">— Chọn loại báo giá —</option>` + opts.map(t => `<option value="${esc(t)}" ${t === cur ? 'selected' : ''}>${esc(t)}</option>`).join('');
   sel.classList.toggle('req-missing', !cur && typeMissingFlag);
+  cselAttach(sel);
+  cselSync(sel);
 }
 function onQuoteTypeChange(){
   quoteType = document.getElementById('quoteType').value;
@@ -4808,11 +4890,12 @@ function showTypeDialog(asNew){
           <select id="typeDialogSel"><option value="">— Chọn loại báo giá —</option>${quoteTypes.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select>
         </div>
         <div class="modal-f">
-          <button type="button" class="btn-g" onclick="document.getElementById('modalRoot').innerHTML=''">Huỷ</button>
+          <button type="button" class="btn-g" onclick="cselClose(); document.getElementById('modalRoot').innerHTML=''">Huỷ</button>
           <button type="button" class="btn-f right" onclick="confirmTypeAndSave(${asNew ? 'true' : 'false'})">Lưu báo giá</button>
         </div>
       </div>
     </div>`;
+  cselAttach(document.getElementById('typeDialogSel'));
 }
 function confirmTypeAndSave(asNew){
   const v = document.getElementById('typeDialogSel').value;
