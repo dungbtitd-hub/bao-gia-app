@@ -745,333 +745,650 @@
       font-size:10px;
     }
   }
+
+  /* ================== GIAO DIỆN MỚI (tông xanh tím than) ================== */
+  :root{
+    --ui-navy:#1b2a5e; --ui-navy-dark:#131d45; --ui-soft:#e2e7f4; --ui-panel:#eef1f8;
+    --ui-line:#c5cde0; --ui-line-soft:#dfe4ef; --ui-field:#a8b2cb; --ui-muted:#5f6680; --ui-ink:#1a2033;
+    --appbar-h:52px; --subbar-h:0px;
+  }
+  body{background:var(--ui-panel); overflow:hidden; display:flex; flex-direction:column; height:100vh;}
+  .appbar{
+    background:var(--ui-navy-dark); color:#f4f6fb; padding:9px 18px; display:flex; align-items:center; gap:8px;
+    font-family:Arial, Helvetica, sans-serif; flex-wrap:wrap; min-height:var(--appbar-h); box-sizing:border-box;
+  }
+  .tabs1{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .tab1{
+    display:flex; align-items:center; gap:6px; padding:6px 11px; border:1.5px solid #56619a; border-radius:8px;
+    background:transparent; color:#dfe4f5; font-size:12.5px; font-weight:700; cursor:pointer; font-family:Arial, sans-serif; white-space:nowrap;
+  }
+  .tab1:hover{background:rgba(255,255,255,0.08);}
+  .tab1.active{background:#fff; color:var(--ui-navy); border-color:#fff;}
+  .tabs-sep{width:1px; height:22px; background:#3c4778; margin:0 4px;}
+  .appbar-right{margin-left:auto; display:flex; align-items:center; gap:6px;}
+  .tb{display:flex; align-items:center; gap:5px; padding:5px 9px; white-space:nowrap; border:1px solid #56619a; border-radius:7px;
+    background:transparent; color:#dfe4f5; font-size:12.5px; font-weight:600; cursor:pointer; font-family:Arial, sans-serif;}
+  .tb:hover{background:rgba(255,255,255,0.08);}
+  .tb-main{background:#2b3a7a; color:#fff;}
+  @media (max-width:1560px){ .app-name .an-long{display:none;} }
+  @media (max-width:1300px){ .app-name{display:none;} }
+  .app-name{margin-left:10px; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; font-weight:700; white-space:nowrap;}
+  .menu-wrap{position:relative;}
+  .menu{display:none; position:absolute; right:0; top:calc(100% + 6px); width:190px; background:#fff; border:1px solid var(--ui-line);
+    border-radius:8px; box-shadow:0 8px 24px rgba(19,29,69,0.25); overflow:hidden; z-index:50;}
+  .menu.open{display:block;}
+  .menu-i{display:block; width:100%; text-align:left; padding:9px 12px; border:none; background:#fff; color:var(--ui-ink); font-size:12.5px; cursor:pointer;}
+  .menu-i:hover{background:var(--ui-panel);}
+
+  .subbar, .subbar2{font-family:Arial, Helvetica, sans-serif; display:none;}
+  body.tab-items .subbar, body.tab-items .subbar2{display:block;}
+  .subbar{background:var(--ui-soft); border-bottom:1px solid var(--ui-line); padding:8px 18px;}
+  .subbar2{background:#fff; border-bottom:1px solid var(--ui-line); padding:7px 18px; box-shadow:0 2px 6px rgba(19,29,69,0.08);}
+  .hm-cards{display:flex; flex-wrap:wrap; gap:8px; align-items:center; max-height:96px; overflow-y:auto;}
+  .hm-card{display:flex; align-items:stretch; border:1.5px solid var(--ui-field); border-radius:8px; overflow:hidden; background:#fff;}
+  .hm-card.active{border-color:var(--ui-navy);}
+  .hm-card button{border:none; background:#fff; color:var(--ui-ink); cursor:pointer; font-family:Arial, sans-serif;}
+  .hm-card.active button{background:var(--ui-navy); color:#fff;}
+  .hm-pick{padding:6px 12px; font-size:12.5px; font-weight:600; max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .hm-note{opacity:.7; font-weight:400;}
+  .hm-dup{padding:6px 9px; border-left:1px solid rgba(0,0,0,0.12) !important; display:flex; align-items:center;}
+  .hm-add{display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:8px; border:1.5px dashed var(--ui-navy);
+    color:var(--ui-navy); font-size:12.5px; font-weight:600; background:transparent; cursor:pointer;}
+  .sub-tabs{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .pill{padding:6px 14px; border:1.5px solid var(--ui-field); border-radius:8px; font-size:12.5px; font-weight:600; background:#fff;
+    color:var(--ui-ink); cursor:pointer; font-family:Arial, sans-serif;}
+  .pill.on{background:var(--ui-navy); color:#fff; border-color:var(--ui-navy);}
+  .pill .cnt{font-weight:400; opacity:.75;}
+  .sub-tabs .editing{margin-left:auto; font-size:12px; color:var(--ui-muted);}
+  .sub-tabs .editing strong{color:var(--ui-ink);}
+
+  .layout{display:flex !important; flex:1; min-height:0 !important; grid-template-columns:none !important;}
+  .panel{
+    --accent:#1b2a5e; --accent-soft:#e2e7f4; --line:#c5cde0; --panel:#eef1f8; --field-border:#a8b2cb; --muted:#5f6680; --ink:#1a2033;
+    flex:1; min-width:440px; max-height:none !important; height:100%; resize:none !important; padding:16px 20px 40px; background:var(--ui-panel);
+    border-right:1px solid var(--ui-line);
+  }
+  .panel input[type=text]:focus, .panel input[type=number]:focus, .panel textarea:focus, .panel select:focus{box-shadow:0 0 0 2px rgba(27,42,94,0.15);}
+  .pane{display:none;}
+  .pane.active{display:block;}
+  .card{background:#fff; border:1px solid var(--ui-line); border-radius:10px; padding:12px 16px 14px; margin-bottom:14px;}
+  .card-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:4px;}
+  .card-head .right{margin-left:auto;}
+  .ttl{font-size:14px; font-weight:700; color:var(--ui-navy);}
+  .ttl-lg{font-size:17px; font-weight:700; color:var(--ui-navy);}
+  .pane-title{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;}
+  .pane-title-actions{margin-left:auto; display:flex; gap:8px; flex-wrap:wrap;}
+  .pane-actions{display:flex; justify-content:flex-end; margin-top:4px;}
+  .muted{color:var(--ui-muted); font-weight:400;}
+  .req{color:#b42318;}
+  .chip{display:inline-block; font-size:10.5px; font-weight:600; border-radius:10px; padding:2px 8px; white-space:nowrap;
+    color:var(--ui-muted); background:var(--ui-panel); border:1px solid var(--ui-line-soft);}
+  .chip.ok{color:#1f6b3a; background:#e3f3e8; border-color:#b5dcc1;}
+  .chip.warn{color:#8a5a00; background:#fdf1d6; border-color:#ecd39a;}
+  .chip.auto{color:var(--ui-navy); background:var(--ui-soft); border-color:var(--ui-line);}
+  .btn-o, .btn-f, .btn-g, .btn-def{font-family:Arial, sans-serif; cursor:pointer; border-radius:7px;}
+  .btn-o{padding:6px 12px; border:1px solid var(--ui-navy); color:var(--ui-navy); background:#fff; font-size:12px; font-weight:600;}
+  .btn-f{padding:6px 12px; border:1px solid var(--ui-navy); color:#fff; background:var(--ui-navy); font-size:12px; font-weight:700;}
+  .btn-g{padding:6px 12px; border:1px solid var(--ui-field); color:var(--ui-ink); background:#fff; font-size:12px;}
+  .btn-def{padding:4px 10px; border:1px solid var(--ui-field); color:var(--ui-navy); background:#f5f7fc; font-size:11px; font-weight:600;}
+  .btn-danger{padding:7px 12px; border:1px solid #c9a3a3; color:#9b2c2c; background:#fff; border-radius:7px; font-size:12.5px; cursor:pointer;}
+  .btn-o:hover, .btn-f:hover, .btn-g:hover, .btn-def:hover{filter:brightness(0.96);}
+  .linkbtn{background:none; border:none; color:var(--ui-navy); font-size:11.5px; text-decoration:underline; padding:0; cursor:pointer;}
+  .head-actions{display:flex; align-items:center; gap:6px; font-weight:normal;}
+  .inline-input{display:flex; gap:6px; align-items:center;}
+  .inline-input input{flex:1;}
+  .icon-btn{white-space:nowrap;}
+  .seg{display:inline-flex; border:1.5px solid var(--ui-navy); border-radius:8px; overflow:hidden;}
+  .seg button{padding:5px 12px; border:none; font-size:12px; font-weight:600; background:#fff; color:var(--ui-ink); cursor:pointer;}
+  .seg button + button{border-left:1.5px solid var(--ui-navy);}
+  .seg button.on{background:var(--ui-navy); color:#fff;}
+  .lockv{box-sizing:border-box; padding:6px 8px; border:1px solid var(--ui-line-soft); border-radius:6px; font-size:13px; background:#f1f3f8; color:#8a92a8; min-width:62px;}
+  .ratio-row{display:flex; gap:18px; flex-wrap:wrap; margin-top:6px;}
+  .ratio-row .fld label{margin-top:0;}
+  .ratio-row .val{display:flex; align-items:center; gap:6px;}
+  .ratio-row input{width:90px;}
+  .opt-block{margin-top:12px; padding-top:10px; border-top:1px solid var(--ui-line-soft);}
+  .sync-box{display:flex !important; gap:10px; align-items:flex-start; padding:10px 12px; margin-top:12px !important; border-radius:8px;
+    border:1.5px dashed var(--ui-field); background:#f5f7fc; color:var(--ui-ink) !important; font-size:12.5px !important; cursor:pointer;}
+  .sync-box.on{border:1.5px solid #6fb487; background:#e3f3e8;}
+  .sync-box input{width:auto; margin-top:2px;}
+  .chips-wrap{display:flex; flex-wrap:wrap; gap:6px;}
+  .type-chip{display:inline-flex; align-items:center; gap:6px; padding:4px 6px 4px 11px; border:1px solid var(--ui-line); border-radius:14px; font-size:12px; background:#f5f7fc;}
+  .type-chip button{border:none; background:none; color:#9b2c2c; cursor:pointer; font-size:12px; padding:0 2px;}
+  .settings-group{background:#fff; border-color:var(--ui-line); border-radius:10px; padding:12px 14px 14px; margin-top:0; margin-bottom:12px;}
+  .settings-group-title{font-size:13px;}
+
+  /* Bảng nhập liệu gọn (chỉ hiện dòng đầu) */
+  .tbl-card{padding:0; overflow:hidden;}
+  .tbl-head{display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 16px; background:var(--ui-soft);}
+  .tbl-head .right{margin-left:auto;}
+  .thead, .trow{display:grid; font-size:12.5px;}
+  .thead{background:#f5f7fc; font-weight:700; font-size:12px; border-top:1px solid var(--ui-line);}
+  .thead > div{padding:8px 8px;}
+  .trow{border-top:1px solid var(--ui-line-soft); align-items:start; background:#fff;}
+  .trow:hover{background:#f7f9fd;}
+  .trow > div, .trow > button{padding:8px 8px; min-width:0;}
+  .trow .ctr{text-align:center;}
+  .trow .b{font-weight:700;}
+  .trow .txt{display:flex; align-items:center; gap:8px; text-align:left; background:none; border:none; cursor:pointer; font-size:12.5px; color:var(--ui-ink); font-family:Arial, sans-serif;}
+  .trow .edit{background:none; border:none; color:#8a92a8; cursor:pointer; display:flex; justify-content:center;}
+  .ell{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0;}
+  .ctl{display:flex; gap:3px; justify-content:center;}
+  .mini{padding:2px 6px; border:1px solid var(--ui-field); background:#fff; border-radius:6px; cursor:pointer; color:var(--ui-navy); font-weight:700; font-size:12px; line-height:1.2;}
+  .mini:disabled{opacity:.3; cursor:default;}
+  .tbl-foot{display:flex; gap:8px; flex-wrap:wrap; padding:10px 14px; border-top:1px solid var(--ui-line-soft); background:#fafbfe;}
+  .tbl-foot .right{margin-left:auto;}
+  .lump{padding:14px 16px; display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap;}
+  .lump label{margin-top:0;}
+  .lump input{width:220px; font-weight:700;}
+
+  /* Báo giá chính: từng dòng */
+  .grp{border:1px solid var(--ui-line); border-radius:8px; padding:10px 12px; margin-bottom:10px; background:#fafbfe;}
+  .grp-head{display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px;}
+  .grp-head .del{margin-left:auto; border:none; background:none; color:#a33; cursor:pointer; font-size:12px;}
+  .grp-sub{display:flex; gap:6px; align-items:center; margin-top:6px;}
+  .grp-sub .num{width:34px; font-size:12px; color:var(--ui-muted); text-align:right;}
+  .grp-sub select{flex:1;}
+  .grp-sub .del{border:none; background:none; color:#a33; cursor:pointer;}
+  .grp-flags{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
+  .flag{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--ui-line); border-radius:14px; background:#fff; font-size:12px; color:var(--ui-ink); cursor:pointer; margin:0 !important;}
+  .flag input{width:auto; margin:0;}
+  .flag.auto{background:var(--ui-soft); color:var(--ui-navy); font-weight:600; cursor:default;}
+
+  /* Xem trước + zoom */
+  .preview-col{flex:none; display:flex; flex-direction:column; background:#d8deea; height:100%; min-width:0; max-width:65%;}
+  .preview-toolbar{flex:none; display:flex; align-items:center; gap:6px; padding:7px 12px; background:#fff; border-bottom:1px solid var(--ui-line);
+    font-family:Arial, sans-serif; flex-wrap:wrap;}
+  .pt-title{font-size:11px; font-weight:700; color:var(--ui-navy); text-transform:uppercase; letter-spacing:.05em; margin-right:auto;}
+  .zbtn{width:28px; height:26px; border:1px solid var(--ui-field); background:#fff; border-radius:6px; cursor:pointer; font-size:15px; color:var(--ui-navy); line-height:1;}
+  .zlabel{width:42px; text-align:center; font-size:12.5px; font-weight:700;}
+  .pt-sep{width:1px; height:20px; background:var(--ui-line); margin:0 2px;}
+  .lbtn{padding:4px 8px; border:1px solid var(--ui-field); border-radius:6px; font-size:11.5px; background:#fff; color:var(--ui-ink); cursor:pointer;}
+  .lbtn.on{background:var(--ui-navy); color:#fff; border-color:var(--ui-navy);}
+  .preview-wrap{flex:1; min-height:0; max-height:none !important; padding:20px !important; overflow:auto !important; display:block !important;}
+  #zoomWrap{zoom:0.75; width:max-content; margin:0 auto;}
+  .preview-restore{display:none; flex:none; width:34px; border:none; border-left:1px solid var(--ui-line); background:var(--ui-soft);
+    color:var(--ui-navy); font-size:12px; font-weight:700; writing-mode:vertical-rl; padding:16px 0; cursor:pointer;}
+  body.preview-hidden .preview-col{display:none;}
+  body.preview-hidden .preview-restore{display:block;}
+  body.tab-registry .preview-col, body.tab-registry .preview-restore{display:none !important;}
+
+  /* Chân trang: dải xám cách mép dưới (mặc định 1cm), số trang ở giữa dải */
+  .footer-bar{bottom:var(--footer-offset, 10mm) !important; display:grid !important; grid-template-columns:1fr auto 1fr; gap:10px;}
+  .footer-bar .band-page{text-align:center; color:#1f3a5c; font-size:11px; font-weight:bold; white-space:nowrap;}
+  .footer-bar .band-right{justify-self:end; display:flex; align-items:center;}
+  .page-num-label{display:none !important;}
+
+  /* Tuỳ chọn trình bày từng bảng */
+  .tbl-style{margin-top:10px; padding-top:8px; border-top:1px dashed var(--ui-line); display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;}
+  .tbl-style label{margin:0;}
+  .tbl-style select{width:auto;}
+  .tbl-style .checkbox-line{margin-top:0;}
+  #allPages.zebra-main table.quote-table tbody tr:nth-child(even):not(.total-row):not(.discount-row) td{background:#f6f3ec;}
+  #allPages.zebra-summary table.summary-table tbody tr:nth-child(even):not(.sum-row) td{background:#f6f3ec;}
+  #allPages.zebra-expert table.expert-table tbody tr:nth-child(even):not(.sum-row) td{background:#f6f3ec;}
+  #allPages.zebra-other table.other-table tbody tr:nth-child(even):not(.sum-row) td{background:#f6f3ec;}
+  #allPages.zebra-salary table.salary-table-print tbody tr:nth-child(even) td{background:#f6f3ec;}
+  #allPages.nohb-main table.quote-table th, #allPages.nohb-summary table.summary-table th, #allPages.nohb-expert table.expert-table th,
+  #allPages.nohb-other table.other-table th, #allPages.nohb-salary table.salary-table-print th{font-weight:normal;}
+  .sheet table.quote-table, .sheet table.quote-table *{font-family:var(--font-main, 'Times New Roman'), Times, serif !important;}
+  .sheet table.summary-table, .sheet table.summary-table *{font-family:var(--font-summary, 'Times New Roman'), Times, serif !important;}
+  .sheet table.expert-table, .sheet table.expert-table *{font-family:var(--font-expert, 'Times New Roman'), Times, serif !important;}
+  .sheet table.other-table, .sheet table.other-table *{font-family:var(--font-other, 'Times New Roman'), Times, serif !important;}
+  .sheet table.salary-table-print, .sheet table.salary-table-print *{font-family:var(--font-salary, 'Times New Roman'), Times, serif !important;}
+
+  /* Popup + thông báo */
+  .modal-ov{position:fixed; inset:0; background:rgba(19,29,69,0.42); display:flex; align-items:center; justify-content:center; z-index:100; font-family:Arial, Helvetica, sans-serif;}
+  .modal{width:700px; max-width:calc(100% - 32px); max-height:calc(100% - 40px); overflow-y:auto; background:#fff; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,0.3); color:var(--ui-ink);
+    --accent:#1b2a5e; --line:#c5cde0; --field-border:#a8b2cb; --muted:#5f6680;}
+  .modal-h{display:flex; align-items:center; padding:14px 18px; background:var(--ui-navy); color:#fff; font-size:15px; font-weight:700; position:sticky; top:0; z-index:1;}
+  .modal-h .x{margin-left:auto; background:none; border:none; color:#fff; font-size:18px; cursor:pointer;}
+  .modal-b{padding:14px 18px;}
+  .modal-b label{margin-top:10px;}
+  .modal-f{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:12px 18px; border-top:1px solid var(--ui-line-soft); background:#f5f7fc; position:sticky; bottom:0;}
+  .modal-f .right{margin-left:auto;}
+  .lv-row{display:grid; grid-template-columns:1fr 110px 110px 34px; gap:8px; align-items:end; padding:8px 10px; border:1px solid var(--ui-line-soft); border-radius:8px; background:#f8f9fd; margin-top:6px;}
+  .lv-row label{margin:0 0 3px;}
+  .depth-row{display:flex; align-items:center; gap:8px; margin-top:8px; font-size:12.5px;}
+  .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--ui-navy-dark); color:#fff; font-size:13px; padding:10px 18px;
+    border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,0.25); z-index:200; font-family:Arial, sans-serif; display:none; max-width:80%;}
+  .toast.show{display:block;}
+
+  /* Quản lý báo giá */
+  .reg-filters{display:flex; flex-direction:column; gap:10px;}
+  .reg-line{display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap;}
+  .reg-line label{margin:0 0 3px;}
+  .reg-line select, .reg-line input{width:auto; min-width:160px;}
+  .reg-stats{display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:14px;}
+  .stat{background:#fff; border:1px solid var(--ui-line); border-radius:10px; padding:12px 14px;}
+  .stat .k{font-size:11px; font-weight:700; color:var(--ui-muted); text-transform:uppercase; letter-spacing:.04em;}
+  .stat .v{font-size:22px; font-weight:700; color:var(--ui-navy); margin-top:4px;}
+  .reg-table{background:#fff; border:1px solid var(--ui-line); border-radius:10px; overflow:hidden;}
+  .reg-grid{display:grid; grid-template-columns:44px 150px 90px 180px minmax(160px,1fr) 120px 60px 130px 70px; align-items:center; font-size:12.5px;}
+  .reg-grid > div{padding:8px 8px; min-width:0;}
+  .reg-h{background:var(--ui-soft); font-size:11px; font-weight:700; color:var(--ui-muted); text-transform:uppercase;}
+  .reg-row{border-top:1px solid var(--ui-line-soft);}
+  .reg-row.cur{background:#f7f9ff;}
+  .reg-code{display:flex; align-items:center; gap:6px; background:none; border:none; color:var(--ui-navy); font-weight:700; cursor:pointer; padding:2px; font-size:12.5px;}
+  .reg-type{display:inline-block; font-size:11px; font-weight:600; color:#fff; background:#3a4a8c; border-radius:10px; padding:2px 8px;}
+  .reg-grp{display:flex; align-items:center; gap:10px; padding:8px 14px; background:#f5f7fc; border-top:1px solid var(--ui-line); font-size:12.5px;}
+  .reg-detail{margin:0 14px 12px 58px; border:1px solid var(--ui-line-soft); border-radius:8px; background:#fafbfe; font-size:12.5px;}
+  .reg-detail > div{display:grid; grid-template-columns:40px 1fr 150px; padding:6px 10px; border-bottom:1px solid #eef1f8;}
+  .reg-total{display:flex; justify-content:space-between; padding:10px 14px; background:var(--ui-navy); color:#fff; font-weight:700; font-size:13px;}
+  #reportPrint{display:none;}
+
+  @media print{
+    body{overflow:visible !important; display:block !important; height:auto !important;}
+    .appbar, .subbar, .subbar2, .preview-toolbar, .preview-restore, #modalRoot, .toast{display:none !important;}
+    .layout{display:block !important; height:auto !important;}
+    .preview-col{display:block !important; max-width:none !important; height:auto !important; background:#fff !important;}
+    #zoomWrap{zoom:1 !important; width:auto !important;}
+    html, body{background:#fff !important;}
+    .preview-wrap{padding:0 !important; overflow:visible !important; height:auto !important; background:#fff !important;}
+    #zoomWrap{margin:0 !important;}
+    body.printing-report .layout{display:none !important;}
+    body.printing-report #reportPrint{display:block !important; font-family:'Times New Roman', serif; padding:12mm;}
+    #reportPrint table{width:100%; border-collapse:collapse; font-size:11pt;}
+    #reportPrint th, #reportPrint td{border:1px solid #555; padding:4px 6px; vertical-align:top;}
+    #reportPrint th{background:#e2e7f4 !important;}
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Phần mềm Báo giá — ITD Việt Nam</h1>
-  <span>Ứng dụng desktop offline</span>
+<header class="appbar">
+  <nav class="tabs1">
+    <button type="button" class="tab1 active" data-tab="items" onclick="setMainTab('items')">Các hạng mục báo giá</button>
+    <button type="button" class="tab1" data-tab="main" onclick="setMainTab('main')">Báo giá chính</button>
+    <button type="button" class="tab1" data-tab="format" onclick="setMainTab('format')">Định dạng cỡ chữ</button>
+    <span class="tabs-sep"></span>
+    <button type="button" class="tab1" data-tab="params" onclick="setMainTab('params')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>
+      Tham số &amp; thiết lập
+    </button>
+    <button type="button" class="tab1" data-tab="registry" onclick="setMainTab('registry')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M8 13h8M8 16h5"></path></svg>
+      Quản lý báo giá
+    </button>
+  </nav>
+  <div class="appbar-right">
+    <button type="button" class="tb" onclick="newQuote()" title="Soạn báo giá mới (dùng cấu hình mặc định)">Mới</button>
+    <button type="button" class="tb" onclick="openQuoteFile()">Mở</button>
+    <button type="button" class="tb tb-main" onclick="saveQuoteFile(false)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path><path d="M7 3v5h8V3M7 21v-7h10v7"></path></svg>
+      Lưu
+    </button>
+    <button type="button" class="tb" onclick="saveQuoteFile(true)">Lưu bản mới</button>
+    <div class="menu-wrap">
+      <button type="button" class="tb" onclick="toggleExportMenu(event)">Xuất file <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"></path></svg></button>
+      <div class="menu" id="exportMenu">
+        <button type="button" class="menu-i" onclick="closeExportMenu(); exportExcel()">Xuất Excel (.xlsx)</button>
+        <button type="button" class="menu-i" onclick="closeExportMenu(); exportWord()">Xuất Word (.docx)</button>
+        <button type="button" class="menu-i" onclick="closeExportMenu(); printQuote()">In / Xuất PDF</button>
+      </div>
+    </div>
+    <div class="app-name"><span class="an-long">Phần mềm </span>Báo giá — ITD Việt Nam</div>
+  </div>
 </header>
-<div class="toggle-bar">
-  <span>Bố cục:</span>
-  <button onclick="setLayout('default')">Cân bằng</button>
-  <button onclick="setLayout('wide')">Soạn thảo rộng</button>
-  <button onclick="setLayout('preview')">Xem trước rộng</button>
-  <button onclick="setLayout('editor-only')">Chỉ soạn thảo</button>
+
+<div class="subbar" id="subbarItems">
+  <div class="hm-cards" id="detailTabs"></div>
+</div>
+<div class="subbar2" id="subbarItems2">
+  <div class="sub-tabs" id="subTabs"></div>
 </div>
 
 <div class="layout">
   <div class="panel">
 
-    <h2>Thông tin công ty</h2>
-    <label>Tên công ty</label>
-    <input type="text" id="companyName" value="Công ty cổ phần Công nghệ ITD Việt Nam">
-    <label>Địa chỉ</label>
-    <textarea id="companyAddr">Số 1, ngõ 30 đường Lý Sơn, tổ 29, phường Việt Hưng, Hà Nội, Việt Nam</textarea>
-    <div class="row2">
-      <div><label>Điện thoại</label><input type="text" id="companyPhone" value="+84 969953355"></div>
-      <div><label>Email</label><input type="text" id="companyEmail" value="itdvietnam.jsc83@gmail.com"></div>
-    </div>
+    <!-- ================= CÁC HẠNG MỤC BÁO GIÁ ================= -->
+    <section class="pane active" data-pane="items">
+      <div id="detailTabBody"></div>
+    </section>
 
-    <h2>Logo &amp; chân trang</h2>
-    <label>Logo công ty (PNG/JPG/SVG)</label>
-    <input type="file" id="logoUpload" accept="image/*" onchange="handleLogoUpload(this.files[0])">
-    <p class="hint" id="logoUploadHint">Đang dùng logo mặc định ITD Việt Nam. Tải ảnh lên để thay bằng logo của anh — áp dụng cho cả bản xem trước, in PDF, Excel và Word.</p>
-    <div class="checkbox-line" style="margin-top:4px;">
-      <button type="button" class="add-btn" style="padding:4px 8px;font-size:10px;" onclick="resetLogoToDefault()">↺ Khôi phục logo mặc định</button>
-    </div>
-    <div class="checkbox-line">
-      <input type="checkbox" id="showHeaderLogo" checked onchange="render()">
-      <label style="margin:0;">Hiển thị logo ở đầu trang (cạnh tiêu đề BÁO GIÁ)</label>
-    </div>
-    <div class="checkbox-line">
-      <input type="checkbox" id="showFooterLogo" checked onchange="render()">
-      <label style="margin:0;">Hiển thị logo ở chân trang (mọi trang)</label>
-    </div>
-    <label>Chữ hiển thị ở chân trang</label>
-    <input type="text" id="footerCaptionInput" placeholder="Để trống = tự lấy theo Tên công ty" oninput="render()">
-    <p class="hint">Để trống thì chân trang tự lấy theo "Tên công ty" ở trên (viết hoa). Nhập vào đây nếu muốn hiển thị khác đi, ví dụ tên viết tắt.</p>
-
-    <h2>Tên công ty ký tên (khóa bằng mật khẩu)</h2>
-    <label>Dòng "Tên công ty" ở phần ký tên cuối báo giá</label>
-    <div id="signNameDisplay" class="fixed-clause-display" onclick="toggleSignNameEdit()">
-      <span id="signNameText">Công ty cổ phần Công nghệ ITD Việt Nam</span>
-      <button type="button" class="edit-pencil" onclick="event.stopPropagation(); toggleSignNameEdit();">🔒 Sửa</button>
-    </div>
-    <input type="text" id="signNameInput" style="display:none;" oninput="render()">
-    <div class="checkbox-line" style="margin-top:4px;">
-      <button type="button" class="add-btn" style="padding:4px 8px;font-size:10px;" onclick="changeEditPassword()">🔑 Đặt / đổi mật khẩu bảo vệ</button>
-    </div>
-    <p class="hint">Mặc định lấy theo "Tên công ty" ở trên. Bấm "Sửa" và nhập đúng mật khẩu nếu muốn dòng ký tên hiển thị khác đi (không ảnh hưởng các chỗ khác). Đây chỉ là khóa tạm tránh sửa nhầm, không phải bảo mật cấp cao — mật khẩu được lưu trong chính file báo giá.</p>
-
-    <h2>Thông tin báo giá</h2>
-    <div class="row3">
-      <div><label>Ngày</label><input type="text" inputmode="numeric" id="qDay" value="21" oninput="render()" onblur="padDateField('qDay')"></div>
-      <div><label>Tháng</label><input type="text" inputmode="numeric" id="qMonth" value="07" oninput="render()" onblur="padDateField('qMonth')"></div>
-      <div><label>Năm</label><input type="number" id="qYear" value="2026" oninput="render()"></div>
-    </div>
-    <label>Mã số báo giá</label>
-    <input type="text" id="quoteCode" value="" oninput="onQuoteCodeManualEdit()">
-    <div class="checkbox-line" style="margin-top:4px;">
-      <button type="button" class="add-btn" style="padding:4px 8px;font-size:10px;" onclick="resetQuoteCodeToAuto()">↺ Đặt lại tự động theo ngày tháng năm</button>
-    </div>
-    <p class="hint">Mặc định tự ghép theo ngày tháng năm (tháng+ngày.năm.ITDVN) — có thể sửa tay, khi đó sẽ không tự đổi theo ngày tháng nữa cho tới khi bấm "Đặt lại tự động".</p>
-    <label>Kính gửi</label>
-    <textarea id="recipient">Trung tâm Truyền thông, Dữ liệu và Công nghệ số thành phố Hà Nội</textarea>
-    <label>Nội dung mở đầu (phần thay đổi theo từng báo giá)</label>
-    <textarea id="introPrefix">Theo yêu cầu của Quý Ban về việc báo giá thực hiện các dịch vụ tư vấn liên quan đến nhiệm vụ...</textarea>
-    <div class="fixed-clause-block">
-      <div id="fixedClauseDisplay" class="fixed-clause-display" onclick="toggleFixedClauseEdit()">
-        <span id="fixedClauseText">Công ty cổ phần Công nghệ ITD Việt Nam xin gửi Quý khách hàng báo giá Dịch vụ theo yêu cầu, như sau:</span>
-        <button type="button" class="edit-pencil" onclick="event.stopPropagation(); toggleFixedClauseEdit();">✎ Sửa</button>
-      </div>
-      <textarea id="fixedClauseInput" style="display:none;" oninput="render()">Công ty cổ phần Công nghệ ITD Việt Nam xin gửi Quý khách hàng báo giá Dịch vụ theo yêu cầu, như sau:</textarea>
-    </div>
-
-    <h2>Chế độ báo giá</h2>
-    <div class="mode-toggle">
-      <button id="btnSingle" class="active" onclick="setMode('single')">1 dịch vụ (có Tổng cộng)</button>
-      <button id="btnMulti" onclick="setMode('multi')">Nhiều dịch vụ (không giảm giá ở đây)</button>
-    </div>
-    <p class="hint" id="modeHint"></p>
-
-    <h2>Bảng lương chuyên gia</h2>
-    <p class="hint">Sửa trực tiếp khi thông tư thay đổi — mọi hạng mục dự toán chi tiết sẽ tự cập nhật theo.</p>
-    <label>Thông tư áp dụng</label>
-    <input type="text" id="circularName" value="Thông tư 004/2025/TT-BNV" oninput="updateSalaryMeta('circularName', this.value)">
-    <label>Số ngày công quy đổi/tháng</label>
-    <input type="number" id="workDaysPerMonth" value="26" oninput="updateSalaryMeta('workDaysPerMonth', this.value)" onblur="refreshAfterSalaryEdit()">
-    <label>Các mức lương</label>
-    <div id="salaryLevels"></div>
-    <button class="add-btn" onclick="addSalaryLevel()">+ Thêm mức lương</button>
-    <div class="checkbox-line" style="margin-top:8px;gap:8px;">
-      <button type="button" class="add-btn" style="padding:4px 8px;font-size:10px;" onclick="exportSalaryTemplate()">⬇️ Tải file mẫu (Excel)</button>
-      <button type="button" class="add-btn" style="padding:4px 8px;font-size:10px;" onclick="importSalaryExcel()">⬆️ Nhập từ Excel</button>
-    </div>
-    <p class="hint">Tải file mẫu (đã điền sẵn dữ liệu hiện tại) → sửa trong Excel → nhập lại để cập nhật nhanh cả bảng, thay vì sửa tay từng dòng.</p>
-
-    <div class="settings-group">
-      <div class="settings-group-title with-lock">
-        <span>⚙ Thuế GTGT & Thu nhập chịu thuế tính trước (áp dụng CHUNG cho tất cả hạng mục)</span>
-        <button type="button" class="edit-pencil" onclick="toggleGlobalPctLock('vat')" id="globalVatPctLockBtn">🔒 Sửa</button>
-      </div>
-      <div class="row2">
-        <div>
-          <label>% VAT (thuế GTGT)</label>
-          <input type="number" id="globalVatPct" value="8" step="0.1" disabled class="locked-amount" oninput="updateGlobalVatPct(this.value)">
+    <!-- ================= BÁO GIÁ CHÍNH ================= -->
+    <section class="pane" data-pane="main">
+      <div class="card">
+        <div class="card-head"><div class="ttl">Thông tin báo giá</div></div>
+        <div class="row3">
+          <div><label>Ngày</label><input type="text" inputmode="numeric" id="qDay" value="21" oninput="render()" onblur="padDateField('qDay')"></div>
+          <div><label>Tháng</label><input type="text" inputmode="numeric" id="qMonth" value="07" oninput="render()" onblur="padDateField('qMonth')"></div>
+          <div><label>Năm</label><input type="number" id="qYear" value="2026" oninput="render()"></div>
         </div>
-        <div>
-          <label>% TN chịu thuế tính trước <button type="button" class="edit-pencil" onclick="toggleGlobalPctLock('tn')" id="globalTnPctLockBtn">🔒 Sửa</button></label>
-          <input type="number" id="globalTnPct" value="6" step="0.1" disabled class="locked-amount" oninput="updateGlobalTnPct(this.value)">
+        <label>Mã số báo giá</label>
+        <div class="inline-input">
+          <input type="text" id="quoteCode" value="" oninput="onQuoteCodeManualEdit()">
+          <button type="button" class="btn-g icon-btn" title="Đặt lại tự động theo ngày tháng năm" onclick="resetQuoteCodeToAuto()">↺ Tự động</button>
+        </div>
+        <label class="req-label">Loại báo giá <span class="req">*</span> <span class="muted">(bắt buộc khi lưu)</span></label>
+        <select id="quoteType" onchange="onQuoteTypeChange()"></select>
+        <div class="row2">
+          <div><label>Chủ đầu tư</label><input type="text" id="investorName" placeholder="Để trống = lấy theo Kính gửi"></div>
+          <div><label>Lĩnh vực</label><input type="text" id="fieldName" list="fieldList" placeholder="VD: Chuyển đổi số"><datalist id="fieldList"></datalist></div>
         </div>
       </div>
-      <p class="hint">Mặc định khóa để tránh sửa nhầm — bấm "🔒 Sửa" ở từng ô để mở khóa. Chỉ cần sửa 1 lần ở đây — tất cả bảng "Tổng hợp chi phí" của mọi hạng mục sẽ tự cập nhật theo, không sửa riêng từng hạng mục được nữa.</p>
-    </div>
 
-    <div class="settings-group">
-      <div class="settings-group-title with-lock">
-        <span>⚙ Bảng tỷ lệ % Chi phí quản lý (Cql) theo Chi phí chuyên gia (Ccg)</span>
-        <button type="button" class="edit-pencil" onclick="toggleCqlTiersLock()" id="cqlTiersLockBtn">🔒 Sửa</button>
-      </div>
-      <p class="hint">Phần mềm tự động chọn tỷ lệ Cql theo tổng Ccg của từng hạng mục dựa vào bảng này. Bảng này chỉ dùng để sửa khi quy định thay đổi — KHÔNG hiển thị trong báo giá xuất ra. Mặc định khóa, bấm "🔒 Sửa" để mở khóa chỉnh sửa.</p>
-      <div id="cqlTiersList"></div>
-      <button class="add-btn" onclick="addCqlTier()" id="cqlTiersAddBtn" disabled>+ Thêm bậc</button>
-    </div>
-
-    <h2>Dự toán chi tiết (theo hạng mục)</h2>
-    <p class="hint">Tạo các hạng mục dự toán chi tiết ở đây trước — mỗi hạng mục là 1 tab, tự tính tổng. Tên hạng mục đặt ở đây sẽ hiện đúng như vậy ở bảng báo giá chính.</p>
-    <div class="detail-tabs" id="detailTabs"></div>
-    <div class="detail-tab-body" id="detailTabBody"></div>
-
-    <h2>Hạng mục báo giá</h2>
-    <p class="hint">Chọn hạng mục từ Dự toán chi tiết ở trên — tên và giá dịch vụ tự lấy theo, không nhập tay ở đây.</p>
-    <div id="itemsContainer"></div>
-    <button class="add-btn" onclick="addGroup()">+ Thêm hạng mục</button>
-
-    <div class="checkbox-line">
-      <input type="checkbox" id="showVatBreakdown" onchange="render()">
-      <label style="margin:0;">Hiển thị chi tiết Trước VAT / VAT / Sau VAT ở bảng báo giá chính</label>
-    </div>
-    <p class="hint">Nếu bật: cột "Giá dịch vụ" được tách thành 3 cột Đơn giá trước VAT / VAT / Đơn giá sau VAT cho từng hạng mục. Khi đó nếu hạng mục có giảm giá, giảm giá được trừ ngay trên giá trị trước thuế (G), không trừ trên (G + GTGT) — tổng cộng cuối cùng không đổi.</p>
-
-    <div id="discountBlock">
-      <div class="checkbox-line">
-        <input type="checkbox" id="discountEnabled" checked onchange="render()">
-        <label style="margin:0;">Áp dụng giảm giá dịch vụ</label>
-      </div>
-      <div class="mode-toggle" style="margin:8px 0;">
-        <button type="button" id="discountModePctBtn" class="active" onclick="setDiscountMode('pct')">Theo %</button>
-        <button type="button" id="discountModeFixedBtn" onclick="setDiscountMode('fixed')">Số tiền cố định</button>
-      </div>
-      <div id="discountPctWrap">
-        <label>% giảm giá</label>
-        <input type="number" id="discountPct" value="15" step="0.1" oninput="render()">
-      </div>
-      <div id="discountFixedWrap" style="display:none;">
-        <label>Số tiền giảm giá cố định (đ)</label>
-        <input type="number" id="discountFixed" value="0" step="100000" oninput="render()">
-      </div>
-    </div>
-
-    <h2>Ghi chú cuối trang</h2>
-    <div id="notesContainer"></div>
-    <button class="add-btn" onclick="addNote()">+ Thêm ghi chú</button>
-    <label>Khoảng cách giữa các dòng ghi chú (px)</label>
-    <input type="number" id="bodyPMargin" value="6" step="1" min="0" max="16" oninput="render()">
-    <p class="hint">Áp dụng cho cả đoạn "Kính gửi" mở đầu và các dòng ghi chú cuối trang — giảm xuống nếu muốn phần ký tên dễ vừa trang hơn.</p>
-
-    <h2>Lời kết</h2>
-    <textarea class="autowrap" id="closingNote" rows="1">Mong nhận được sự hợp tác của Quý cơ quan</textarea>
-
-    <h2>Định dạng chữ</h2>
-    <p class="hint">Mỗi khối bên dưới chỉnh cỡ chữ riêng cho 1 phần của báo giá — độc lập hoàn toàn với nhau, tự do chỉnh để bố cục vừa 1 trang hoặc thoáng hơn tùy ý.</p>
-
-    <div class="settings-group">
-      <div class="settings-group-title">① Tiêu đề & nội dung báo giá chính (kính gửi, mở đầu, lời kết...)</div>
-      <label>Cỡ chữ tiêu đề "BÁO GIÁ" (px)</label>
-      <input type="number" id="titleSize" value="26" min="14" max="48" oninput="render()">
-      <label>Giãn cách chữ tiêu đề (em)</label>
-      <input type="number" id="titleSpacing" value="0.15" step="0.01" min="0" max="1" oninput="render()">
-      <div class="row2">
-        <div>
-          <label>Cỡ chữ nội dung (px)</label>
-          <input type="number" id="bodySize" value="13" min="9" max="20" oninput="render()">
-        </div>
-        <div>
-          <label>Giãn dòng nội dung</label>
-          <input type="number" id="bodyLine" value="1.7" step="0.05" min="1" max="3" oninput="render()">
+      <div class="card">
+        <div class="card-head"><div class="ttl">Bảng báo giá chính</div></div>
+        <div id="itemsContainer"></div>
+        <button class="add-btn" onclick="addGroup()">+ Thêm dòng vào báo giá chính</button>
+        <div class="opt-block">
+          <div id="discountBlock">
+            <div class="checkbox-line">
+              <input type="checkbox" id="discountEnabled" checked onchange="render()">
+              <label style="margin:0;">Áp dụng giảm giá dịch vụ</label>
+            </div>
+            <div class="mode-toggle" style="margin:8px 0;">
+              <button type="button" id="discountModePctBtn" class="active" onclick="setDiscountMode('pct')">Theo %</button>
+              <button type="button" id="discountModeFixedBtn" onclick="setDiscountMode('fixed')">Số tiền cố định</button>
+            </div>
+            <div id="discountPctWrap">
+              <label>% giảm giá</label>
+              <input type="number" id="discountPct" value="15" step="0.1" oninput="render()">
+            </div>
+            <div id="discountFixedWrap" style="display:none;">
+              <label>Số tiền giảm giá cố định (đ)</label>
+              <input type="number" id="discountFixed" value="0" step="100000" oninput="render()">
+            </div>
+          </div>
+          <div class="checkbox-line">
+            <input type="checkbox" id="showTotalRow" checked onchange="render()">
+            <label style="margin:0;">Hiển thị dòng Tổng cộng</label>
+          </div>
+          <div class="checkbox-line">
+            <input type="checkbox" id="showVatBreakdown" onchange="render()">
+            <label style="margin:0;">Hiển thị chi tiết Trước VAT / VAT / Sau VAT ở bảng báo giá chính</label>
+          </div>
         </div>
       </div>
-      <label>Giãn cách chữ nội dung (em)</label>
-      <input type="number" id="bodySpacing" value="0" step="0.005" min="0" max="0.2" oninput="render()">
-      <p class="hint">"Lời kết" luôn dùng chung cỡ chữ với nội dung báo giá chính ở trên — không có ô riêng.</p>
-    </div>
 
-    <div class="settings-group">
-      <div class="settings-group-title">② Bảng báo giá chính (danh mục hạng mục + tổng cộng)</div>
-      <div class="row2">
-        <div>
-          <label>Cỡ chữ (px)</label>
-          <input type="number" id="mainTableSize" value="12.5" step="0.5" min="8" max="18" oninput="render()">
+      <div class="card">
+        <div class="card-head"><div class="ttl">Nội dung soạn thảo</div></div>
+        <label>Kính gửi</label>
+        <textarea id="recipient">Trung tâm Truyền thông, Dữ liệu và Công nghệ số thành phố Hà Nội</textarea>
+        <label>Nội dung mở đầu (phần thay đổi theo từng báo giá)</label>
+        <textarea id="introPrefix">Theo yêu cầu của Quý Ban về việc báo giá thực hiện các dịch vụ tư vấn liên quan đến nhiệm vụ...</textarea>
+        <div class="fixed-clause-block">
+          <label>Câu dẫn cố định</label>
+          <div id="fixedClauseDisplay" class="fixed-clause-display" onclick="toggleFixedClauseEdit()">
+            <span id="fixedClauseText">Công ty cổ phần Công nghệ ITD Việt Nam xin gửi Quý khách hàng báo giá Dịch vụ theo yêu cầu, như sau:</span>
+            <button type="button" class="edit-pencil" onclick="event.stopPropagation(); toggleFixedClauseEdit();">✎ Sửa</button>
+          </div>
+          <textarea id="fixedClauseInput" style="display:none;" oninput="render()">Công ty cổ phần Công nghệ ITD Việt Nam xin gửi Quý khách hàng báo giá Dịch vụ theo yêu cầu, như sau:</textarea>
         </div>
-        <div>
-          <label>Giãn dòng</label>
-          <input type="number" id="mainTableLine" value="1.4" step="0.05" min="1" max="2.5" oninput="render()">
+        <label>Ghi chú cuối trang</label>
+        <div id="notesContainer"></div>
+        <button class="add-btn" onclick="addNote()">+ Thêm ghi chú</button>
+        <label>Lời kết</label>
+        <textarea class="autowrap" id="closingNote" rows="1">Mong nhận được sự hợp tác của Quý cơ quan</textarea>
+      </div>
+      <div class="pane-actions"><button type="button" class="btn-o" onclick="saveDefaults(['main'])">Lưu làm mặc định cho báo giá mới</button></div>
+    </section>
+
+    <!-- ================= ĐỊNH DẠNG ================= -->
+    <section class="pane" data-pane="format">
+      <div class="pane-title">
+        <div class="ttl-lg">Định dạng cỡ chữ &amp; trình bày</div>
+        <div class="pane-title-actions">
+          <button type="button" class="btn-g" onclick="applyDefaults(['format'])">Áp dụng cấu hình mặc định</button>
+          <button type="button" class="btn-f" onclick="saveDefaults(['format'])">Lưu làm mặc định</button>
         </div>
       </div>
-      <div class="row2">
-        <div>
-          <label>Khoảng cách trên/dưới từ đường kẻ đến chữ (px)</label>
-          <input type="number" id="mainTablePadY" value="7" step="1" min="1" max="16" oninput="render()">
+
+      <div class="settings-group">
+        <div class="settings-group-title">① Tiêu đề &amp; nội dung báo giá chính (kính gửi, mở đầu, lời kết...)</div>
+        <label>Cỡ chữ tiêu đề "BÁO GIÁ" (px)</label>
+        <input type="number" id="titleSize" value="26" min="14" max="48" oninput="render()">
+        <label>Giãn cách chữ tiêu đề (em)</label>
+        <input type="number" id="titleSpacing" value="0.15" step="0.01" min="0" max="1" oninput="render()">
+        <div class="row2">
+          <div><label>Cỡ chữ nội dung (px)</label><input type="number" id="bodySize" value="13" min="9" max="20" oninput="render()"></div>
+          <div><label>Giãn dòng nội dung</label><input type="number" id="bodyLine" value="1.7" step="0.05" min="1" max="3" oninput="render()"></div>
         </div>
-        <div>
-          <label>Khoảng cách trái/phải từ đường kẻ đến chữ (px)</label>
-          <input type="number" id="mainTablePadX" value="8" step="1" min="1" max="20" oninput="render()">
+        <div class="row2">
+          <div><label>Giãn cách chữ nội dung (em)</label><input type="number" id="bodySpacing" value="0" step="0.005" min="0" max="0.2" oninput="render()"></div>
+          <div><label>Khoảng cách giữa các dòng ghi chú (px)</label><input type="number" id="bodyPMargin" value="6" step="1" min="0" max="16" oninput="render()"></div>
         </div>
       </div>
-      <p class="hint">Giảm khoảng cách trên/dưới trong ô giúp bảng nhiều hạng mục co gọn lại, dễ vừa 1 trang hơn.</p>
-    </div>
 
-    <div class="settings-group">
-      <div class="settings-group-title">③ Bảng "Tổng hợp chi phí" (mỗi hạng mục)</div>
-      <div class="row2">
-        <div>
-          <label>Cỡ chữ (px)</label>
-          <input type="number" id="summaryTableSize" value="12.5" step="0.5" min="8" max="18" oninput="render()">
+      <div class="settings-group">
+        <div class="settings-group-title">② Bảng báo giá chính (danh mục hạng mục + tổng cộng)</div>
+        <div class="row2">
+          <div><label>Cỡ chữ (px)</label><input type="number" id="mainTableSize" value="12.5" step="0.5" min="8" max="18" oninput="render()"></div>
+          <div><label>Giãn dòng</label><input type="number" id="mainTableLine" value="1.4" step="0.05" min="1" max="2.5" oninput="render()"></div>
         </div>
-        <div>
-          <label>Giãn dòng</label>
-          <input type="number" id="summaryTableLine" value="1.4" step="0.05" min="1" max="2.5" oninput="render()">
+        <div class="row2">
+          <div><label>Khoảng cách trên/dưới từ đường kẻ đến chữ (px)</label><input type="number" id="mainTablePadY" value="7" step="1" min="1" max="16" oninput="render()"></div>
+          <div><label>Khoảng cách trái/phải từ đường kẻ đến chữ (px)</label><input type="number" id="mainTablePadX" value="8" step="1" min="1" max="20" oninput="render()"></div>
+        </div>
+        <div class="tbl-style" data-key="main"></div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">③ Bảng "Tổng hợp chi phí" (mỗi hạng mục)</div>
+        <div class="row2">
+          <div><label>Cỡ chữ (px)</label><input type="number" id="summaryTableSize" value="12.5" step="0.5" min="8" max="18" oninput="render()"></div>
+          <div><label>Giãn dòng</label><input type="number" id="summaryTableLine" value="1.4" step="0.05" min="1" max="2.5" oninput="render()"></div>
+        </div>
+        <div class="tbl-style" data-key="summary"></div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">④ Bảng "Diễn giải chi phí chuyên gia"</div>
+        <div class="row2">
+          <div><label>Cỡ chữ (px)</label><input type="number" id="expertTableSize" value="12" step="0.5" min="8" max="18" oninput="render()"></div>
+          <div><label>Giãn dòng</label><input type="number" id="expertTableLine" value="1.4" step="0.05" min="1" max="2.5" oninput="render()"></div>
+        </div>
+        <div class="tbl-style" data-key="expert"></div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">⑤ Bảng "Diễn giải chi phí khác"</div>
+        <div class="row2">
+          <div><label>Cỡ chữ (px)</label><input type="number" id="otherTableSize" value="12" step="0.5" min="8" max="18" oninput="render()"></div>
+          <div><label>Giãn dòng</label><input type="number" id="otherTableLine" value="1.4" step="0.05" min="1" max="2.5" oninput="render()"></div>
+        </div>
+        <div class="tbl-style" data-key="other"></div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">⑥ Bảng lương chuyên gia (trang riêng cuối báo giá)</div>
+        <div class="row2">
+          <div><label>Cỡ chữ (px)</label><input type="number" id="salaryTableSize" value="12" step="0.5" min="8" max="18" oninput="render()"></div>
+          <div><label>Giãn dòng</label><input type="number" id="salaryTableLine" value="1.4" step="0.05" min="1" max="2.5" oninput="render()"></div>
+        </div>
+        <div class="tbl-style" data-key="salary"></div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">⑦ Ngày tháng &amp; tên công ty (dòng ký tên cuối báo giá)</div>
+        <div class="row2">
+          <div><label>Cỡ chữ dòng ngày tháng năm (px)</label><input type="number" id="dateSize" value="13" step="0.5" min="8" max="20" oninput="render()"></div>
+          <div><label>Cỡ chữ dòng tên công ty (px)</label><input type="number" id="companySignSize" value="13" step="0.5" min="8" max="20" oninput="render()"></div>
+        </div>
+        <label>Khoảng cách từ "Lời kết" đến phần ký tên (px)</label>
+        <input type="number" id="signGapTop" value="20" step="2" min="0" max="60" oninput="render()">
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">⑧ Chân trang (mọi trang)</div>
+        <div class="row2">
+          <div><label>Khoảng cách dải chân trang tới mép dưới (cm)</label><input type="number" id="footerOffsetCm" value="1" step="0.1" min="0.3" max="3" oninput="render()"></div>
+          <div style="display:flex;align-items:flex-end;"><div class="checkbox-line"><input type="checkbox" id="showPageNumber" checked onchange="render()"><label style="margin:0;">Số trang ở giữa dải chân trang (Trang x / y)</label></div></div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="settings-group">
-      <div class="settings-group-title">④ Bảng "Diễn giải chi phí chuyên gia"</div>
-      <div class="row2">
-        <div>
-          <label>Cỡ chữ (px)</label>
-          <input type="number" id="expertTableSize" value="12" step="0.5" min="8" max="18" oninput="render()">
-        </div>
-        <div>
-          <label>Giãn dòng</label>
-          <input type="number" id="expertTableLine" value="1.4" step="0.05" min="1" max="2.5" oninput="render()">
+    <!-- ================= THAM SỐ & THIẾT LẬP ================= -->
+    <section class="pane" data-pane="params">
+      <div class="pane-title">
+        <div class="ttl-lg">Tham số &amp; thiết lập chung</div>
+        <div class="pane-title-actions">
+          <button type="button" class="btn-g" onclick="applyDefaults(null)">Áp dụng mặc định vào báo giá này</button>
+          <button type="button" class="btn-f" onclick="saveDefaults(null)">Lưu tất cả làm mặc định</button>
         </div>
       </div>
-    </div>
 
-    <div class="settings-group">
-      <div class="settings-group-title">⑤ Bảng "Diễn giải chi phí khác"</div>
-      <div class="row2">
-        <div>
-          <label>Cỡ chữ (px)</label>
-          <input type="number" id="otherTableSize" value="12" step="0.5" min="8" max="18" oninput="render()">
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Thuế GTGT &amp; Thu nhập chịu thuế tính trước</span>
+          <span class="head-actions">
+            <span id="overrideCountChip"></span>
+            <button type="button" class="btn-def" onclick="saveDefaults(['vatTn'])">Lưu làm mặc định</button>
+            <button type="button" class="edit-pencil" onclick="toggleGlobalPctLock('vat')" id="globalVatPctLockBtn">🔒 Sửa</button>
+          </span>
         </div>
-        <div>
-          <label>Giãn dòng</label>
-          <input type="number" id="otherTableLine" value="1.4" step="0.05" min="1" max="2.5" oninput="render()">
+        <div class="row2">
+          <div>
+            <label>% VAT (thuế GTGT)</label>
+            <input type="number" id="globalVatPct" value="8" step="0.1" disabled class="locked-amount" oninput="updateGlobalVatPct(this.value)">
+          </div>
+          <div>
+            <label>% TN chịu thuế tính trước <button type="button" class="edit-pencil" onclick="toggleGlobalPctLock('tn')" id="globalTnPctLockBtn">🔒 Sửa</button></label>
+            <input type="number" id="globalTnPct" value="6" step="0.1" disabled class="locked-amount" oninput="updateGlobalTnPct(this.value)">
+          </div>
+        </div>
+        <label class="sync-box" id="syncBox">
+          <input type="checkbox" id="syncAllPcts" onchange="toggleSyncAll(this.checked)">
+          <span><strong>Áp dụng đồng bộ cho tất cả hạng mục</strong> — mọi hạng mục (kể cả hạng mục đã “Sửa tỉ lệ” riêng) dùng đúng % VAT, % TN ở trên và % Cql theo bảng bên dưới.</span>
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Bảng tỷ lệ % Chi phí quản lý (Cql) theo Chi phí chuyên gia (Ccg)</span>
+          <span class="head-actions">
+            <button type="button" class="btn-def" onclick="saveDefaults(['cqlTiers'])">Lưu làm mặc định</button>
+            <button type="button" class="edit-pencil" onclick="toggleCqlTiersLock()" id="cqlTiersLockBtn">🔒 Sửa</button>
+          </span>
+        </div>
+        <div id="cqlTiersList"></div>
+        <button class="add-btn" onclick="addCqlTier()" id="cqlTiersAddBtn" disabled>+ Thêm bậc</button>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Bảng lương chuyên gia</span>
+          <span class="head-actions">
+            <span id="salaryDefaultChip"></span>
+            <button type="button" class="btn-def" onclick="saveDefaults(['salaryTable'])">Lưu làm mặc định</button>
+          </span>
+        </div>
+        <label>Thông tư áp dụng</label>
+        <input type="text" id="circularName" value="Thông tư 004/2025/TT-BNV" oninput="updateSalaryMeta('circularName', this.value)">
+        <label>Số ngày công quy đổi/tháng</label>
+        <input type="number" id="workDaysPerMonth" value="26" oninput="updateSalaryMeta('workDaysPerMonth', this.value)" onblur="refreshAfterSalaryEdit()">
+        <label>Các mức lương</label>
+        <div id="salaryLevels"></div>
+        <button class="add-btn" onclick="addSalaryLevel()">+ Thêm mức lương</button>
+        <div class="checkbox-line" style="margin-top:8px;gap:8px;">
+          <button type="button" class="btn-g" onclick="exportSalaryTemplate()">Tải file mẫu (Excel)</button>
+          <button type="button" class="btn-g" onclick="importSalaryExcel()">Nhập từ Excel</button>
         </div>
       </div>
-    </div>
 
-    <div class="settings-group">
-      <div class="settings-group-title">⑥ Bảng lương chuyên gia (trang riêng cuối báo giá)</div>
-      <div class="row2">
-        <div>
-          <label>Cỡ chữ (px)</label>
-          <input type="number" id="salaryTableSize" value="12" step="0.5" min="8" max="18" oninput="render()">
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Danh mục loại báo giá</span>
+          <span class="head-actions"><button type="button" class="btn-def" onclick="saveDefaults(['types'])">Lưu làm mặc định</button></span>
         </div>
-        <div>
-          <label>Giãn dòng</label>
-          <input type="number" id="salaryTableLine" value="1.4" step="0.05" min="1" max="2.5" oninput="render()">
+        <div id="typesList" class="chips-wrap"></div>
+        <div class="inline-input" style="margin-top:8px;">
+          <input type="text" id="newTypeInput" placeholder="Tên loại báo giá mới...">
+          <button type="button" class="btn-o" onclick="addQuoteType()">+ Thêm loại</button>
         </div>
       </div>
-    </div>
 
-    <div class="settings-group">
-      <div class="settings-group-title">⑦ Ngày tháng & tên công ty (dòng ký tên cuối báo giá)</div>
-      <div class="row2">
-        <div>
-          <label>Cỡ chữ dòng ngày tháng năm (px)</label>
-          <input type="number" id="dateSize" value="13" step="0.5" min="8" max="20" oninput="render()">
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Thông tin công ty</span>
+          <span class="head-actions"><button type="button" class="btn-def" onclick="saveDefaults(['company'])">Lưu làm mặc định</button></span>
         </div>
-        <div>
-          <label>Cỡ chữ dòng tên công ty (px)</label>
-          <input type="number" id="companySignSize" value="13" step="0.5" min="8" max="20" oninput="render()">
+        <label>Tên công ty</label>
+        <input type="text" id="companyName" value="Công ty cổ phần Công nghệ ITD Việt Nam">
+        <label>Địa chỉ</label>
+        <textarea id="companyAddr">Số 1, ngõ 30 đường Lý Sơn, tổ 29, phường Việt Hưng, Hà Nội, Việt Nam</textarea>
+        <div class="row2">
+          <div><label>Điện thoại</label><input type="text" id="companyPhone" value="+84 969953355"></div>
+          <div><label>Email</label><input type="text" id="companyEmail" value="itdvietnam.jsc83@gmail.com"></div>
         </div>
       </div>
-      <label>Khoảng cách từ "Lời kết" đến phần ký tên (px)</label>
-      <input type="number" id="signGapTop" value="20" step="2" min="0" max="60" oninput="render()">
-      <p class="hint">Giảm số này nếu muốn "Lời kết" và phần ký tên (ngày tháng năm + tên công ty) sát nhau hơn — giúp cả khối dễ vừa 1 trang hơn khi báo giá có nhiều hạng mục.</p>
-    </div>
 
-    <div class="export-buttons">
-      <button onclick="exportExcel()">Xuất Excel</button>
-      <button class="secondary" onclick="exportWord()">Xuất Word</button>
-    </div>
-    <div class="export-buttons">
-      <button class="secondary" onclick="window.print()" style="width:100%;">🖨️ In / Xuất PDF</button>
-    </div>
-    <p class="hint">File Excel/Word sẽ được lưu vào thư mục anh chọn khi bấm xuất. Bản Word/Excel/PDF đều bao gồm đầy đủ trang báo giá chính, các trang dự toán chi tiết và bảng lương chuyên gia — tự động phân trang đúng khổ A4.</p>
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Logo &amp; chân trang</span>
+          <span class="head-actions"><button type="button" class="btn-def" onclick="saveDefaults(['logo'])">Lưu làm mặc định</button></span>
+        </div>
+        <label>Logo công ty (PNG/JPG/SVG)</label>
+        <input type="file" id="logoUpload" accept="image/*" onchange="handleLogoUpload(this.files[0])">
+        <p class="hint" id="logoUploadHint">Đang dùng logo mặc định ITD Việt Nam.</p>
+        <div class="checkbox-line" style="margin-top:4px;">
+          <button type="button" class="btn-g" onclick="resetLogoToDefault()">↺ Khôi phục logo mặc định</button>
+        </div>
+        <div class="checkbox-line">
+          <input type="checkbox" id="showHeaderLogo" checked onchange="render()">
+          <label style="margin:0;">Hiển thị logo ở đầu trang (cạnh tiêu đề BÁO GIÁ)</label>
+        </div>
+        <div class="checkbox-line">
+          <input type="checkbox" id="showFooterLogo" checked onchange="render()">
+          <label style="margin:0;">Hiển thị logo ở chân trang (mọi trang)</label>
+        </div>
+        <label>Chữ hiển thị ở chân trang</label>
+        <input type="text" id="footerCaptionInput" placeholder="Để trống = tự lấy theo Tên công ty" oninput="render()">
+      </div>
 
-    <h2>Lưu / Mở báo giá</h2>
-    <div class="export-buttons">
-      <button onclick="saveQuoteFile()">💾 Lưu báo giá (.json)</button>
-      <button class="secondary" onclick="openQuoteFile()">📂 Mở báo giá</button>
-    </div>
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Tên công ty ký tên (khóa bằng mật khẩu)</span>
+          <span class="head-actions"><button type="button" class="btn-def" onclick="saveDefaults(['sign'])">Lưu làm mặc định</button></span>
+        </div>
+        <div id="signNameDisplay" class="fixed-clause-display" onclick="toggleSignNameEdit()">
+          <span id="signNameText">Công ty cổ phần Công nghệ ITD Việt Nam</span>
+          <button type="button" class="edit-pencil" onclick="event.stopPropagation(); toggleSignNameEdit();">🔒 Sửa</button>
+        </div>
+        <input type="text" id="signNameInput" style="display:none;" oninput="render()">
+        <div class="checkbox-line" style="margin-top:6px;">
+          <button type="button" class="btn-g" onclick="changeEditPassword()">Đặt / đổi mật khẩu bảo vệ</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= QUẢN LÝ BÁO GIÁ ================= -->
+    <section class="pane" data-pane="registry">
+      <div id="registryRoot"></div>
+    </section>
+
     <input type="file" id="loadQuoteInput" accept=".json" style="display:none;" onchange="loadQuoteFile(this.files[0])">
-    <p class="hint">Lưu lại toàn bộ nội dung đang soạn (thông tin công ty, hạng mục, dự toán chi tiết, bảng lương...) thành 1 file — mở lại để sửa tiếp hoặc dùng làm mẫu cho báo giá khác.</p>
-
   </div>
 
-  <div class="preview-wrap">
-    <div id="allPages">
-      <div id="sheet"></div>
-      <div id="extraPages"></div>
+  <div class="preview-col" id="previewCol">
+    <div class="preview-toolbar">
+      <div class="pt-title">Xem trước</div>
+      <button type="button" class="zbtn" onclick="zoomPreview(-0.05)" title="Thu nhỏ">−</button>
+      <div class="zlabel" id="zoomLabel">75%</div>
+      <button type="button" class="zbtn" onclick="zoomPreview(0.05)" title="Phóng to">+</button>
+      <span class="pt-sep"></span>
+      <button type="button" class="lbtn" data-layout="default" onclick="setLayout('default')">Cân bằng</button>
+      <button type="button" class="lbtn" data-layout="wide" onclick="setLayout('wide')">Soạn thảo rộng</button>
+      <button type="button" class="lbtn" data-layout="preview" onclick="setLayout('preview')">Xem trước rộng</button>
+      <button type="button" class="lbtn" data-layout="editor-only" onclick="setLayout('editor-only')">Chỉ soạn thảo</button>
+    </div>
+    <div class="preview-wrap">
+      <div id="zoomWrap">
+        <div id="allPages">
+          <div id="sheet"></div>
+          <div id="extraPages"></div>
+        </div>
+      </div>
     </div>
   </div>
+  <button type="button" class="preview-restore" id="previewRestore" onclick="setLayout('default')">Hiện xem trước</button>
 </div>
+
+<div id="modalRoot"></div>
+<div id="toast" class="toast"></div>
+<div id="reportPrint"></div>
+
 
 <script>
 const LOGO_DATA_URI = "data:image/png;base64,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";
@@ -1137,6 +1454,35 @@ let cqlTiers = [
 // sửa 1 lần ở đây (xem updateGlobalVatPct/updateGlobalTnPct), không sửa riêng từng hạng mục.
 let globalVatPct = 8;
 let globalTnPct = 6;
+// ---- Trạng thái giao diện mới ----
+let activeMainTab = 'items';
+let activeSubTab = 'summary';
+let ratioEditing = false;
+let confirmDeleteSheet = false;
+let rowModal = null;
+let syncAllPcts = false;
+let quoteType = '';
+let typeMissingFlag = false;
+let quoteTypes = ['Tư vấn lập dự án / BCKTKT', 'Tư vấn đấu thầu (HSMT, đánh giá HSDT)', 'Thẩm tra, thẩm định', 'Khảo sát, lập đề cương – dự toán',
+  'Phát triển phần mềm', 'Cung cấp thiết bị, bản quyền', 'Đào tạo, chuyển giao', 'Bảo trì, hỗ trợ kỹ thuật'];
+let quoteUid = 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+let currentFilePath = '';
+let quoteLoadedFromFile = false;
+let tableStyles = {
+  main: { font:'Times New Roman', zebra:false, headBold:true },
+  summary: { font:'Times New Roman', zebra:false, headBold:true },
+  expert: { font:'Times New Roman', zebra:false, headBold:true },
+  other: { font:'Times New Roman', zebra:false, headBold:true },
+  salary: { font:'Times New Roman', zebra:false, headBold:true },
+};
+let previewZoom = 0.75;
+let currentLayout = 'default';
+let appDefaults = {};
+let registry = [];
+const _now = new Date();
+let regFilter = { ptype:'year', y:_now.getFullYear(), qt:Math.ceil((_now.getMonth()+1)/3), m:_now.getMonth()+1,
+  from:_now.getFullYear()+'-01-01', to:_now.getFullYear()+'-12-31', type:'all', investor:'all', field:'all', text:'', group:'none' };
+let regOpen = {};
 // Cac o so lieu it thay doi (VAT/TN chung, bang ty le Cql) mac dinh khoa/mo, tranh sua nham —
 // bam nut but chi "Sua" o tung o/bang de mo khoa (khong dat mat khau, chi la khoa tam thoi
 // trong phien lam viec — xem toggleGlobalPctLock/toggleCqlTiersLock).
@@ -1316,13 +1662,13 @@ function resolveCqlPct(ccg){
 // ---- Thuế GTGT (VAT) & Thu nhập chịu thuế tính trước (TN) — sửa 1 lần, áp dụng chung ----
 function updateGlobalVatPct(val){
   globalVatPct = parseFloat(val) || 0;
-  detailSheets.forEach(s => { s.vatPct = globalVatPct; });
+  syncSheetPcts();
   renderDetailSheets();
   render();
 }
 function updateGlobalTnPct(val){
   globalTnPct = parseFloat(val) || 0;
-  detailSheets.forEach(s => { s.tnPct = globalTnPct; });
+  syncSheetPcts();
   renderDetailSheets();
   render();
 }
@@ -1426,7 +1772,9 @@ function computeDetailTotal(sheet){
   const Ck = sheet.ckMode==='lumpsum'
     ? (sheet.ckLumpsum||0)
     : sheet.otherRows.reduce((s,r)=> s + (r.quantity||0)*(r.unitPrice||0), 0);
-  const cqlPct = resolveCqlPct(Ccg);
+  // % Cql tự chọn theo bảng tỷ lệ dựa trên Ccg — trừ khi hạng mục được "Sửa tỉ lệ" riêng (cqlPctOverride).
+  const autoCqlPct = resolveCqlPct(Ccg);
+  const cqlPct = (sheet.cqlPctOverride != null && sheet.cqlPctOverride !== '') ? (parseFloat(sheet.cqlPctOverride) || 0) : autoCqlPct;
   const Cql = Ccg * cqlPct / 100;
   const TN = (Ccg + Cql + Ck) * (sheet.tnPct||0) / 100;
   const G = Ccg + Cql + Ck + TN;
@@ -1459,7 +1807,7 @@ function computeDetailTotal(sheet){
   // (áp dụng luôn cả khi TẮT "Áp dụng làm tròn tổng cộng", vì unit khi đó = 1 đồng).
   const mainVatBase = modeFn(mainVatBaseRaw / unit) * unit;
   const mainVatAmount = roundedTotal - mainVatBase;
-  return { Ccg, Ck, Cql, cqlPct, TN, G, VAT, beforeDiscount, discount, total, roundedTotal, roundEnabled, mainVatBase, mainVatAmount };
+  return { Ccg, Ck, Cql, cqlPct, autoCqlPct, TN, G, VAT, beforeDiscount, discount, total, roundedTotal, roundEnabled, mainVatBase, mainVatAmount };
 }
 
 // ---- Bảng lương dùng chung ----
@@ -1512,7 +1860,9 @@ function addDetailSheet(){
     otherRows:[{desc:'', unit:'', quantity:0, unitPrice:0}],
     tnPct:globalTnPct, vatPct:globalVatPct, roundingUnit:100000, roundingMode:'floor', roundEnabled:true, discountEnabled:false, discountPct:0, discountMode:'pct', discountFixed:0 });
   activeDetailTab = id;
+  activeSubTab = 'summary';
   renderDetailSheets();
+  renderItems();
   render();
 }
 function removeDetailSheet(id){
@@ -1528,6 +1878,9 @@ function removeDetailSheet(id){
 }
 function switchDetailTab(id){
   activeDetailTab = id;
+  ratioEditing = false;
+  confirmDeleteSheet = false;
+  rowModal = null;
   renderDetailSheets();
 }
 function updateDetailName(id, val){
@@ -1690,179 +2043,6 @@ function setDetailDiscountMode(id, m){
   s.discountMode = m;
   renderDetailSheets();
   render();
-}
-
-function renderDetailSheets(){
-  const tabsC = document.getElementById('detailTabs');
-  const bodyC = document.getElementById('detailTabBody');
-  if (!tabsC) return;
-  tabsC.innerHTML = detailSheets.map(s => `
-    <button type="button" class="detail-tab ${s.id===activeDetailTab?'active':''}" onclick="switchDetailTab('${s.id}')" title="${(s.note||'').replace(/"/g,'&quot;')}">${s.name || '(chưa đặt tên)'}${s.note ? ` <span style="opacity:.6;font-weight:normal;">(${s.note.replace(/</g,'&lt;')})</span>` : ''}</button>
-  `).join('') + `<button type="button" class="detail-tab-add" onclick="addDetailSheet()">+</button>`;
-
-  const s = detailSheets.find(s=>s.id===activeDetailTab);
-  if (!s){ bodyC.innerHTML=''; return; }
-  const t = computeDetailTotal(s);
-  const levelOptions = (selId) => salaryTable.levels.map(l=>`<option value="${l.id}" ${l.id===selId?'selected':''}>${l.name} (${fmt(dailyRate(l.id))}đ/ngày)</option>`).join('');
-
-  bodyC.innerHTML = `
-    <label>Tên hạng mục (sẽ hiện đúng tên này ở bảng báo giá chính)</label>
-    <textarea class="autowrap" rows="1" oninput="updateDetailName('${s.id}', this.value)" onblur="refreshAfterDetailNameEdit()">${s.name.replace(/</g,'&lt;')}</textarea>
-
-    <label>Ghi chú nội bộ (chỉ để bạn phân biệt các hạng mục trùng tên khi chọn — KHÔNG in ra báo giá/PDF/Word/Excel)</label>
-    <textarea class="autowrap" rows="1" placeholder="Ví dụ: đối với hạ tầng phần cứng" oninput="updateDetailNote('${s.id}', this.value)" onblur="refreshAfterDetailNoteEdit()">${(s.note||'').replace(/</g,'&lt;')}</textarea>
-
-    <label class="section-label">1. Chi phí chuyên gia (Ccg)</label>
-    <div class="mode-toggle" style="margin-bottom:8px;">
-      <button type="button" class="${s.ccgMode==='linked'?'active':''}" onclick="setCcgMode('${s.id}','linked')">Link từ diễn giải</button>
-      <button type="button" class="${s.ccgMode==='lumpsum'?'active':''}" onclick="setCcgMode('${s.id}','lumpsum')">Trọn gói (nhập số)</button>
-    </div>
-    ${s.ccgMode==='lumpsum' ? `
-      <label>Số tiền Ccg trọn gói</label>
-      <input type="number" value="${s.ccgLumpsum}" oninput="updateCcgLumpsum('${s.id}', this.value)">
-    ` : `
-      ${(() => {
-        const nums = computeExpertRowNumbers(s.expertRows);
-        const analysis = analyzeExpertRows(s.expertRows);
-        return s.expertRows.map((r,idx)=>{
-          const a = analysis[idx];
-          const d = r.depth || 0;
-          const maxD = maxAllowedExpertDepth(s.expertRows, idx);
-          return `
-        <div class="item-row" style="${d>0 ? `margin-left:${d*20}px; border-left:3px solid var(--accent);` : ''}">
-          ${s.expertRows.length>1 ? `<button class="del" onclick="removeExpertRow('${s.id}', ${idx})">✕</button>` : ''}
-          <div class="row-stt">STT ${nums[idx]} · Cấp ${d+1}</div>
-          <textarea class="autowrap" rows="1" placeholder="Nội dung công việc" oninput="updateExpertRow('${s.id}', ${idx}, 'desc', this.value)">${(r.desc||'').replace(/</g,'&lt;')}</textarea>
-          ${a.hasChildren ? `
-            <div class="row-subtotal" style="color:var(--accent);font-weight:bold;margin-top:6px;">Tổng công việc con: ${fmt(a.childrenTotal)} đ (tự động — các mức chuyên gia bị khóa)</div>
-          ` : `
-            <div class="hint" style="margin-top:6px;margin-bottom:2px;">Các mức chuyên gia tham gia công việc này:</div>
-            ${r.levels.map((lv,li)=>`
-              <div class="row3" style="margin-top:4px;">
-                <select onchange="updateExpertLevel('${s.id}', ${idx}, ${li}, 'levelId', this.value)">${levelOptions(lv.levelId)}</select>
-                <input type="number" placeholder="Số người" value="${lv.quantity}" oninput="updateExpertLevel('${s.id}', ${idx}, ${li}, 'quantity', this.value)" onblur="refreshDetailRowSubtotals()">
-                <input type="number" placeholder="Ngày công" value="${lv.days}" oninput="updateExpertLevel('${s.id}', ${idx}, ${li}, 'days', this.value)" onblur="refreshDetailRowSubtotals()">
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
-                <div class="row-subtotal" style="margin:0;">= ${fmt(dailyRate(lv.levelId) * (lv.quantity||0) * (lv.days||0))} đ</div>
-                ${r.levels.length>1 ? `<button class="del" style="position:static;font-size:11px;" onclick="removeExpertLevel('${s.id}', ${idx}, ${li})">✕ Bỏ mức này</button>` : ''}
-              </div>
-            `).join('')}
-            <button class="add-btn" style="margin-top:6px;font-size:10px;padding:4px;" onclick="addExpertLevel('${s.id}', ${idx})">+ Thêm mức chuyên gia khác cho công việc này</button>
-            <div class="row-subtotal" style="font-weight:bold;margin-top:6px;">Tổng công việc: ${fmt(a.ownAmount)} đ</div>
-          `}
-          <div class="checkbox-line" style="margin-top:6px;gap:6px;">
-            ${d < maxD ? `<button type="button" class="add-btn" style="padding:3px 8px;font-size:10px;" onclick="indentExpertRow('${s.id}', ${idx})">⇥ Tăng cấp (thành con của dòng trên)</button>` : ''}
-            ${d > 0 ? `<button type="button" class="add-btn" style="padding:3px 8px;font-size:10px;" onclick="outdentExpertRow('${s.id}', ${idx})">⇤ Giảm cấp</button>` : ''}
-          </div>
-          <button class="add-btn" style="margin-top:6px;font-size:10px;padding:4px;" onclick="addExpertRowAfter('${s.id}', ${idx}, false)">+ Thêm sau (cùng cấp)</button>
-          <button class="add-btn" style="margin-top:3px;font-size:10px;padding:4px;" onclick="addExpertRowAfter('${s.id}', ${idx}, true)">+ Thêm dòng con sau</button>
-        </div>`;
-        }).join('');
-      })()}
-      <button class="add-btn" onclick="addExpertRow('${s.id}')">+ Thêm công việc chuyên gia (cuối)</button>
-      <p class="hint">Hỗ trợ nhiều cấp lồng nhau (cấp 1, cấp 1.1, cấp 1.1.1...) — dòng nào có dòng con sẽ tự động hiện TỔNG các dòng con ngay bên dưới nó, dùng nút "Tăng cấp"/"Giảm cấp" để sắp xếp.</p>
-      <div class="checkbox-line" style="margin-top:8px;gap:8px;">
-        <button type="button" class="add-btn" style="padding:4px 8px;font-size:10px;" onclick="exportExpertTemplate()">⬇️ Tải file mẫu (Excel)</button>
-        <button type="button" class="add-btn" style="padding:4px 8px;font-size:10px;" onclick="importExpertExcel('${s.id}')">⬆️ Nhập từ Excel</button>
-      </div>
-      <p class="hint">Nhập từ Excel sẽ THAY THẾ toàn bộ danh sách công việc chuyên gia của hạng mục này. Tải file mẫu để biết đúng cấu trúc cột (Mức chuyên gia phải trùng tên với Bảng lương chuyên gia ở trên).</p>
-    `}
-
-    <label class="section-label">2. Chi phí khác (Ck)</label>
-    <div class="mode-toggle" style="margin-bottom:8px;">
-      <button type="button" class="${s.ckMode==='linked'?'active':''}" onclick="setCkMode('${s.id}','linked')">Link từ diễn giải</button>
-      <button type="button" class="${s.ckMode==='lumpsum'?'active':''}" onclick="setCkMode('${s.id}','lumpsum')">Trọn gói (nhập số)</button>
-    </div>
-    ${s.ckMode==='lumpsum' ? `
-      <label>Số tiền Ck trọn gói</label>
-      <input type="number" value="${s.ckLumpsum}" oninput="updateCkLumpsum('${s.id}', this.value)">
-    ` : `
-      ${(() => { const nums2 = computeRowNumbers(s.otherRows); return s.otherRows.map((r,idx)=>`
-        <div class="item-row" style="${r.isSub ? 'margin-left:20px; border-left:3px solid var(--accent);' : ''}">
-          ${s.otherRows.length>1 ? `<button class="del" onclick="removeOtherRow('${s.id}', ${idx})">✕</button>` : ''}
-          <div class="row-stt">STT ${nums2[idx]}</div>
-          <textarea class="autowrap" rows="1" placeholder="Vật tư, vật liệu" oninput="updateOtherRow('${s.id}', ${idx}, 'desc', this.value)">${(r.desc||'').replace(/</g,'&lt;')}</textarea>
-          <div class="row3" style="margin-top:6px;">
-            <input type="text" placeholder="Đơn vị" value="${(r.unit||'').replace(/"/g,'&quot;')}" oninput="updateOtherRow('${s.id}', ${idx}, 'unit', this.value)">
-            <input type="number" placeholder="Khối lượng" value="${r.quantity}" oninput="updateOtherRow('${s.id}', ${idx}, 'quantity', this.value)" onblur="refreshDetailRowSubtotals()">
-            <input type="number" placeholder="Đơn giá" value="${r.unitPrice}" oninput="updateOtherRow('${s.id}', ${idx}, 'unitPrice', this.value)" onblur="refreshDetailRowSubtotals()">
-          </div>
-          <div class="row-subtotal">= ${fmt((r.quantity||0)*(r.unitPrice||0))} đ</div>
-          ${idx>0 ? `<label class="checkbox-line" style="margin-top:6px;"><input type="checkbox" ${r.isSub?'checked':''} onchange="updateOtherRow('${s.id}', ${idx}, 'isSub', this.checked)"><span style="font-size:11px;">Là dòng con của dòng phía trên</span></label>` : ''}
-        </div>
-      `).join(''); })()}
-      <button class="add-btn" onclick="addOtherRow('${s.id}')">+ Thêm chi phí khác</button>
-      <button class="add-btn" onclick="addOtherRow('${s.id}', true)">+ Thêm dòng con</button>
-      <div class="checkbox-line" style="margin-top:8px;gap:8px;">
-        <button type="button" class="add-btn" style="padding:4px 8px;font-size:10px;" onclick="exportOtherCostsTemplate()">⬇️ Tải file mẫu (Excel)</button>
-        <button type="button" class="add-btn" style="padding:4px 8px;font-size:10px;" onclick="importOtherCostsExcel('${s.id}')">⬆️ Nhập từ Excel</button>
-      </div>
-      <p class="hint">Nhập từ Excel sẽ THAY THẾ toàn bộ danh sách chi phí khác của hạng mục này.</p>
-    `}
-
-    <label class="section-label">3. Tỷ lệ tính toán</label>
-    <div class="row3">
-      <div><label>% Cql / Ccg (tự động)</label><input type="number" value="${t.cqlPct}" disabled class="locked-amount"></div>
-      <div><label>% TN chịu thuế (chung)</label><input type="number" value="${s.tnPct}" disabled class="locked-amount"></div>
-      <div><label>% VAT (chung)</label><input type="number" value="${s.vatPct}" disabled class="locked-amount"></div>
-    </div>
-    <p class="hint">% Cql tự động chọn theo Ccg = ${fmt(t.Ccg)}đ, dựa trên bảng tỷ lệ Chi phí chung ở mục "Bảng lương chuyên gia" phía trên. % TN và % VAT chỉnh chung cho tất cả hạng mục ở cùng mục đó — không sửa riêng từng hạng mục được.</p>
-    <div class="checkbox-line">
-      <input type="checkbox" ${s.roundEnabled!==false?'checked':''} onchange="toggleDetailRoundEnabled('${s.id}')">
-      <label style="margin:0;">Áp dụng làm tròn tổng cộng</label>
-    </div>
-    ${s.roundEnabled!==false ? `
-    <div class="row2">
-      <div>
-        <label>Làm tròn đến</label>
-        <select onchange="updateRoundingUnit('${s.id}', this.value)">
-          <option value="1" ${s.roundingUnit===1?'selected':''}>Không làm tròn</option>
-          <option value="100" ${s.roundingUnit===100?'selected':''}>Hàng trăm (100đ)</option>
-          <option value="1000" ${s.roundingUnit===1000?'selected':''}>Hàng nghìn (1.000đ)</option>
-          <option value="10000" ${s.roundingUnit===10000?'selected':''}>Hàng chục nghìn (10.000đ)</option>
-          <option value="100000" ${s.roundingUnit===100000?'selected':''}>Hàng trăm nghìn (100.000đ)</option>
-          <option value="1000000" ${s.roundingUnit===1000000?'selected':''}>Hàng triệu (1.000.000đ)</option>
-        </select>
-      </div>
-      <div>
-        <label>Kiểu làm tròn</label>
-        <select onchange="updateRoundingMode('${s.id}', this.value)">
-          <option value="floor" ${s.roundingMode==='floor'?'selected':''}>Làm tròn xuống</option>
-          <option value="nearest" ${s.roundingMode==='nearest'?'selected':''}>Làm tròn gần nhất</option>
-          <option value="ceil" ${s.roundingMode==='ceil'?'selected':''}>Làm tròn lên</option>
-        </select>
-      </div>
-    </div>
-    ` : ''}
-
-    <div class="checkbox-line">
-      <input type="checkbox" ${s.discountEnabled?'checked':''} onchange="toggleDetailDiscount('${s.id}')">
-      <label style="margin:0;">Áp dụng giảm giá cho hạng mục này</label>
-    </div>
-    ${s.discountEnabled ? `
-    <div class="mode-toggle" style="margin:8px 0;">
-      <button type="button" class="${s.discountMode!=='fixed'?'active':''}" onclick="setDetailDiscountMode('${s.id}', 'pct')">Theo %</button>
-      <button type="button" class="${s.discountMode==='fixed'?'active':''}" onclick="setDetailDiscountMode('${s.id}', 'fixed')">Số tiền cố định</button>
-    </div>
-    ${s.discountMode==='fixed'
-      ? `<label>Số tiền giảm giá cố định (đ)</label><input type="number" value="${s.discountFixed||0}" step="100000" oninput="updateDetailDiscountFixed('${s.id}', this.value)">`
-      : `<label>% giảm giá</label><input type="number" value="${s.discountPct}" step="0.1" oninput="updateDetailDiscountPct('${s.id}', this.value)">`}
-    ` : ''}
-
-    <div class="formula-breakdown">
-      <div>Ccg (chi phí chuyên gia)${s.ccgMode==='lumpsum'?' — trọn gói':''}: <strong>${fmt(t.Ccg)}</strong></div>
-      <div>Cql (${t.cqlPct}% × Ccg, tự động theo Ccg): <strong>${fmt(t.Cql)}</strong></div>
-      <div>Ck (chi phí khác)${s.ckMode==='lumpsum'?' — trọn gói':''}: <strong>${fmt(t.Ck)}</strong></div>
-      <div>TN (${s.tnPct}% × (Ccg+Cql+Ck)): <strong>${fmt(t.TN)}</strong></div>
-      <div>G = Ccg+Cql+Ck+TN: <strong>${fmt(t.G)}</strong></div>
-      <div>VAT (${s.vatPct}% × G): <strong>${fmt(t.VAT)}</strong></div>
-      ${s.discountEnabled ? `<div>Giảm giá (${s.discountMode==='fixed'?'số tiền cố định':(s.discountPct+'%')}): <strong>-${fmt(t.discount)}</strong></div>` : ''}
-    </div>
-    <div class="detail-total">Tổng cộng (G+GTGT${s.discountEnabled?' - giảm giá':''}): ${fmt(t.total)} VNĐ<br>${s.roundEnabled!==false ? 'Tổng cộng (làm tròn)' : 'Tổng cộng (không làm tròn)'} — số dùng ở báo giá chính: <strong>${fmt(t.roundedTotal)} VNĐ</strong></div>
-    ${detailSheets.length>1 ? `<button class="add-btn" style="border-color:#a33;color:#a33;" onclick="removeDetailSheet('${s.id}')">Xóa hạng mục này</button>` : ''}
-  `;
-  autoGrowAll();
 }
 
 // ==== Import / Export file mẫu Excel (chuyên gia / chi phí khác / bảng lương) ====
@@ -2076,23 +2256,13 @@ function changeEditPassword(){
   alert(editPassword ? 'Đã đổi mật khẩu bảo vệ.' : 'Đã bỏ bảo vệ mật khẩu cho mục này.');
 }
 
-function setLayout(mode){
-  const layout = document.querySelector('.layout');
-  layout.classList.remove('wide-editor','collapsed-preview');
-  const previewWrap = document.querySelector('.preview-wrap');
-  if (mode==='wide'){ layout.style.gridTemplateColumns='60% 40%'; }
-  else if (mode==='preview'){ layout.style.gridTemplateColumns='320px 1fr'; }
-  else if (mode==='editor-only'){ layout.style.gridTemplateColumns='1fr 0px'; previewWrap.style.display='none'; return; }
-  else { layout.style.gridTemplateColumns='400px 1fr'; }
-  previewWrap.style.display='';
-}
-
 function updatePageNumbers(){
-  const pages = document.querySelectorAll('.sheet');
+  const pages = document.querySelectorAll('#allPages .sheet');
+  const showEl = document.getElementById('showPageNumber');
+  const show = showEl ? showEl.checked : true;
   pages.forEach((page, i) => {
-    let pn = page.querySelector('.page-num-label');
-    if (!pn){ pn = document.createElement('div'); pn.className='page-num-label'; page.appendChild(pn); }
-    pn.textContent = `Trang ${i+1} / ${pages.length}`;
+    const bp = page.querySelector('.band-page');
+    if (bp) bp.textContent = show ? `Trang ${i+1} / ${pages.length}` : '';
   });
 }
 
@@ -2122,17 +2292,8 @@ function padDateField(id){
   render();
 }
 
-function setMode(m){
-  mode = m;
-  document.getElementById('btnSingle').classList.toggle('active', m==='single');
-  document.getElementById('btnMulti').classList.toggle('active', m==='multi');
-  document.getElementById('discountBlock').style.display = (m==='single') ? 'block' : 'none';
-  document.getElementById('modeHint').textContent = (m==='single')
-    ? 'Chỉ 1 hạng mục dịch vụ. Có thể bật/tắt giảm giá; nếu bật sẽ hiện dòng giảm giá + dòng Tổng cộng.'
-    : 'Nhiều hạng mục dịch vụ. Không có cột/dòng giảm giá và không có dòng Tổng cộng ở bảng chính — mỗi số tiền hạng mục coi như đã bao gồm giảm giá (nếu có) tính từ sheet dự toán chi tiết riêng.';
-  renderItems();
-  render();
-}
+// Đã bỏ "chế độ báo giá" (1 dịch vụ / nhiều dịch vụ): giảm giá và dòng Tổng cộng bật/tắt trực tiếp.
+function setMode(m){ mode = 'single'; }
 
 // Giam gia dich vu o bang bao gia chinh (mode 'single') - linh hoat theo % hoac so tien co dinh.
 let discountMode = 'pct';
@@ -2148,7 +2309,7 @@ function setDiscountMode(m){
 function addGroup(){
   const usedIds = quoteGroups.flatMap(g=>g.subItems.map(it=>it.detailId));
   const unused = detailSheets.find(s=>!usedIds.includes(s.id));
-  quoteGroups.push({ id:'g'+Date.now(), mainContent:'', showMain:false, sumSubItems:false, subItemsItalic:false, subItems:[{detailId: unused ? unused.id : detailSheets[0].id}] });
+  quoteGroups.push({ id:'g'+Date.now(), mainContent:'', showMain:false, sumSubItems:false, subItemsItalic:false, boldRows:false, inTotal:true, inDiscount:true, subItems:[{detailId: unused ? unused.id : detailSheets[0].id}] });
   renderItems();
   render();
 }
@@ -2199,59 +2360,40 @@ function totalLeafCount(){
 
 function renderItems(){
   const c = document.getElementById('itemsContainer');
-  c.innerHTML = '';
+  if (!c) return;
   const detailOptions = (selId) => detailSheets.map(s => {
     const t = computeDetailTotal(s);
     const noteSuffix = s.note ? ` (${s.note})` : '';
-    return `<option value="${s.id}" ${selId===s.id?'selected':''}>${(s.name||'(chưa đặt tên)')}${noteSuffix} — ${fmt(t.roundedTotal)} đ</option>`;
+    return `<option value="${s.id}" ${selId===s.id?'selected':''}>${esc(s.name||'(chưa đặt tên)')}${esc(noteSuffix)} — ${fmt(t.roundedTotal)} đ</option>`;
   }).join('');
-
   const groupNums = computeGroupNumbers(quoteGroups);
-
-  quoteGroups.forEach((g, gi) => {
+  c.innerHTML = quoteGroups.map((g, gi) => {
     const gn = groupNums[gi];
-    const div = document.createElement('div');
-    div.className = 'group-block';
-    div.innerHTML = `
-      <div class="group-header">
-        <strong>Hạng mục ${gn.mainNum != null ? gn.mainNum : (gi+1)}</strong>
-        ${quoteGroups.length>1 ? `<button class="del" onclick="removeGroup(${gi})">✕ Xóa hạng mục</button>` : ''}
+    const head = g.showMain ? `Dòng ${gn.mainNum} — dòng cha + ${g.subItems.length} dòng con` : `Dòng ${gn.subNums.join(', ')}`;
+    return `<div class="grp">
+      <div class="grp-head"><strong>${head}</strong>${quoteGroups.length>1 ? `<button type="button" class="del" onclick="removeGroup(${gi})">✕ Xoá</button>` : ''}</div>
+      <div class="checkbox-line" style="margin-top:0;"><input type="checkbox" ${g.showMain?'checked':''} onchange="toggleGroupShowMain(${gi})"><label style="margin:0;">Có dòng cha (nhóm nhiều hạng mục con, đánh số 1.1, 1.2…)</label></div>
+      ${g.showMain ? `<label>Nội dung dòng cha</label><textarea class="autowrap" rows="1" oninput="updateGroupContent(${gi}, this.value)">${esc(g.mainContent)}</textarea>` : ''}
+      ${g.subItems.map((it, si) => `<div class="grp-sub"><span class="num">${gn.subNums[si]}</span><select onchange="updateSubItemLink(${gi},${si}, this.value)">${detailOptions(it.detailId)}</select>${g.subItems.length>1 ? `<button type="button" class="del" title="Bỏ hạng mục này" onclick="removeSubItem(${gi},${si})">✕</button>` : ''}</div>`).join('')}
+      <button class="add-btn" style="margin-top:6px;padding:5px;font-size:12px;" onclick="addSubItem(${gi})">+ Thêm hạng mục${g.showMain?' con':''} vào dòng này</button>
+      <div class="grp-flags">
+        ${g.showMain ? `<span class="flag auto">Dòng cha in đậm tự động</span>
+          <label class="flag"><input type="checkbox" ${g.subItemsItalic?'checked':''} onchange="toggleGroupSubItemsItalic(${gi})"> In nghiêng dòng con</label>
+          <label class="flag"><input type="checkbox" ${g.sumSubItems?'checked':''} onchange="toggleGroupSumSubItems(${gi})"> Hiện tổng dòng con ở dòng cha</label>`
+        : `<label class="flag"><input type="checkbox" ${g.boldRows?'checked':''} onchange="toggleGroupFlag(${gi},'boldRows')"> In đậm dòng</label>`}
+        <label class="flag"><input type="checkbox" ${g.inTotal!==false?'checked':''} onchange="toggleGroupFlag(${gi},'inTotal')"> Cộng vào Tổng cộng</label>
+        <label class="flag"><input type="checkbox" ${g.inDiscount!==false?'checked':''} onchange="toggleGroupFlag(${gi},'inDiscount')"> Áp dụng giảm giá</label>
       </div>
-      <label class="checkbox-line">
-        <input type="checkbox" ${g.showMain?'checked':''} onchange="toggleGroupShowMain(${gi})">
-        <span>Hiển thị nội dung hạng mục chính (nếu tắt, hạng mục con sẽ đánh số liên tục không phân cấp)</span>
-      </label>
-      ${g.showMain ? `
-        <label>Nội dung hạng mục chính</label>
-        <textarea class="autowrap" rows="1" oninput="updateGroupContent(${gi}, this.value)">${(g.mainContent||'').replace(/</g,'&lt;')}</textarea>
-        <label class="checkbox-line">
-          <input type="checkbox" ${g.sumSubItems?'checked':''} onchange="toggleGroupSumSubItems(${gi})">
-          <span>Cộng tổng giá trị các hạng mục con vào dòng hạng mục chính này (tùy chọn — mặc định KHÔNG cộng)</span>
-        </label>
-        <label class="checkbox-line">
-          <input type="checkbox" ${g.subItemsItalic?'checked':''} onchange="toggleGroupSubItemsItalic(${gi})">
-          <span>In nghiêng các dòng hạng mục con (mặc định: chữ thẳng)</span>
-        </label>
-      ` : ''}
-      <div class="sub-items-list">
-        ${g.subItems.map((it, si) => `
-          <div class="item-row" style="${g.showMain?'margin-left:16px;border-left:3px solid var(--accent);':''}">
-            ${g.subItems.length>1 ? `<button class="del" onclick="removeSubItem(${gi},${si})">✕</button>` : ''}
-            <label>Hạng mục con ${gn.subNums[si]} (từ Dự toán chi tiết)</label>
-            <select onchange="updateSubItemLink(${gi},${si}, this.value)">${detailOptions(it.detailId)}</select>
-          </div>
-        `).join('')}
-      </div>
-      <button class="add-btn" onclick="addSubItem(${gi})">+ Thêm hạng mục con</button>
-    `;
-    c.appendChild(div);
-  });
-
-  if (mode==='single' && totalLeafCount()>1){
-    quoteGroups = [quoteGroups[0]];
-    quoteGroups[0].subItems = [quoteGroups[0].subItems[0]];
-    renderItems();
-  }
+    </div>`;
+  }).join('');
+  autoGrowAll();
+}
+function toggleGroupFlag(gi, key){
+  const g = quoteGroups[gi];
+  if (key === 'boldRows') g.boldRows = !g.boldRows;
+  else g[key] = (g[key] === false);
+  renderItems();
+  render();
 }
 
 function fmt(n){
@@ -2259,6 +2401,8 @@ function fmt(n){
 }
 
 function render(){
+  syncSheetPcts();
+  applyTableStylesToPreview();
   const titleSize = document.getElementById('titleSize').value;
   const titleSpacing = document.getElementById('titleSpacing').value;
   const bodySize = document.getElementById('bodySize').value;
@@ -2321,7 +2465,8 @@ function render(){
   document.getElementById('fixedClauseText').textContent = fixedClause;
   const closingNote = document.getElementById('closingNote').value;
 
-  const discountEnabled = mode==='single' && document.getElementById('discountEnabled').checked;
+  const discountEnabled = document.getElementById('discountEnabled').checked;
+  const showTotalRow = document.getElementById('showTotalRow') ? document.getElementById('showTotalRow').checked : true;
   const discountPct = parseFloat(document.getElementById('discountPct').value) || 0;
   const discountFixed = parseFloat(document.getElementById('discountFixed').value) || 0;
   const showVatBreakdown = document.getElementById('showVatBreakdown') ? document.getElementById('showVatBreakdown').checked : false;
@@ -2337,6 +2482,7 @@ function render(){
 
   let rowHtmlArr = [];
   let subtotal = 0;
+  let discountBase = 0;
   const resolvedRows = [];
   const groupNums = computeGroupNumbers(quoteGroups);
 
@@ -2352,9 +2498,11 @@ function render(){
         const s = detailSheets.find(s=>s.id===it.detailId);
         const t = s ? computeDetailTotal(s) : {roundedTotal:0, mainVatBase:0, mainVatAmount:0};
         const amt = t.roundedTotal;
-        subtotal += amt;
+        if (g.inTotal !== false) subtotal += amt;
+        if (g.inDiscount !== false) discountBase += amt;
         sumAmt += amt; sumBeforeVat += t.mainVatBase; sumVat += t.mainVatAmount;
-        return {number: gn.subNums[si], name: s ? s.name : '(chưa chọn hạng mục)', amount: amt, beforeVat: t.mainVatBase, vatAmount: t.mainVatAmount, isMain:false, detailId: it.detailId, italic: !!g.subItemsItalic};
+        return {number: gn.subNums[si], name: s ? s.name : '(chưa chọn hạng mục)', amount: amt, beforeVat: t.mainVatBase, vatAmount: t.mainVatAmount, isMain:false, detailId: it.detailId, italic: !!g.subItemsItalic,
+          inTotal: g.inTotal !== false, inDiscount: g.inDiscount !== false};
       });
       resolvedRows.push({
         number: `${gn.mainNum}`, name: g.mainContent || '(chưa nhập nội dung)',
@@ -2373,8 +2521,10 @@ function render(){
         const s = detailSheets.find(s=>s.id===it.detailId);
         const t = s ? computeDetailTotal(s) : {roundedTotal:0, mainVatBase:0, mainVatAmount:0};
         const amt = t.roundedTotal;
-        subtotal += amt;
-        resolvedRows.push({number: gn.subNums[si], name: s ? s.name : '(chưa chọn hạng mục)', amount: amt, beforeVat: t.mainVatBase, vatAmount: t.mainVatAmount, isMain:false, detailId: it.detailId});
+        if (g.inTotal !== false) subtotal += amt;
+        if (g.inDiscount !== false) discountBase += amt;
+        resolvedRows.push({number: gn.subNums[si], name: s ? s.name : '(chưa chọn hạng mục)', amount: amt, beforeVat: t.mainVatBase, vatAmount: t.mainVatAmount, isMain:false, detailId: it.detailId,
+          bold: !!g.boldRows, inTotal: g.inTotal !== false, inDiscount: g.inDiscount !== false});
       });
     }
   });
@@ -2394,9 +2544,11 @@ function render(){
       // Dong hang muc con: cho phep chon in nghieng (xem checkbox "In nghieng cac dong hang muc con"
       // trong renderItems() - g.subItemsItalic) - mac dinh chu thang nhu truoc gio.
       const trOpen = row.italic ? '<tr style="font-style:italic;">' : '<tr>';
+      // Dong khong co dong con: cho phep tu chon "In dam dong" (g.boldRows) - in dam ca STT, noi dung, gia tri.
+      const B = (v) => row.bold ? `<strong>${v}</strong>` : v;
       rowHtmlArr.push(showVatBreakdown
-        ? `${trOpen}<td class="center fit">${row.number}</td><td>${row.name}</td><td class="num">${fmt(row.beforeVat)}</td><td class="num">${fmt(row.vatAmount)}</td><td class="num">${fmt(row.amount)}</td></tr>`
-        : `${trOpen}<td class="center fit">${row.number}</td><td>${row.name}</td><td class="num">${fmt(row.amount)}</td></tr>`);
+        ? `${trOpen}<td class="center fit">${B(row.number)}</td><td>${B(row.name)}</td><td class="num">${B(fmt(row.beforeVat))}</td><td class="num">${B(fmt(row.vatAmount))}</td><td class="num">${B(fmt(row.amount))}</td></tr>`
+        : `${trOpen}<td class="center fit">${B(row.number)}</td><td>${B(row.name)}</td><td class="num">${B(fmt(row.amount))}</td></tr>`);
     }
   });
   let tt = resolvedRows.length + 1;
@@ -2405,34 +2557,26 @@ function render(){
   let discountAmount = 0;
   let grandTotal = subtotal;
 
-  if (mode==='single'){
-    // subtotal la tong cac t.roundedTotal cua tung hang muc — cac gia tri nay da duoc dam bao la
-    // so nguyen VND (xem computeDetailTotal). Lam tron sang so nguyen o day chi de phong ngua sai
-    // so dau phay dong rat nho khi cong don nhieu hang muc.
-    const subtotalR = Math.round(subtotal);
-    if (discountEnabled){
-      // Lam tron GIAM GIA truoc, roi suy ra TONG CONG = subtotal - giam gia (deu la so nguyen) —
-      // dam bao tuyet doi subtotal = giam gia + tong cong, khong lech 1 dong do lam tron rieng le.
-      // Linh hoat: giam gia co the la theo % hoac so tien co dinh (clamp de khong am tong tien).
-      const discountLabel = (discountMode === 'fixed') ? 'Giảm giá dịch vụ' : `Giảm giá dịch vụ ${discountPct}%`;
-      discountAmount = (discountMode === 'fixed')
-        ? Math.min(Math.round(discountFixed), subtotalR)
-        : Math.round(subtotal * discountPct/100);
-      grandTotal = subtotalR - discountAmount;
-      rowHtmlArr.push(showVatBreakdown
-        ? `<tr class="discount-row"><td class="center fit">${tt}</td><td colspan="3">${discountLabel}</td><td class="num">-${fmt(discountAmount)}</td></tr>`
-        : `<tr class="discount-row"><td class="center fit">${tt}</td><td>${discountLabel}</td><td class="num">-${fmt(discountAmount)}</td></tr>`);
-      rowHtmlArr.push(showVatBreakdown
-        ? `<tr class="total-row"><td></td><td colspan="3">Tổng cộng giá trị dịch vụ</td><td class="num">${fmt(grandTotal)}</td></tr>`
-        : `<tr class="total-row"><td></td><td>Tổng cộng giá trị dịch vụ</td><td class="num">${fmt(grandTotal)}</td></tr>`);
-    } else {
-      rowHtmlArr.push(showVatBreakdown
-        ? `<tr class="total-row"><td></td><td colspan="3">Tổng cộng giá trị dịch vụ</td><td class="num">${fmt(subtotalR)}</td></tr>`
-        : `<tr class="total-row"><td></td><td>Tổng cộng giá trị dịch vụ</td><td class="num">${fmt(subtotalR)}</td></tr>`);
-      grandTotal = subtotalR;
-    }
+  // Giam gia va dong "Tong cong" bat/tat doc lap (khong con phu thuoc che do 1 dich vu / nhieu dich vu).
+  // Giam gia chi tinh tren cac dong duoc tich "Ap dung giam gia"; Tong cong chi cong cac dong duoc tich
+  // "Cong vao Tong cong" (xem renderItems / toggleGroupFlag).
+  const subtotalR = Math.round(subtotal);
+  const discountBaseR = Math.round(discountBase);
+  if (discountEnabled){
+    const discountLabel = (discountMode === 'fixed') ? 'Giảm giá dịch vụ' : `Giảm giá dịch vụ ${discountPct}%`;
+    discountAmount = (discountMode === 'fixed')
+      ? Math.min(Math.round(discountFixed), discountBaseR)
+      : Math.round(discountBaseR * discountPct/100);
+    rowHtmlArr.push(showVatBreakdown
+      ? `<tr class="discount-row"><td class="center fit">${tt}</td><td colspan="3">${discountLabel}</td><td class="num">-${fmt(discountAmount)}</td></tr>`
+      : `<tr class="discount-row"><td class="center fit">${tt}</td><td>${discountLabel}</td><td class="num">-${fmt(discountAmount)}</td></tr>`);
   }
-  // multi mode: no discount row, no total row — per spec
+  grandTotal = subtotalR - discountAmount;
+  if (showTotalRow){
+    rowHtmlArr.push(showVatBreakdown
+      ? `<tr class="total-row"><td></td><td colspan="3">Tổng cộng giá trị dịch vụ</td><td class="num">${fmt(grandTotal)}</td></tr>`
+      : `<tr class="total-row"><td></td><td>Tổng cộng giá trị dịch vụ</td><td class="num">${fmt(grandTotal)}</td></tr>`);
+  }
 
   const leadingHtml = `
     <div class="doc-header">
@@ -2485,12 +2629,15 @@ function render(){
     </div>
   `;
 
+  // Dai mau chan trang (lap lai o MOI trang): ten cong ty - so trang (o giua) - logo.
   const footerBarHtml = `
     <div class="footer-bar print-footer">
       <div class="company-caption">${footerCaptionText}</div>
-      ${showFooterLogo ? `<img src="${logoDataUri}" class="logo-img logo-img-footer" alt="Logo">` : ''}
+      <div class="band-page"></div>
+      <div class="band-right">${showFooterLogo ? `<img src="${logoDataUri}" class="logo-img logo-img-footer" alt="Logo">` : ''}</div>
     </div>
   `;
+  window._footerBarHtml = footerBarHtml;
 
   // Phan trang bao gia chinh: neu nhieu hang muc hoac noi dung dai khien bang khong du cho tren 1 trang
   // (dac biet la khong con du 5cm tu ten cong ty cho ky den dai mau ITD) -> tu dong nhay sang trang moi,
@@ -2521,9 +2668,15 @@ function render(){
     recipient, introPrefix, fixedClause, footerNotes: footerNotes.slice(), closingNote, items: resolvedItems, mode, discountEnabled, discountPct, discountMode, discountFixed, discountAmount, subtotal, grandTotal, showVatBreakdown,
     logoDataUri, showHeaderLogo, showFooterLogo, footerCaption: footerCaptionText, signCompanyName: signCompanyNameFinal,
     detailSheets: JSON.parse(JSON.stringify(orderedDetailSheetsForExport)), salaryTable: JSON.parse(JSON.stringify(salaryTable)),
-    cqlTiers: JSON.parse(JSON.stringify(cqlTiers)), globalVatPct, globalTnPct};
+    cqlTiers: JSON.parse(JSON.stringify(cqlTiers)), globalVatPct, globalTnPct,
+    showTotalRow, discountBase: discountBaseR, quoteType,
+    investorName: (document.getElementById('investorName') || {}).value || '', fieldName: (document.getElementById('fieldName') || {}).value || '',
+    tableStyles: JSON.parse(JSON.stringify(tableStyles)),
+    footerOffsetCm: parseFloat((document.getElementById('footerOffsetCm') || {}).value) || 1,
+    showPageNumber: document.getElementById('showPageNumber') ? document.getElementById('showPageNumber').checked : true};
 
   renderExtraPages();
+  appendFooterToExtraPages();
 }
 
 function mmToPx(mm){ return mm * 96 / 25.4; }
@@ -2950,7 +3103,7 @@ function measureExtraPageBlockHeight(innerHtml){
 function computeBandGapBudgetPx(footerBarHtml, gapMM){
   const footerBarHeightPx = measureBlockHeight(footerBarHtml);
   const footerBarHeightMM = footerBarHeightPx * 25.4 / 96;
-  const FOOTER_BOTTOM_OFFSET_MM = 14; // khop voi CSS .footer-bar { bottom:14mm } (xem @media print .print-footer)
+  const FOOTER_BOTTOM_OFFSET_MM = (parseFloat((document.getElementById('footerOffsetCm') || {}).value) || 1) * 10; // khop voi CSS .footer-bar { bottom:14mm } (xem @media print .print-footer)
   const PAGE_HEIGHT_MM = 297;
   const PAGE_PAD_TOP_MM = 20; // khop voi .sheet { padding: 20mm ... } khi in
   const footerTopFromPageTopMM = PAGE_HEIGHT_MM - FOOTER_BOTTOM_OFFSET_MM - footerBarHeightMM;
@@ -3437,7 +3590,16 @@ function renderExtraPages(){
 function collectFullState(){
   return {
     _fileType: 'baogia-itd-project',
-    _version: 1,
+    _version: 2,
+    quoteUid,
+    quoteType,
+    investorName: document.getElementById('investorName').value,
+    fieldName: document.getElementById('fieldName').value,
+    syncAllPcts,
+    showTotalRow: document.getElementById('showTotalRow').checked,
+    tableStyles: JSON.parse(JSON.stringify(tableStyles)),
+    footerOffsetCm: document.getElementById('footerOffsetCm').value,
+    showPageNumber: document.getElementById('showPageNumber').checked,
     companyName: document.getElementById('companyName').value,
     companyAddr: document.getElementById('companyAddr').value,
     companyPhone: document.getElementById('companyPhone').value,
@@ -3495,16 +3657,24 @@ function collectFullState(){
   };
 }
 
-async function saveQuoteFile(){
+async function saveQuoteFile(asNew){
+  render();
+  if (!quoteType){ showTypeDialog(!!asNew); return; }
+  const prevUid = quoteUid;
+  if (asNew) quoteUid = newUid();
   const state = collectFullState();
 
   if (window.pywebview){
-    const result = await window.pywebview.api.save_quote_project(state);
+    const path = asNew ? null : (currentFilePath || null);
+    const result = await window.pywebview.api.save_quote_project(state, path);
     if (result && result.ok){
-      alert('Đã lưu báo giá: ' + result.path);
+      currentFilePath = result.path;
+      upsertRegistry(buildRegistryRecord(result.path));
+      showToast('Đã lưu báo giá: ' + result.path + ' — đã cập nhật sổ Quản lý báo giá');
     } else if (result && result.cancelled){
-      // người dùng bấm Cancel, không làm gì
+      quoteUid = prevUid;
     } else {
+      quoteUid = prevUid;
       alert('Có lỗi khi lưu báo giá: ' + ((result && result.error) || 'không rõ nguyên nhân'));
     }
     return;
@@ -3523,6 +3693,8 @@ async function saveQuoteFile(){
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  upsertRegistry(buildRegistryRecord(''));
+  showToast('Đã lưu báo giá — đã cập nhật sổ Quản lý báo giá');
 }
 
 function normalizeLoadedData(data){
@@ -3595,6 +3767,9 @@ function normalizeLoadedData(data){
     discountPct: s.discountPct || 0,
     discountMode: s.discountMode === 'fixed' ? 'fixed' : 'pct',
     discountFixed: s.discountFixed || 0,
+    ownVat: (s.ownVat != null && s.ownVat !== '') ? (parseFloat(s.ownVat) || 0) : null,
+    ownTn: (s.ownTn != null && s.ownTn !== '') ? (parseFloat(s.ownTn) || 0) : null,
+    cqlPctOverride: (s.cqlPctOverride != null && s.cqlPctOverride !== '') ? (parseFloat(s.cqlPctOverride) || 0) : null,
   }));
 
   const validDetailIds = data.detailSheets.map(s=>s.id);
@@ -3615,6 +3790,9 @@ function normalizeLoadedData(data){
     showMain: !!g.showMain,
     sumSubItems: !!g.sumSubItems,
     subItemsItalic: !!g.subItemsItalic,
+    boldRows: !!g.boldRows,
+    inTotal: g.inTotal !== false,
+    inDiscount: g.inDiscount !== false,
     subItems: (g.subItems && g.subItems.length ? g.subItems : [{detailId: fallbackDetailId}]).map(it=>({
       detailId: validDetailIds.includes(it.detailId) ? it.detailId : fallbackDetailId,
     })),
@@ -3688,9 +3866,20 @@ function applyLoadedQuoteData(rawData){
     if (document.getElementById('globalTnPct')) document.getElementById('globalTnPct').value = globalTnPct;
     detailSheets = data.detailSheets;
     quoteGroups = data.quoteGroups;
-    mode = data.mode === 'multi' ? 'multi' : 'single';
+    mode = 'single';
     activeDetailTab = (detailSheets.find(s=>s.id===data.activeDetailTab) ? data.activeDetailTab : detailSheets[0].id);
     footerNotes = (data.footerNotes && data.footerNotes.length) ? data.footerNotes : footerNotes;
+    quoteType = data.quoteType || '';
+    document.getElementById('investorName').value = data.investorName || '';
+    document.getElementById('fieldName').value = data.fieldName || '';
+    quoteUid = data.quoteUid || newUid();
+    syncAllPcts = !!data.syncAllPcts;
+    if (data.tableStyles) tableStyles = Object.assign(tableStyles, JSON.parse(JSON.stringify(data.tableStyles)));
+    document.getElementById('footerOffsetCm').value = data.footerOffsetCm || 1;
+    document.getElementById('showPageNumber').checked = data.showPageNumber !== false;
+    quoteLoadedFromFile = true;
+    ratioEditing = false; rowModal = null; activeSubTab = 'summary'; confirmDeleteSheet = false;
+    document.getElementById('modalRoot').innerHTML = '';
 
     relockSensitiveFields();
     autoGrowAll();
@@ -3698,8 +3887,9 @@ function applyLoadedQuoteData(rawData){
     renderCqlTiers();
     renderDetailSheets();
     renderNotes();
-    setMode(mode);
-    if (document.getElementById('discountEnabled')) document.getElementById('discountEnabled').checked = !!data.discountEnabled;
+    // File cu o che do "nhieu dich vu": khong co giam gia / dong Tong cong o bang chinh -> giu nguyen cach trinh bay do.
+    document.getElementById('showTotalRow').checked = (data.showTotalRow != null) ? !!data.showTotalRow : (data.mode !== 'multi');
+    if (document.getElementById('discountEnabled')) document.getElementById('discountEnabled').checked = !!data.discountEnabled && data.mode !== 'multi';
     if (document.getElementById('discountPct')) document.getElementById('discountPct').value = data.discountPct || 0;
     if (document.getElementById('discountFixed')) document.getElementById('discountFixed').value = data.discountFixed || 0;
     setDiscountMode(data.discountMode === 'fixed' ? 'fixed' : 'pct');
@@ -3719,9 +3909,13 @@ function applyLoadedQuoteData(rawData){
     const signInputEl = document.getElementById('signNameInput');
     if (signDisplay && signInputEl){ signDisplay.style.display = 'flex'; signInputEl.style.display = 'none'; }
 
+    renderItems();
+    renderTableStyleControls();
+    renderTypeSelect();
+    refreshParamChips();
     render();
     autoGrowAll();
-    alert('Đã mở báo giá thành công.');
+    showToast('Đã mở báo giá thành công.');
     return true;
   } catch (err){
     console.error(err);
@@ -3734,7 +3928,7 @@ async function openQuoteFile(){
   if (window.pywebview){
     const result = await window.pywebview.api.open_quote_project();
     if (result && result.ok){
-      applyLoadedQuoteData(result.data);
+      if (applyLoadedQuoteData(result.data)) currentFilePath = result.path || '';
     } else if (result && result.cancelled){
       // người dùng bấm Cancel, không làm gì
     } else {
@@ -3788,6 +3982,939 @@ function showExportResult(result){
   }
 }
 
+
+// =====================================================================================
+// GIAO DIỆN MỚI: tab chính, hạng mục (thẻ + tab con), popup nhập dòng, tỉ lệ riêng,
+// mặc định cho báo giá mới, sổ Quản lý báo giá, zoom xem trước.
+// =====================================================================================
+function esc(v){
+  return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+function newUid(){ return 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+// ---------- Tab chính ----------
+function setMainTab(tab){
+  activeMainTab = tab;
+  document.querySelectorAll('.tab1').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.dataset.pane === tab));
+  ['items','main','format','params','registry'].forEach(t => document.body.classList.toggle('tab-' + t, t === tab));
+  if (tab === 'registry') renderRegistry();
+  if (tab === 'main') { renderItems(); renderTypeSelect(); renderFieldList(); }
+  if (tab === 'params') { renderTypesList(); refreshParamChips(); }
+  autoGrowAll();
+}
+function setSubTab(t){
+  activeSubTab = t;
+  ratioEditing = false;
+  confirmDeleteSheet = false;
+  renderDetailSheets();
+}
+
+// ---------- Tỉ lệ: chung / riêng từng hạng mục ----------
+// % VAT và % TN: mặc định lấy theo giá trị chung (tab Tham số). Hạng mục nào được "Sửa tỉ lệ" riêng
+// thì lưu ownVat/ownTn; % Cql tự chọn theo bảng tỷ lệ dựa trên Ccg trừ khi có cqlPctOverride.
+function syncSheetPcts(){
+  detailSheets.forEach(s => {
+    if (syncAllPcts){ s.ownVat = null; s.ownTn = null; s.cqlPctOverride = null; }
+    s.vatPct = (s.ownVat != null && s.ownVat !== '') ? parseFloat(s.ownVat) : globalVatPct;
+    s.tnPct = (s.ownTn != null && s.ownTn !== '') ? parseFloat(s.ownTn) : globalTnPct;
+  });
+}
+function sheetHasOwnPcts(s){
+  return (s.ownVat != null && s.ownVat !== '') || (s.ownTn != null && s.ownTn !== '') || (s.cqlPctOverride != null && s.cqlPctOverride !== '');
+}
+function toggleSheetRatioEdit(){
+  if (syncAllPcts){
+    showToast('Đang bật "Áp dụng đồng bộ cho tất cả hạng mục" ở tab Tham số & thiết lập — bỏ tích ở đó để sửa riêng.');
+    return;
+  }
+  ratioEditing = !ratioEditing;
+  renderDetailSheets();
+}
+function setSheetOwnPct(id, field, val){
+  const s = detailSheets.find(x => x.id === id);
+  if (!s) return;
+  const v = parseFloat(val);
+  if (field === 'vat') s.ownVat = (isNaN(v) || v === globalVatPct) ? null : v;
+  else if (field === 'tn') s.ownTn = (isNaN(v) || v === globalTnPct) ? null : v;
+  else if (field === 'cql'){
+    const auto = computeDetailTotal(Object.assign({}, s, { cqlPctOverride: null })).cqlPct;
+    s.cqlPctOverride = (isNaN(v) || v === auto) ? null : v;
+  }
+  syncSheetPcts();
+  render();
+  refreshParamChips();
+}
+function resetSheetOwnPcts(id){
+  const s = detailSheets.find(x => x.id === id);
+  if (!s) return;
+  s.ownVat = null; s.ownTn = null; s.cqlPctOverride = null;
+  ratioEditing = false;
+  syncSheetPcts();
+  renderDetailSheets();
+  render();
+  refreshParamChips();
+}
+function toggleSyncAll(checked){
+  syncAllPcts = !!checked;
+  let n = 0;
+  if (syncAllPcts){
+    detailSheets.forEach(s => { if (sheetHasOwnPcts(s)) n++; s.ownVat = null; s.ownTn = null; s.cqlPctOverride = null; });
+    ratioEditing = false;
+    showToast('Đã đồng bộ ' + detailSheets.length + ' hạng mục theo tham số chung' + (n ? ' (bỏ phần sửa riêng ở ' + n + ' hạng mục)' : ''));
+  }
+  syncSheetPcts();
+  renderDetailSheets();
+  render();
+  refreshParamChips();
+}
+function refreshParamChips(){
+  const box = document.getElementById('syncBox');
+  const cb = document.getElementById('syncAllPcts');
+  if (cb) cb.checked = !!syncAllPcts;
+  if (box) box.classList.toggle('on', !!syncAllPcts);
+  const chip = document.getElementById('overrideCountChip');
+  if (chip){
+    const n = detailSheets.filter(sheetHasOwnPcts).length;
+    chip.innerHTML = n ? `<span class="chip warn">${n} hạng mục đang sửa riêng</span>` : '';
+  }
+  const sc = document.getElementById('salaryDefaultChip');
+  if (sc){
+    if (!appDefaults || !appDefaults.salaryTable) sc.innerHTML = '';
+    else sc.innerHTML = JSON.stringify(appDefaults.salaryTable) === JSON.stringify(salaryTable)
+      ? '<span class="chip ok">Đang là mặc định</span>'
+      : '<span class="chip warn">Khác mặc định — chưa lưu</span>';
+  }
+}
+
+// ---------- Hạng mục: nhân bản ----------
+function duplicateDetailSheet(id){
+  const idx = detailSheets.findIndex(s => s.id === id);
+  if (idx < 0) return;
+  const copy = JSON.parse(JSON.stringify(detailSheets[idx]));
+  copy.id = 'd' + Date.now();
+  copy.name = (copy.name || 'Hạng mục') + ' (bản sao)';
+  detailSheets.splice(idx + 1, 0, copy);
+  activeDetailTab = copy.id;
+  activeSubTab = 'summary';
+  renderDetailSheets();
+  renderItems();
+  render();
+  showToast('Đã nhân bản thành "' + copy.name + '"');
+}
+function askDeleteSheet(){ confirmDeleteSheet = true; renderDetailSheets(); }
+function cancelDeleteSheet(){ confirmDeleteSheet = false; renderDetailSheets(); }
+function addOtherRowAfter(id, idx, asSub){
+  const s = detailSheets.find(s=>s.id===id);
+  s.otherRows.splice(idx+1, 0, {desc:'', unit:'', quantity:0, unitPrice:0, isSub:!!asSub});
+  renderDetailSheets();
+  render();
+}
+function addExpertRowAndOpen(id){
+  addExpertRow(id);
+  const s = detailSheets.find(x=>x.id===id);
+  openRowModal('expert', s.expertRows.length - 1);
+}
+function addOtherRowAndOpen(id){
+  addOtherRow(id);
+  const s = detailSheets.find(x=>x.id===id);
+  openRowModal('other', s.otherRows.length - 1);
+}
+function levelNameOf(levelId){
+  const l = salaryTable.levels.find(x => x.id === levelId);
+  return l ? l.name : '?';
+}
+
+const ICON_COPY = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="1.5"></rect><path d="M5 15V5a1 1 0 0 1 1-1h10"></path></svg>';
+const ICON_PEN = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 20h4L19 9l-4-4L4 16v4z"></path></svg>';
+
+function renderDetailSheets(){
+  syncSheetPcts();
+  const tabsC = document.getElementById('detailTabs');
+  const bodyC = document.getElementById('detailTabBody');
+  const subC = document.getElementById('subTabs');
+  if (!tabsC || !bodyC) return;
+  if (!detailSheets.find(s => s.id === activeDetailTab)) activeDetailTab = detailSheets[0].id;
+
+  tabsC.innerHTML = detailSheets.map(s => `
+    <div class="hm-card ${s.id===activeDetailTab?'active':''}">
+      <button type="button" class="hm-pick" onclick="switchDetailTab('${s.id}')" title="${esc(s.name)}${s.note ? ' — ' + esc(s.note) : ''}">${esc(s.name || '(chưa đặt tên)')}${s.note ? ` <span class="hm-note">(${esc(s.note)})</span>` : ''}</button>
+      <button type="button" class="hm-dup" title="Nhân bản hạng mục này" onclick="duplicateDetailSheet('${s.id}')">${ICON_COPY}</button>
+    </div>`).join('') + `<button type="button" class="hm-add" onclick="addDetailSheet()">+ Thêm hạng mục</button>`;
+
+  const s = detailSheets.find(x => x.id === activeDetailTab);
+  const expNote = s.ccgMode === 'lumpsum' ? 'trọn gói' : `${s.expertRows.length} dòng`;
+  const othNote = s.ckMode === 'lumpsum' ? 'trọn gói' : `${s.otherRows.length} dòng`;
+  if (subC) subC.innerHTML = `
+    <button type="button" class="pill ${activeSubTab==='summary'?'on':''}" onclick="setSubTab('summary')">Tổng hợp hạng mục</button>
+    <button type="button" class="pill ${activeSubTab==='expert'?'on':''}" onclick="setSubTab('expert')">Diễn giải chuyên gia <span class="cnt">· ${expNote}</span></button>
+    <button type="button" class="pill ${activeSubTab==='other'?'on':''}" onclick="setSubTab('other')">Chi phí khác <span class="cnt">· ${othNote}</span></button>
+    <div class="editing">Đang sửa: <strong>${esc(s.name || '(chưa đặt tên)')}</strong></div>`;
+
+  if (activeSubTab === 'expert') bodyC.innerHTML = renderExpertPane(s);
+  else if (activeSubTab === 'other') bodyC.innerHTML = renderOtherPane(s);
+  else bodyC.innerHTML = renderSummaryPane(s);
+  autoGrowAll();
+  if (rowModal) renderRowModal();
+}
+
+function renderSummaryPane(s){
+  const t = computeDetailTotal(s);
+  const ownV = s.ownVat != null && s.ownVat !== '';
+  const ownT = s.ownTn != null && s.ownTn !== '';
+  const ownC = s.cqlPctOverride != null && s.cqlPctOverride !== '';
+  const hasOwn = ownV || ownT || ownC;
+  const chip = (own, autoLabel) => own ? '<span class="chip warn">Riêng</span>' : `<span class="chip ${autoLabel==='Tự động'?'auto':''}">${autoLabel}</span>`;
+  const ratioBody = ratioEditing ? `
+      <div class="ratio-row">
+        <div class="fld"><label>% VAT</label><input type="number" step="0.1" value="${s.vatPct}" onchange="setSheetOwnPct('${s.id}','vat',this.value)"></div>
+        <div class="fld"><label>% TN chịu thuế tính trước</label><input type="number" step="0.1" value="${s.tnPct}" onchange="setSheetOwnPct('${s.id}','tn',this.value)"></div>
+        <div class="fld"><label>% Cql / Ccg</label><input type="number" step="0.5" value="${t.cqlPct}" onchange="setSheetOwnPct('${s.id}','cql',this.value)"></div>
+      </div>` : `
+      <div class="ratio-row">
+        <div class="fld"><label>% VAT</label><div class="val"><div class="lockv">${s.vatPct}</div>${chip(ownV,'Chung')}</div></div>
+        <div class="fld"><label>% TN chịu thuế tính trước</label><div class="val"><div class="lockv">${s.tnPct}</div>${chip(ownT,'Chung')}</div></div>
+        <div class="fld"><label>% Cql / Ccg</label><div class="val"><div class="lockv">${t.cqlPct}</div>${chip(ownC,'Tự động')}</div></div>
+      </div>`;
+  return `
+    <div class="card">
+      <div class="row2">
+        <div><label>Tên hạng mục (hiện đúng tên này ở bảng báo giá chính)</label>
+          <textarea class="autowrap" rows="1" oninput="updateDetailName('${s.id}', this.value)" onblur="refreshAfterDetailNameEdit()">${esc(s.name)}</textarea></div>
+        <div><label>Ghi chú nội bộ (không in ra báo giá)</label>
+          <textarea class="autowrap" rows="1" placeholder="Ví dụ: đối với hạ tầng phần cứng" oninput="updateDetailNote('${s.id}', this.value)" onblur="refreshAfterDetailNoteEdit()">${esc(s.note)}</textarea></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="ttl">Tỉ lệ tính toán</div>
+        ${syncAllPcts ? '<span class="chip ok">Đồng bộ theo Tham số</span>' : ''}
+        ${hasOwn ? `<span class="chip warn">Đã sửa riêng</span><button type="button" class="linkbtn" onclick="resetSheetOwnPcts('${s.id}')">Về theo tham số chung</button>` : ''}
+        <button type="button" class="${ratioEditing ? 'btn-f' : 'btn-o'} right" style="${syncAllPcts ? 'opacity:.45;' : ''}" onclick="toggleSheetRatioEdit()">${ratioEditing ? 'Xong' : 'Sửa tỉ lệ'}</button>
+      </div>
+      ${ratioBody}
+    </div>
+
+    <div class="card">
+      <div class="checkbox-line" style="margin-top:0;">
+        <input type="checkbox" ${s.discountEnabled?'checked':''} onchange="toggleDetailDiscount('${s.id}')">
+        <label style="margin:0;font-weight:700;color:var(--ui-navy);">Áp dụng giảm giá cho hạng mục này</label>
+      </div>
+      ${s.discountEnabled ? `
+        <div class="mode-toggle" style="margin:8px 0;max-width:320px;">
+          <button type="button" class="${s.discountMode!=='fixed'?'active':''}" onclick="setDetailDiscountMode('${s.id}', 'pct')">Theo %</button>
+          <button type="button" class="${s.discountMode==='fixed'?'active':''}" onclick="setDetailDiscountMode('${s.id}', 'fixed')">Số tiền cố định</button>
+        </div>
+        ${s.discountMode==='fixed'
+          ? `<label>Số tiền giảm giá cố định (đ)</label><input type="number" value="${s.discountFixed||0}" step="100000" oninput="updateDetailDiscountFixed('${s.id}', this.value)" style="max-width:240px;">`
+          : `<label>% giảm giá</label><input type="number" value="${s.discountPct}" step="0.1" oninput="updateDetailDiscountPct('${s.id}', this.value)" style="max-width:160px;">`}
+      ` : ''}
+    </div>
+
+    <div class="card">
+      <div class="checkbox-line" style="margin-top:0;">
+        <input type="checkbox" ${s.roundEnabled!==false?'checked':''} onchange="toggleDetailRoundEnabled('${s.id}')">
+        <label style="margin:0;font-weight:700;color:var(--ui-navy);">Áp dụng làm tròn tổng cộng</label>
+      </div>
+      ${s.roundEnabled!==false ? `
+      <div class="row2">
+        <div><label>Làm tròn đến</label>
+          <select onchange="updateRoundingUnit('${s.id}', this.value)">
+            <option value="1" ${s.roundingUnit===1?'selected':''}>Không làm tròn</option>
+            <option value="100" ${s.roundingUnit===100?'selected':''}>Hàng trăm (100đ)</option>
+            <option value="1000" ${s.roundingUnit===1000?'selected':''}>Hàng nghìn (1.000đ)</option>
+            <option value="10000" ${s.roundingUnit===10000?'selected':''}>Hàng chục nghìn (10.000đ)</option>
+            <option value="100000" ${s.roundingUnit===100000?'selected':''}>Hàng trăm nghìn (100.000đ)</option>
+            <option value="1000000" ${s.roundingUnit===1000000?'selected':''}>Hàng triệu (1.000.000đ)</option>
+          </select></div>
+        <div><label>Kiểu làm tròn</label>
+          <select onchange="updateRoundingMode('${s.id}', this.value)">
+            <option value="floor" ${s.roundingMode==='floor'?'selected':''}>Làm tròn xuống</option>
+            <option value="nearest" ${s.roundingMode==='nearest'?'selected':''}>Làm tròn gần nhất</option>
+            <option value="ceil" ${s.roundingMode==='ceil'?'selected':''}>Làm tròn lên</option>
+          </select></div>
+      </div>` : ''}
+    </div>
+
+    ${detailSheets.length > 1 ? (confirmDeleteSheet
+      ? `<div class="checkbox-line"><span style="color:#9b2c2c;">Xoá hạng mục “${esc(s.name)}”?</span>
+           <button type="button" class="btn-g" onclick="cancelDeleteSheet()">Huỷ</button>
+           <button type="button" class="btn-danger" style="background:#9b2c2c;color:#fff;" onclick="confirmDeleteSheet=false; removeDetailSheet('${s.id}')">Xoá</button></div>`
+      : `<button type="button" class="btn-danger" onclick="askDeleteSheet()">Xoá hạng mục này</button>`) : ''}
+  `;
+}
+
+const EXPERT_COLS = '62px 58px minmax(140px,1fr) 92px 50px 72px 34px';
+const OTHER_COLS = '62px 58px minmax(140px,1fr) 80px 90px 34px';
+
+function renderExpertPane(s){
+  const linked = s.ccgMode !== 'lumpsum';
+  let html = `
+    <div class="card tbl-card">
+      <div class="tbl-head">
+        <div class="ttl">Chi phí chuyên gia (Ccg)</div>
+        <div class="seg">
+          <button type="button" class="${linked?'on':''}" onclick="setCcgMode('${s.id}','linked')">Link từ diễn giải (theo ngày công)</button>
+          <button type="button" class="${!linked?'on':''}" onclick="setCcgMode('${s.id}','lumpsum')">Trọn gói (nhập số)</button>
+        </div>
+        ${linked ? `<button type="button" class="btn-o right" onclick="addExpertRowAndOpen('${s.id}')">+ Thêm dòng</button>` : ''}
+      </div>`;
+  if (!linked){
+    html += `<div class="lump"><div><label>Số tiền Ccg trọn gói (đ)</label><input type="number" value="${s.ccgLumpsum}" oninput="updateCcgLumpsum('${s.id}', this.value)"></div></div></div>`;
+    return html;
+  }
+  const nums = computeExpertRowNumbers(s.expertRows);
+  const an = analyzeExpertRows(s.expertRows);
+  html += `<div class="thead" style="grid-template-columns:${EXPERT_COLS}"><div class="ctr" style="text-align:center;">Cấp</div><div style="text-align:center;">STT</div><div>Công việc thực hiện</div><div>Mức CG</div><div style="text-align:center;">SL</div><div style="text-align:center;">Ngày công</div><div></div></div>`;
+  html += s.expertRows.map((r, idx) => {
+    const d = r.depth || 0;
+    const maxD = maxAllowedExpertDepth(s.expertRows, idx);
+    const a = an[idx];
+    const lines = String(r.desc || '').split('\n');
+    const first = lines[0] || '(chưa nhập nội dung)';
+    const more = lines.length > 1 ? `<span class="chip auto">+${lines.length - 1} dòng</span>` : '';
+    const lv = a.hasChildren ? '<span style="color:#a8b2cb;">—</span>' : (r.levels || []).map(l => `<div>${esc(levelNameOf(l.levelId))}</div>`).join('');
+    const qty = a.hasChildren ? '' : (r.levels || []).map(l => `<div>${l.quantity}</div>`).join('');
+    const days = a.hasChildren ? '' : (r.levels || []).map(l => `<div>${l.days}</div>`).join('');
+    return `<div class="trow" style="grid-template-columns:${EXPERT_COLS}">
+      <div class="ctl">
+        <button type="button" class="mini" ${d > 0 ? '' : 'disabled'} title="Giảm cấp" onclick="outdentExpertRow('${s.id}', ${idx})">‹</button>
+        <button type="button" class="mini" ${d < maxD ? '' : 'disabled'} title="Tăng cấp (thành con của dòng trên)" onclick="indentExpertRow('${s.id}', ${idx})">›</button>
+      </div>
+      <div class="ctr ${a.hasChildren ? 'b' : ''}">${nums[idx]}</div>
+      <button type="button" class="txt" style="padding-left:${8 + d * 20}px" onclick="openRowModal('expert', ${idx})"><span class="ell ${a.hasChildren ? 'b' : ''}">${esc(first)}</span>${more}</button>
+      <div>${lv}</div>
+      <div class="ctr">${qty}</div>
+      <div class="ctr">${days}</div>
+      <button type="button" class="edit" title="Sửa dòng" onclick="openRowModal('expert', ${idx})">${ICON_PEN}</button>
+    </div>`;
+  }).join('');
+  html += `<div class="tbl-foot">
+      <button type="button" class="btn-g" onclick="addExpertRowAndOpen('${s.id}')">+ Thêm công việc (cuối)</button>
+      <button type="button" class="btn-g right" onclick="exportExpertTemplate()">Tải file mẫu (Excel)</button>
+      <button type="button" class="btn-g" onclick="importExpertExcel('${s.id}')">Nhập từ Excel</button>
+    </div></div>`;
+  return html;
+}
+
+function renderOtherPane(s){
+  const linked = s.ckMode !== 'lumpsum';
+  let html = `
+    <div class="card tbl-card">
+      <div class="tbl-head">
+        <div class="ttl">Chi phí khác (Ck)</div>
+        <div class="seg">
+          <button type="button" class="${linked?'on':''}" onclick="setCkMode('${s.id}','linked')">Link từ diễn giải</button>
+          <button type="button" class="${!linked?'on':''}" onclick="setCkMode('${s.id}','lumpsum')">Trọn gói (nhập số)</button>
+        </div>
+        ${linked ? `<button type="button" class="btn-o right" onclick="addOtherRowAndOpen('${s.id}')">+ Thêm dòng</button>` : ''}
+      </div>`;
+  if (!linked){
+    html += `<div class="lump"><div><label>Số tiền Ck trọn gói (đ)</label><input type="number" value="${s.ckLumpsum}" oninput="updateCkLumpsum('${s.id}', this.value)"></div></div></div>`;
+    return html;
+  }
+  const nums = computeRowNumbers(s.otherRows);
+  html += `<div class="thead" style="grid-template-columns:${OTHER_COLS}"><div style="text-align:center;">Cấp</div><div style="text-align:center;">STT</div><div>Vật tư, vật liệu</div><div style="text-align:center;">Đơn vị</div><div style="text-align:center;">Khối lượng</div><div></div></div>`;
+  html += s.otherRows.map((r, idx) => {
+    const lines = String(r.desc || '').split('\n');
+    const first = lines[0] || '(chưa nhập nội dung)';
+    const more = lines.length > 1 ? `<span class="chip auto">+${lines.length - 1} dòng</span>` : '';
+    return `<div class="trow" style="grid-template-columns:${OTHER_COLS}">
+      <div class="ctl">
+        <button type="button" class="mini" ${r.isSub ? '' : 'disabled'} title="Giảm cấp" onclick="updateOtherRow('${s.id}', ${idx}, 'isSub', false)">‹</button>
+        <button type="button" class="mini" ${(!r.isSub && idx > 0) ? '' : 'disabled'} title="Là dòng con của dòng phía trên" onclick="updateOtherRow('${s.id}', ${idx}, 'isSub', true)">›</button>
+      </div>
+      <div class="ctr">${nums[idx]}</div>
+      <button type="button" class="txt" style="padding-left:${r.isSub ? 28 : 8}px" onclick="openRowModal('other', ${idx})"><span class="ell">${esc(first)}</span>${more}</button>
+      <div class="ctr">${esc(r.unit)}</div>
+      <div class="ctr">${r.quantity}</div>
+      <button type="button" class="edit" title="Sửa dòng" onclick="openRowModal('other', ${idx})">${ICON_PEN}</button>
+    </div>`;
+  }).join('');
+  html += `<div class="tbl-foot">
+      <button type="button" class="btn-g" onclick="addOtherRowAndOpen('${s.id}')">+ Thêm chi phí khác</button>
+      <button type="button" class="btn-g right" onclick="exportOtherCostsTemplate()">Tải file mẫu (Excel)</button>
+      <button type="button" class="btn-g" onclick="importOtherCostsExcel('${s.id}')">Nhập từ Excel</button>
+    </div></div>`;
+  return html;
+}
+
+// ---------- Popup nhập chi tiết 1 dòng ----------
+function openRowModal(kind, idx){ rowModal = { kind, idx }; renderRowModal(); }
+function closeRowModal(){
+  rowModal = null;
+  const root = document.getElementById('modalRoot');
+  if (root) root.innerHTML = '';
+  renderDetailSheets();
+  render();
+}
+function modalDeleteRow(){
+  const s = detailSheets.find(x => x.id === activeDetailTab);
+  if (!s || !rowModal) return;
+  const list = rowModal.kind === 'expert' ? s.expertRows : s.otherRows;
+  if (list.length <= 1){ showToast('Cần giữ lại ít nhất 1 dòng.'); return; }
+  if (!confirm('Xoá dòng này?')) return;
+  const idx = rowModal.idx;
+  rowModal = null;
+  if (s && list === s.expertRows) removeExpertRow(s.id, idx); else removeOtherRow(s.id, idx);
+  closeRowModal();
+}
+function modalInsertAfter(asChild){
+  const s = detailSheets.find(x => x.id === activeDetailTab);
+  if (!s || !rowModal) return;
+  const idx = rowModal.idx;
+  if (rowModal.kind === 'expert') addExpertRowAfter(s.id, idx, asChild);
+  else addOtherRowAfter(s.id, idx, asChild || !!s.otherRows[idx].isSub);
+  rowModal = { kind: rowModal.kind, idx: idx + 1 };
+  renderRowModal();
+  const ta = document.getElementById('rowDesc');
+  if (ta) ta.focus();
+}
+function renderRowModal(){
+  const root = document.getElementById('modalRoot');
+  if (!root) return;
+  if (!rowModal){ root.innerHTML = ''; return; }
+  const s = detailSheets.find(x => x.id === activeDetailTab);
+  if (!s){ rowModal = null; root.innerHTML = ''; return; }
+  const idx = rowModal.idx;
+  let title, body, extraBtns;
+  if (rowModal.kind === 'expert'){
+    const r = s.expertRows[idx];
+    if (!r){ rowModal = null; root.innerHTML = ''; return; }
+    const nums = computeExpertRowNumbers(s.expertRows);
+    const a = analyzeExpertRows(s.expertRows)[idx];
+    const d = r.depth || 0;
+    const maxD = maxAllowedExpertDepth(s.expertRows, idx);
+    const levelOptions = (selId) => salaryTable.levels.map(l=>`<option value="${l.id}" ${l.id===selId?'selected':''}>${esc(l.name)} (${fmt(dailyRate(l.id))}đ/ngày)</option>`).join('');
+    title = `Dòng ${nums[idx]} — Diễn giải chi phí chuyên gia`;
+    body = `
+      <label>Công việc thực hiện</label>
+      <textarea id="rowDesc" rows="8" oninput="updateExpertRow('${s.id}', ${idx}, 'desc', this.value)">${esc(r.desc)}</textarea>
+      <div class="depth-row">Cấp dòng: <strong>Cấp ${d + 1}</strong> (STT ${nums[idx]})
+        <button type="button" class="btn-g" ${d > 0 ? '' : 'disabled'} onclick="outdentExpertRow('${s.id}', ${idx})">‹ Giảm cấp</button>
+        <button type="button" class="btn-g" ${d < maxD ? '' : 'disabled'} onclick="indentExpertRow('${s.id}', ${idx})">Tăng cấp ›</button>
+      </div>
+      ${a.hasChildren ? `<p class="hint" style="font-size:12px;">Dòng này có dòng con nên tự cộng tổng các dòng con (các mức chuyên gia bị khoá).</p>` : `
+        <label>Các mức chuyên gia tham gia công việc này</label>
+        ${(r.levels || []).map((lv, li) => `
+          <div class="lv-row">
+            <div><label>Mức chuyên gia</label><select onchange="updateExpertLevel('${s.id}', ${idx}, ${li}, 'levelId', this.value)">${levelOptions(lv.levelId)}</select></div>
+            <div><label>Khối lượng CG</label><input type="number" value="${lv.quantity}" oninput="updateExpertLevel('${s.id}', ${idx}, ${li}, 'quantity', this.value)"></div>
+            <div><label>Ngày công</label><input type="number" value="${lv.days}" oninput="updateExpertLevel('${s.id}', ${idx}, ${li}, 'days', this.value)"></div>
+            <div>${r.levels.length > 1 ? `<button type="button" class="btn-g" title="Bỏ mức này" onclick="removeExpertLevel('${s.id}', ${idx}, ${li})">✕</button>` : ''}</div>
+          </div>`).join('')}
+        <button type="button" class="add-btn" style="margin-top:8px;" onclick="addExpertLevel('${s.id}', ${idx})">+ Thêm mức chuyên gia khác cho công việc này</button>
+      `}`;
+    extraBtns = `
+      <button type="button" class="btn-g" onclick="modalInsertAfter(false)">+ Thêm sau (cùng cấp)</button>
+      <button type="button" class="btn-g" onclick="modalInsertAfter(true)">+ Thêm dòng con sau</button>`;
+  } else {
+    const r = s.otherRows[idx];
+    if (!r){ rowModal = null; root.innerHTML = ''; return; }
+    const nums = computeRowNumbers(s.otherRows);
+    title = `Dòng ${nums[idx]} — Chi phí khác`;
+    body = `
+      <label>Vật tư, vật liệu</label>
+      <textarea id="rowDesc" rows="6" oninput="updateOtherRow('${s.id}', ${idx}, 'desc', this.value)">${esc(r.desc)}</textarea>
+      <div class="row3" style="grid-template-columns:1fr 1fr 1fr;">
+        <div><label>Đơn vị</label><input type="text" value="${esc(r.unit)}" oninput="updateOtherRow('${s.id}', ${idx}, 'unit', this.value)"></div>
+        <div><label>Khối lượng</label><input type="number" value="${r.quantity}" oninput="updateOtherRow('${s.id}', ${idx}, 'quantity', this.value)"></div>
+        <div><label>Đơn giá (đ)</label><input type="number" value="${r.unitPrice}" oninput="updateOtherRow('${s.id}', ${idx}, 'unitPrice', this.value)"></div>
+      </div>
+      ${idx > 0 ? `<div class="checkbox-line"><input type="checkbox" ${r.isSub ? 'checked' : ''} onchange="updateOtherRow('${s.id}', ${idx}, 'isSub', this.checked)"><label style="margin:0;">Là dòng con của dòng phía trên</label></div>` : ''}`;
+    extraBtns = `
+      <button type="button" class="btn-g" onclick="modalInsertAfter(false)">+ Thêm dòng sau</button>
+      <button type="button" class="btn-g" onclick="modalInsertAfter(true)">+ Thêm dòng con sau</button>`;
+  }
+  const active = document.activeElement;
+  const keepFocusId = active && active.id === 'rowDesc' ? 'rowDesc' : null;
+  root.innerHTML = `
+    <div class="modal-ov" onclick="if(event.target===this) closeRowModal()">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-h">${esc(title)}<button type="button" class="x" onclick="closeRowModal()" aria-label="Đóng">✕</button></div>
+        <div class="modal-b">${body}</div>
+        <div class="modal-f">
+          <button type="button" class="btn-danger" onclick="modalDeleteRow()">Xoá dòng</button>
+          ${extraBtns}
+          <button type="button" class="btn-f right" onclick="closeRowModal()">Xong</button>
+        </div>
+      </div>
+    </div>`;
+  if (keepFocusId){ const el = document.getElementById(keepFocusId); if (el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
+}
+
+// ---------- Loại báo giá ----------
+function renderTypeSelect(){
+  const sel = document.getElementById('quoteType');
+  if (!sel) return;
+  const cur = quoteType;
+  const opts = quoteTypes.slice();
+  if (cur && !opts.includes(cur)) opts.push(cur);
+  sel.innerHTML = `<option value="">— Chọn loại báo giá —</option>` + opts.map(t => `<option value="${esc(t)}" ${t === cur ? 'selected' : ''}>${esc(t)}</option>`).join('');
+  sel.classList.toggle('req-missing', !cur && typeMissingFlag);
+}
+function onQuoteTypeChange(){
+  quoteType = document.getElementById('quoteType').value;
+  typeMissingFlag = false;
+  renderTypeSelect();
+}
+function renderTypesList(){
+  const c = document.getElementById('typesList');
+  if (!c) return;
+  c.innerHTML = quoteTypes.map((t, i) => `<span class="type-chip">${esc(t)}<button type="button" title="Xoá loại này" onclick="removeQuoteType(${i})">✕</button></span>`).join('') || '<span class="muted">Chưa có loại báo giá nào.</span>';
+}
+function addQuoteType(){
+  const inp = document.getElementById('newTypeInput');
+  const v = (inp.value || '').trim();
+  if (!v) return;
+  if (!quoteTypes.includes(v)) quoteTypes.push(v);
+  inp.value = '';
+  renderTypesList();
+  renderTypeSelect();
+}
+function removeQuoteType(i){
+  quoteTypes.splice(i, 1);
+  renderTypesList();
+  renderTypeSelect();
+}
+function renderFieldList(){
+  const dl = document.getElementById('fieldList');
+  if (!dl) return;
+  const set = new Set(['Chuyển đổi số', 'Tư vấn CNTT', 'An toàn thông tin', 'Phần mềm', 'Đào tạo']);
+  registry.forEach(r => { if (r.field) set.add(r.field); });
+  dl.innerHTML = Array.from(set).map(f => `<option value="${esc(f)}">`).join('');
+}
+function showTypeDialog(asNew){
+  const root = document.getElementById('modalRoot');
+  typeMissingFlag = true;
+  renderTypeSelect();
+  root.innerHTML = `
+    <div class="modal-ov">
+      <div class="modal" role="dialog" aria-modal="true" style="width:560px;">
+        <div class="modal-h">Chọn loại báo giá trước khi lưu</div>
+        <div class="modal-b">
+          <p style="font-size:13px;margin-top:0;">Báo giá <strong>${esc(document.getElementById('quoteCode').value)}</strong> chưa có loại báo giá — cần chọn để quản lý, tra cứu và lọc báo cáo về sau.</p>
+          <select id="typeDialogSel"><option value="">— Chọn loại báo giá —</option>${quoteTypes.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select>
+        </div>
+        <div class="modal-f">
+          <button type="button" class="btn-g" onclick="document.getElementById('modalRoot').innerHTML=''">Huỷ</button>
+          <button type="button" class="btn-f right" onclick="confirmTypeAndSave(${asNew ? 'true' : 'false'})">Lưu báo giá</button>
+        </div>
+      </div>
+    </div>`;
+}
+function confirmTypeAndSave(asNew){
+  const v = document.getElementById('typeDialogSel').value;
+  if (!v){ showToast('Vui lòng chọn loại báo giá.'); return; }
+  quoteType = v;
+  typeMissingFlag = false;
+  document.getElementById('modalRoot').innerHTML = '';
+  renderTypeSelect();
+  saveQuoteFile(asNew);
+}
+
+// ---------- Menu xuất file / in ----------
+function toggleExportMenu(e){
+  if (e) e.stopPropagation();
+  document.getElementById('exportMenu').classList.toggle('open');
+}
+function closeExportMenu(){ document.getElementById('exportMenu').classList.remove('open'); }
+document.addEventListener('click', () => { const m = document.getElementById('exportMenu'); if (m) m.classList.remove('open'); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && rowModal) closeRowModal(); });
+function printQuote(){
+  document.body.classList.remove('printing-report');
+  window.print();
+}
+
+// ---------- Zoom / bố cục xem trước ----------
+function applyZoom(){
+  const z = document.getElementById('zoomWrap');
+  if (z) z.style.zoom = previewZoom;
+  const lbl = document.getElementById('zoomLabel');
+  if (lbl) lbl.textContent = Math.round(previewZoom * 100) + '%';
+}
+function zoomPreview(delta){
+  previewZoom = Math.max(0.35, Math.min(1.2, Math.round((previewZoom + delta) * 100) / 100));
+  applyZoom();
+}
+function setLayout(mode){
+  currentLayout = mode;
+  document.querySelectorAll('.lbtn').forEach(b => b.classList.toggle('on', b.dataset.layout === mode));
+  document.body.classList.toggle('preview-hidden', mode === 'editor-only');
+  if (mode === 'wide') previewZoom = 0.55;
+  else if (mode === 'preview') previewZoom = 1.0;
+  else if (mode === 'default') previewZoom = 0.75;
+  applyZoom();
+}
+
+// ---------- Kiểu trình bày từng bảng (font / tô màu xen kẽ / đậm tiêu đề cột) ----------
+const TABLE_STYLE_KEYS = ['main','summary','expert','other','salary'];
+const FONT_CHOICES = ['Times New Roman','Arial','Calibri','Tahoma','Cambria'];
+function renderTableStyleControls(){
+  document.querySelectorAll('.tbl-style').forEach(box => {
+    const k = box.dataset.key;
+    const st = tableStyles[k] || (tableStyles[k] = { font:'Times New Roman', zebra:false, headBold:true });
+    box.innerHTML = `
+      <div><label>Font chữ</label><select onchange="setTableStyle('${k}','font',this.value)">${FONT_CHOICES.map(f => `<option ${f===st.font?'selected':''}>${f}</option>`).join('')}</select></div>
+      <div class="checkbox-line"><input type="checkbox" ${st.zebra?'checked':''} onchange="setTableStyle('${k}','zebra',this.checked)"><label style="margin:0;">Tô màu xen kẽ dòng</label></div>
+      <div class="checkbox-line"><input type="checkbox" ${st.headBold!==false?'checked':''} onchange="setTableStyle('${k}','headBold',this.checked)"><label style="margin:0;">Đậm tiêu đề cột</label></div>`;
+  });
+}
+function setTableStyle(k, field, val){
+  tableStyles[k] = tableStyles[k] || { font:'Times New Roman', zebra:false, headBold:true };
+  tableStyles[k][field] = val;
+  render();
+}
+function applyTableStylesToPreview(){
+  const el = document.getElementById('allPages');
+  if (!el) return;
+  TABLE_STYLE_KEYS.forEach(k => {
+    const st = tableStyles[k] || {};
+    el.classList.toggle('zebra-' + k, !!st.zebra);
+    el.classList.toggle('nohb-' + k, st.headBold === false);
+    el.style.setProperty('--font-' + k, `'${(st.font || 'Times New Roman').replace(/'/g, '')}'`);
+  });
+  const cm = parseFloat((document.getElementById('footerOffsetCm') || {}).value) || 1;
+  el.style.setProperty('--footer-offset', (cm * 10) + 'mm');
+}
+function appendFooterToExtraPages(){
+  const html = window._footerBarHtml || '';
+  document.querySelectorAll('#extraPages .sheet').forEach(pg => {
+    if (!pg.querySelector('.footer-bar')) pg.insertAdjacentHTML('beforeend', html);
+  });
+}
+
+// ---------- Cấu hình mặc định cho báo giá mới ----------
+const FORMAT_FIELD_IDS = ['titleSize','titleSpacing','bodySize','bodyLine','bodySpacing','bodyPMargin','mainTableSize','mainTableLine','mainTablePadY','mainTablePadX',
+  'summaryTableSize','summaryTableLine','expertTableSize','expertTableLine','otherTableSize','otherTableLine','salaryTableSize','salaryTableLine',
+  'dateSize','companySignSize','signGapTop','footerOffsetCm'];
+function collectDefaultsSection(key){
+  const v = id => document.getElementById(id).value;
+  const c = id => document.getElementById(id).checked;
+  switch (key){
+    case 'vatTn': return { globalVatPct, globalTnPct };
+    case 'cqlTiers': return JSON.parse(JSON.stringify(cqlTiers));
+    case 'salaryTable': return JSON.parse(JSON.stringify(salaryTable));
+    case 'types': return quoteTypes.slice();
+    case 'company': return { companyName: v('companyName'), companyAddr: v('companyAddr'), companyPhone: v('companyPhone'), companyEmail: v('companyEmail') };
+    case 'logo': return { logoDataUri, showHeaderLogo: c('showHeaderLogo'), showFooterLogo: c('showFooterLogo'), footerCaption: v('footerCaptionInput') };
+    case 'sign': return { signNameOverride: v('signNameInput'), editPassword: editPassword || '' };
+    case 'format': {
+      const o = {};
+      FORMAT_FIELD_IDS.forEach(id => o[id] = v(id));
+      o.showPageNumber = c('showPageNumber');
+      o.tableStyles = JSON.parse(JSON.stringify(tableStyles));
+      return o;
+    }
+    case 'main': return {
+      recipient: v('recipient'), introPrefix: v('introPrefix'), fixedClause: v('fixedClauseInput'), footerNotes: footerNotes.slice(), closingNote: v('closingNote'),
+      discountEnabled: c('discountEnabled'), discountMode, discountPct: v('discountPct'), discountFixed: v('discountFixed'),
+      showTotalRow: c('showTotalRow'), showVatBreakdown: c('showVatBreakdown') };
+  }
+  return null;
+}
+const DEFAULT_SECTION_LABELS = { vatTn:'% VAT và % TN', cqlTiers:'bảng tỷ lệ Cql', salaryTable:'bảng lương chuyên gia', types:'danh mục loại báo giá',
+  company:'thông tin công ty', logo:'logo & chân trang', sign:'tên công ty ký tên', format:'định dạng', main:'nội dung báo giá chính' };
+async function saveDefaults(keys){
+  const all = keys || Object.keys(DEFAULT_SECTION_LABELS);
+  const partial = {};
+  all.forEach(k => partial[k] = collectDefaultsSection(k));
+  appDefaults = Object.assign({}, appDefaults || {}, partial);
+  try {
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.save_defaults){
+      const r = await window.pywebview.api.save_defaults(partial);
+      if (r && r.ok === false){ alert('Không lưu được cấu hình mặc định: ' + (r.error || '')); return; }
+    } else {
+      localStorage.setItem('baogia_defaults', JSON.stringify(appDefaults));
+    }
+  } catch (e){ console.error(e); }
+  refreshParamChips();
+  showToast(keys ? ('Đã lưu ' + keys.map(k => DEFAULT_SECTION_LABELS[k]).join(', ') + ' làm mặc định cho báo giá mới') : 'Đã lưu toàn bộ tham số & thiết lập làm mặc định cho báo giá mới');
+}
+function applyDefaults(keys, silent){
+  const d = appDefaults || {};
+  const want = k => (!keys || keys.includes(k)) && d[k] != null;
+  const setV = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+  const setC = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.checked = !!val; };
+  if (want('vatTn')){ globalVatPct = parseFloat(d.vatTn.globalVatPct) || 0; globalTnPct = parseFloat(d.vatTn.globalTnPct) || 0; setV('globalVatPct', globalVatPct); setV('globalTnPct', globalTnPct); }
+  if (want('cqlTiers') && Array.isArray(d.cqlTiers) && d.cqlTiers.length) cqlTiers = JSON.parse(JSON.stringify(d.cqlTiers));
+  if (want('salaryTable') && d.salaryTable && d.salaryTable.levels && d.salaryTable.levels.length){
+    const old = salaryTable;
+    salaryTable = JSON.parse(JSON.stringify(d.salaryTable));
+    const ids = salaryTable.levels.map(l => l.id);
+    detailSheets.forEach(s => s.expertRows.forEach(r => (r.levels || []).forEach(lv => {
+      if (!ids.includes(lv.levelId)){
+        const oldName = (old.levels.find(o => o.id === lv.levelId) || {}).name;
+        const byName = salaryTable.levels.find(l => l.name === oldName);
+        lv.levelId = byName ? byName.id : ids[0];
+      }
+    })));
+    setV('circularName', salaryTable.circularName || ''); setV('workDaysPerMonth', salaryTable.workDaysPerMonth || 26);
+  }
+  if (want('types') && Array.isArray(d.types)) quoteTypes = d.types.slice();
+  if (want('company')){ setV('companyName', d.company.companyName); setV('companyAddr', d.company.companyAddr); setV('companyPhone', d.company.companyPhone); setV('companyEmail', d.company.companyEmail); }
+  if (want('logo')){
+    if (d.logo.logoDataUri) logoDataUri = d.logo.logoDataUri;
+    setC('showHeaderLogo', d.logo.showHeaderLogo); setC('showFooterLogo', d.logo.showFooterLogo); setV('footerCaptionInput', d.logo.footerCaption || '');
+  }
+  if (want('sign')){
+    setV('signNameInput', d.sign.signNameOverride || '');
+    editPassword = d.sign.editPassword || '';
+    const t = document.getElementById('signNameText');
+    if (t) t.textContent = (d.sign.signNameOverride || '').trim() || document.getElementById('companyName').value;
+  }
+  if (want('format')){
+    FORMAT_FIELD_IDS.forEach(id => setV(id, d.format[id]));
+    setC('showPageNumber', d.format.showPageNumber !== false);
+    if (d.format.tableStyles) tableStyles = JSON.parse(JSON.stringify(d.format.tableStyles));
+  }
+  if (want('main')){
+    const m = d.main;
+    setV('recipient', m.recipient); setV('introPrefix', m.introPrefix);
+    if (m.fixedClause != null){ setV('fixedClauseInput', m.fixedClause); document.getElementById('fixedClauseText').textContent = m.fixedClause; }
+    if (Array.isArray(m.footerNotes)) footerNotes = m.footerNotes.slice();
+    setV('closingNote', m.closingNote);
+    setC('discountEnabled', m.discountEnabled); setV('discountPct', m.discountPct); setV('discountFixed', m.discountFixed);
+    setC('showTotalRow', m.showTotalRow !== false); setC('showVatBreakdown', m.showVatBreakdown);
+    setDiscountMode(m.discountMode === 'fixed' ? 'fixed' : 'pct');
+  }
+  syncSheetPcts();
+  renderSalaryTable(); renderCqlTiers(); renderNotes(); renderTableStyleControls(); renderTypesList(); renderTypeSelect();
+  renderDetailSheets(); renderItems(); render(); autoGrowAll(); refreshParamChips();
+  if (!silent) showToast('Đã áp dụng cấu hình mặc định vào báo giá này');
+}
+async function loadAppData(){
+  try {
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.load_app_data){
+      const r = await window.pywebview.api.load_app_data();
+      appDefaults = (r && r.defaults) || {};
+      registry = (r && Array.isArray(r.registry)) ? r.registry : [];
+    } else {
+      appDefaults = JSON.parse(localStorage.getItem('baogia_defaults') || '{}');
+      registry = JSON.parse(localStorage.getItem('baogia_registry') || '[]');
+    }
+  } catch (e){ console.error(e); appDefaults = appDefaults || {}; }
+  if (!quoteLoadedFromFile && appDefaults && Object.keys(appDefaults).length) applyDefaults(null, true);
+  renderFieldList();
+  refreshParamChips();
+  if (activeMainTab === 'registry') renderRegistry();
+}
+let appDataLoaded = false;
+function initAppDataOnce(){ if (appDataLoaded) return; appDataLoaded = true; loadAppData(); }
+function newQuote(){
+  if (!confirm('Soạn báo giá mới? Nội dung chưa lưu của báo giá đang mở sẽ mất.')) return;
+  location.reload();
+}
+
+// ---------- Sổ Quản lý báo giá ----------
+async function persistRegistry(){
+  try {
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.save_registry) await window.pywebview.api.save_registry(registry);
+    else localStorage.setItem('baogia_registry', JSON.stringify(registry));
+  } catch (e){ console.error(e); }
+}
+function buildRegistryRecord(filePath){
+  const st = window._quoteState || {};
+  const items = (st.items || []).filter(it => !it.isMain).map(it => ({ name: it.name, value: Math.round(it.amount || 0) }));
+  const dd = String(st.qDay || '').padStart(2, '0'), mm = String(st.qMonth || '').padStart(2, '0');
+  const investor = (document.getElementById('investorName').value || '').trim() || (st.recipient || '').trim();
+  return {
+    uid: quoteUid, code: st.quoteCode || '', date: `${st.qYear || ''}-${mm}-${dd}`, type: quoteType || '',
+    investor, field: (document.getElementById('fieldName').value || '').trim(),
+    items, discount: Math.round(st.discountEnabled ? (st.discountAmount || 0) : 0), total: Math.round(st.grandTotal || 0),
+    filePath: filePath || currentFilePath || '', savedAt: new Date().toISOString()
+  };
+}
+function upsertRegistry(rec){
+  const i = registry.findIndex(r => r.uid === rec.uid);
+  if (i >= 0) registry[i] = rec; else registry.push(rec);
+  persistRegistry();
+  renderFieldList();
+}
+function regDmy(d){ return d && d.length >= 10 ? `${d.slice(8,10)}/${d.slice(5,7)}/${d.slice(0,4)}` : (d || ''); }
+function regPeriodLabel(){
+  const F = regFilter;
+  if (F.ptype === 'year') return 'Năm ' + F.y;
+  if (F.ptype === 'quarter') return 'Quý ' + F.qt + '/' + F.y;
+  if (F.ptype === 'month') return 'Tháng ' + F.m + '/' + F.y;
+  if (F.ptype === 'custom') return regDmy(F.from) + ' – ' + regDmy(F.to);
+  return 'tất cả';
+}
+function regFilteredList(){
+  const F = regFilter;
+  const txt = (F.text || '').trim().toLowerCase();
+  return registry.filter(r => {
+    const y = +String(r.date).slice(0, 4), mo = +String(r.date).slice(5, 7);
+    if (F.ptype === 'year' && y !== F.y) return false;
+    if (F.ptype === 'quarter' && !(y === F.y && Math.ceil(mo / 3) === F.qt)) return false;
+    if (F.ptype === 'month' && !(y === F.y && mo === F.m)) return false;
+    if (F.ptype === 'custom' && !(r.date >= F.from && r.date <= F.to)) return false;
+    if (F.type !== 'all' && r.type !== F.type) return false;
+    if (F.investor !== 'all' && r.investor !== F.investor) return false;
+    if (F.field !== 'all' && r.field !== F.field) return false;
+    if (txt && (`${r.code} ${r.type} ${r.investor} ${r.field} ` + (r.items || []).map(i => i.name).join(' ')).toLowerCase().indexOf(txt) < 0) return false;
+    return true;
+  }).sort((a, b) => (a.date < b.date ? 1 : (a.date > b.date ? -1 : 0)));
+}
+function regGroups(list){
+  const F = regFilter;
+  if (F.group === 'none') return [{ title: '', rows: list, subtotal: list.reduce((s, r) => s + (r.total || 0), 0) }];
+  const keyOf = r => F.group === 'type' ? (r.type || '(chưa phân loại)') : F.group === 'investor' ? (r.investor || '(trống)') : F.group === 'field' ? (r.field || '(trống)') : ('Tháng ' + String(r.date).slice(5, 7) + '/' + String(r.date).slice(0, 4));
+  const map = {}, order = [];
+  list.forEach(r => { const k = keyOf(r); if (!map[k]){ map[k] = []; order.push(k); } map[k].push(r); });
+  const sumOf = k => map[k].reduce((s, r) => s + (r.total || 0), 0);
+  if (F.group !== 'month') order.sort((a, b) => sumOf(b) - sumOf(a));
+  return order.map(k => ({ title: k, rows: map[k], subtotal: sumOf(k) }));
+}
+function setRegFilter(p){ regFilter = Object.assign({}, regFilter, p); renderRegistry(); }
+function stepRegPeriod(dir){
+  const F = regFilter;
+  if (F.ptype === 'year') setRegFilter({ y: F.y + dir });
+  else if (F.ptype === 'quarter'){ let q = F.qt + dir, y = F.y; if (q < 1){ q = 4; y--; } if (q > 4){ q = 1; y++; } setRegFilter({ qt: q, y }); }
+  else if (F.ptype === 'month'){ let m = F.m + dir, y = F.y; if (m < 1){ m = 12; y--; } if (m > 12){ m = 1; y++; } setRegFilter({ m, y }); }
+}
+function toggleRegRow(uid){ regOpen[uid] = !regOpen[uid]; renderRegistry(); }
+function mil(n){ return (n / 1e6).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' tr'; }
+function renderRegistry(){
+  const root = document.getElementById('registryRoot');
+  if (!root) return;
+  const F = regFilter;
+  const list = regFilteredList();
+  const groups = regGroups(list);
+  const total = list.reduce((s, r) => s + (r.total || 0), 0);
+  const invs = Array.from(new Set(registry.map(r => r.investor).filter(Boolean))).sort();
+  const fields = Array.from(new Set(registry.map(r => r.field).filter(Boolean))).sort();
+  const types = Array.from(new Set(quoteTypes.concat(registry.map(r => r.type).filter(Boolean))));
+  const pill = (on, label, fn) => `<button type="button" class="pill ${on ? 'on' : ''}" onclick="${fn}">${label}</button>`;
+  let stt = 0;
+  const rowHtml = r => {
+    stt++;
+    const open = !!regOpen[r.uid];
+    return `<div class="reg-row ${r.uid === quoteUid ? 'cur' : ''}">
+      <div class="reg-grid">
+        <div style="text-align:center;">${stt}</div>
+        <div><button type="button" class="reg-code" onclick="toggleRegRow('${r.uid}')"><span style="display:inline-block;transform:rotate(${open ? 90 : 0}deg);">›</span>${esc(r.code)}</button></div>
+        <div>${regDmy(r.date)}</div>
+        <div><span class="reg-type">${esc(r.type || '(chưa phân loại)')}</span></div>
+        <div class="ell" title="${esc(r.investor)}">${esc(r.investor)}</div>
+        <div class="ell">${esc(r.field)}</div>
+        <div style="text-align:center;">${(r.items || []).length}</div>
+        <div style="text-align:right;font-weight:700;">${fmt(r.total || 0)}</div>
+        <div style="display:flex;gap:4px;">
+          <button type="button" class="btn-g" style="padding:3px 7px;font-size:11px;" title="${esc(r.filePath)}" onclick="openRegistryFile('${r.uid}')">Mở</button>
+          <button type="button" class="btn-g" style="padding:3px 7px;font-size:11px;color:#9b2c2c;" title="Xoá khỏi sổ" onclick="deleteRegistryRecord('${r.uid}')">✕</button>
+        </div>
+      </div>
+      ${open ? `<div class="reg-detail">
+        ${(r.items || []).map((it, i) => `<div><span class="muted">${i + 1}.</span><span>${esc(it.name)}</span><span style="text-align:right;">${fmt(it.value || 0)}</span></div>`).join('')}
+        ${r.discount ? `<div style="color:#8a3b2d;font-style:italic;"><span></span><span>Giảm giá</span><span style="text-align:right;">-${fmt(r.discount)}</span></div>` : ''}
+        <div style="font-weight:700;background:#eef1f8;"><span></span><span>Giá trị báo giá</span><span style="text-align:right;">${fmt(r.total || 0)}</span></div>
+      </div>` : ''}
+    </div>`;
+  };
+  root.innerHTML = `
+    <div class="pane-title">
+      <div class="ttl-lg">Quản lý báo giá</div>
+      <div class="pane-title-actions">
+        <button type="button" class="btn-o" onclick="exportRegistryExcel()">Xuất báo cáo Excel</button>
+        <button type="button" class="btn-f" onclick="printRegistryReport()">In / Xuất PDF báo cáo</button>
+      </div>
+    </div>
+    <div class="card reg-filters">
+      <div class="reg-line">
+        <span class="muted" style="font-weight:700;font-size:11px;text-transform:uppercase;">Kỳ báo cáo</span>
+        ${pill(F.ptype==='month','Tháng',"setRegFilter({ptype:'month'})")}
+        ${pill(F.ptype==='quarter','Quý',"setRegFilter({ptype:'quarter'})")}
+        ${pill(F.ptype==='year','Năm',"setRegFilter({ptype:'year'})")}
+        ${pill(F.ptype==='all','Tất cả',"setRegFilter({ptype:'all'})")}
+        ${pill(F.ptype==='custom','Tuỳ chọn',"setRegFilter({ptype:'custom'})")}
+        ${['year','quarter','month'].includes(F.ptype) ? `<span style="display:flex;align-items:center;gap:4px;margin-left:8px;">
+          <button type="button" class="btn-g" onclick="stepRegPeriod(-1)">‹</button><strong style="min-width:110px;text-align:center;">${regPeriodLabel()}</strong><button type="button" class="btn-g" onclick="stepRegPeriod(1)">›</button></span>` : ''}
+        ${F.ptype === 'custom' ? `<span style="display:flex;align-items:center;gap:6px;">Từ <input type="date" value="${F.from}" onchange="setRegFilter({from:this.value})" style="min-width:0;"> đến <input type="date" value="${F.to}" onchange="setRegFilter({to:this.value})" style="min-width:0;"></span>` : ''}
+      </div>
+      <div class="reg-line">
+        <div><label>Loại báo giá</label><select onchange="setRegFilter({type:this.value})"><option value="all">Tất cả loại báo giá</option>${types.map(t => `<option ${F.type===t?'selected':''}>${esc(t)}</option>`).join('')}</select></div>
+        <div><label>Chủ đầu tư</label><select onchange="setRegFilter({investor:this.value})"><option value="all">Tất cả chủ đầu tư</option>${invs.map(t => `<option ${F.investor===t?'selected':''}>${esc(t)}</option>`).join('')}</select></div>
+        <div><label>Lĩnh vực</label><select onchange="setRegFilter({field:this.value})"><option value="all">Tất cả lĩnh vực</option>${fields.map(t => `<option ${F.field===t?'selected':''}>${esc(t)}</option>`).join('')}</select></div>
+        <div style="flex:1;"><label>Tìm kiếm</label><input type="text" value="${esc(F.text)}" placeholder="Số báo giá, chủ đầu tư, hạng mục..." onchange="setRegFilter({text:this.value})" style="width:100%;"></div>
+      </div>
+      <div class="reg-line">
+        <span class="muted" style="font-weight:700;font-size:11px;text-transform:uppercase;">Nhóm theo</span>
+        ${pill(F.group==='none','Không nhóm',"setRegFilter({group:'none'})")}
+        ${pill(F.group==='type','Loại báo giá',"setRegFilter({group:'type'})")}
+        ${pill(F.group==='investor','Chủ đầu tư',"setRegFilter({group:'investor'})")}
+        ${pill(F.group==='field','Lĩnh vực',"setRegFilter({group:'field'})")}
+        ${pill(F.group==='month','Tháng',"setRegFilter({group:'month'})")}
+      </div>
+    </div>
+    <div class="reg-stats">
+      <div class="stat"><div class="k">Số báo giá</div><div class="v">${list.length}</div></div>
+      <div class="stat"><div class="k">Tổng giá trị</div><div class="v">${mil(total)}</div></div>
+      <div class="stat"><div class="k">Bình quân / báo giá</div><div class="v">${list.length ? mil(total / list.length) : '0'}</div></div>
+      <div class="stat"><div class="k">Số chủ đầu tư</div><div class="v">${new Set(list.map(r => r.investor)).size}</div></div>
+    </div>
+    <div class="reg-table">
+      <div class="reg-grid reg-h"><div style="text-align:center;">STT</div><div>Số báo giá</div><div>Ngày</div><div>Loại báo giá</div><div>Chủ đầu tư</div><div>Lĩnh vực</div><div style="text-align:center;">Hạng mục</div><div style="text-align:right;">Giá trị (đ)</div><div></div></div>
+      ${groups.map(g => `${g.title ? `<div class="reg-grp"><strong style="color:var(--ui-navy);">${esc(g.title)}</strong><span class="muted">${g.rows.length} báo giá</span><strong style="margin-left:auto;">${fmt(g.subtotal)}</strong></div>` : ''}${g.rows.map(rowHtml).join('')}`).join('')}
+      ${list.length ? '' : '<div style="padding:24px;text-align:center;color:var(--ui-muted);">Chưa có báo giá nào trong kỳ / bộ lọc đã chọn. Báo giá sẽ tự vào sổ khi bấm “Lưu” hoặc “Lưu bản mới”.</div>'}
+      <div class="reg-total"><span>Tổng cộng ${regPeriodLabel()} — ${list.length} báo giá</span><span>${fmt(total)} đ</span></div>
+    </div>`;
+}
+async function deleteRegistryRecord(uid){
+  if (!confirm('Xoá báo giá này khỏi sổ Quản lý báo giá? (File báo giá đã lưu trên máy không bị xoá.)')) return;
+  registry = registry.filter(r => r.uid !== uid);
+  await persistRegistry();
+  renderRegistry();
+}
+async function openRegistryFile(uid){
+  const r = registry.find(x => x.uid === uid);
+  if (!r) return;
+  if (!(window.pywebview && window.pywebview.api && window.pywebview.api.open_quote_path)){ alert('Chức năng mở file chỉ dùng được trong phần mềm desktop.'); return; }
+  const res = await window.pywebview.api.open_quote_path(r.filePath);
+  if (res && res.ok){
+    if (applyLoadedQuoteData(res.data)){ currentFilePath = res.path; setMainTab('items'); }
+  } else alert((res && res.error) || 'Không mở được file.');
+}
+function registryPayload(){
+  const list = regFilteredList();
+  const groups = regGroups(list).map(g => ({ title: g.title, subtotal: g.subtotal, rows: g.rows.map(r => Object.assign({}, r, { dateText: regDmy(r.date) })) }));
+  const F = regFilter;
+  const parts = [];
+  if (F.type !== 'all') parts.push('Loại: ' + F.type);
+  if (F.investor !== 'all') parts.push('Chủ đầu tư: ' + F.investor);
+  if (F.field !== 'all') parts.push('Lĩnh vực: ' + F.field);
+  return { title: 'BÁO CÁO TỔNG HỢP BÁO GIÁ', subtitle: 'Kỳ báo cáo: ' + regPeriodLabel() + (parts.length ? ' — ' + parts.join('; ') : ''),
+    slug: regPeriodLabel().replace(/[\s\/–]+/g, '_'), groups, total: list.reduce((s, r) => s + (r.total || 0), 0), count: list.length };
+}
+async function exportRegistryExcel(){
+  if (!(window.pywebview && window.pywebview.api && window.pywebview.api.export_registry_excel)){ alert('Chức năng xuất file chỉ hoạt động trong ứng dụng desktop.'); return; }
+  const res = await window.pywebview.api.export_registry_excel(registryPayload());
+  showExportResult(res);
+}
+function printRegistryReport(){
+  const p = registryPayload();
+  let stt = 0;
+  document.getElementById('reportPrint').innerHTML = `
+    <h2 style="text-align:center;margin:0 0 4px;">${esc(p.title)}</h2>
+    <div style="text-align:center;font-style:italic;margin-bottom:12px;">${esc(p.subtitle)}</div>
+    <table><thead><tr><th>STT</th><th>Số báo giá</th><th>Ngày</th><th>Loại báo giá</th><th>Chủ đầu tư</th><th>Lĩnh vực</th><th>Hạng mục</th><th>Giá trị (đ)</th></tr></thead><tbody>
+    ${p.groups.map(g => `${g.title ? `<tr><td colspan="7"><strong>${esc(g.title)}</strong></td><td style="text-align:right;"><strong>${fmt(g.subtotal)}</strong></td></tr>` : ''}${g.rows.map(r => { stt++; return `<tr><td style="text-align:center;">${stt}</td><td>${esc(r.code)}</td><td>${r.dateText}</td><td>${esc(r.type)}</td><td>${esc(r.investor)}</td><td>${esc(r.field)}</td><td>${(r.items || []).map(i => esc(i.name) + ': ' + fmt(i.value || 0)).join('<br>')}</td><td style="text-align:right;">${fmt(r.total || 0)}</td></tr>`; }).join('')}`).join('')}
+    <tr><td colspan="7"><strong>TỔNG CỘNG (${p.count} báo giá)</strong></td><td style="text-align:right;"><strong>${fmt(p.total)}</strong></td></tr>
+    </tbody></table>`;
+  document.body.classList.add('printing-report');
+  window.print();
+  setTimeout(() => document.body.classList.remove('printing-report'), 500);
+}
+
 // init
 document.querySelector('.panel').addEventListener('input', (e) => {
   if (e.target.classList && e.target.classList.contains('autowrap')) autoGrow(e.target);
@@ -3798,8 +4925,16 @@ renderCqlTiers();
 renderDetailSheets();
 renderItems();
 renderNotes();
-setMode('single');
+renderTableStyleControls();
+renderTypesList();
+renderTypeSelect();
+setMainTab('items');
+setLayout('default');
+render();
 autoGrowAll();
+if (window.pywebview && window.pywebview.api) initAppDataOnce();
+else setTimeout(() => { if (!window.pywebview) initAppDataOnce(); }, 800);
+window.addEventListener('pywebviewready', () => { appDataLoaded = false; initAppDataOnce(); });
 </script>
 
 </body>

@@ -18,7 +18,37 @@ from export_logic import (
     parse_other_costs_excel,
     build_salary_template,
     parse_salary_excel,
+    export_registry_report,
 )
+
+
+def app_data_dir():
+    """Thu muc luu du lieu dung chung cua phan mem (cau hinh mac dinh + so quan ly bao gia)."""
+    if sys.platform == "darwin":
+        base = os.path.join(os.path.expanduser("~"), "Library", "Application Support")
+    else:
+        base = os.environ.get("APPDATA") or os.path.expanduser("~")
+    d = os.path.join(base, "BaoGiaITD")
+    os.makedirs(d, exist_ok=True)
+    return d
+
+
+def _read_json(name, default):
+    path = os.path.join(app_data_dir(), name)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return default
+
+
+def _write_json(name, data):
+    path = os.path.join(app_data_dir(), name)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, path)
+
 
 
 def resource_path(relative_path):
@@ -61,10 +91,13 @@ class Api:
         except Exception as e:
             return {"ok": False, "error": str(e)}
 
-    def save_quote_project(self, state):
+    def save_quote_project(self, state, path=None):
         try:
-            default_name = f"BaoGia_{self._safe_name(state.get('quoteCode', 'BaoGia'))}.json"
-            save_path = self._ask_save_path(default_name, "Quote project files (*.json)")
+            if path and os.path.isdir(os.path.dirname(path) or "."):
+                save_path = path
+            else:
+                default_name = f"BaoGia_{self._safe_name(state.get('quoteCode', 'BaoGia'))}.json"
+                save_path = self._ask_save_path(default_name, "Quote project files (*.json)")
             if not save_path:
                 return {"cancelled": True}
             with open(save_path, "w", encoding="utf-8") as f:
@@ -85,7 +118,52 @@ class Api:
             open_path = result[0] if isinstance(result, (list, tuple)) else result
             with open(open_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            return {"ok": True, "data": data}
+            return {"ok": True, "data": data, "path": open_path}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    def open_quote_path(self, path):
+        """Mo lai 1 file bao gia theo duong dan da luu trong so Quan ly bao gia."""
+        try:
+            if not path or not os.path.exists(path):
+                return {"ok": False, "error": "Không tìm thấy file (có thể đã bị di chuyển hoặc xóa): " + str(path)}
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return {"ok": True, "data": data, "path": path}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    # ---- Cau hinh mac dinh cho bao gia moi + so quan ly bao gia ----
+
+    def load_app_data(self):
+        try:
+            return {"ok": True, "defaults": _read_json("defaults.json", {}), "registry": _read_json("registry.json", [])}
+        except Exception as e:
+            return {"ok": False, "error": str(e), "defaults": {}, "registry": []}
+
+    def save_defaults(self, partial):
+        try:
+            cur = _read_json("defaults.json", {})
+            cur.update(partial or {})
+            _write_json("defaults.json", cur)
+            return {"ok": True}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    def save_registry(self, records):
+        try:
+            _write_json("registry.json", records or [])
+            return {"ok": True}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    def export_registry_excel(self, payload):
+        try:
+            save_path = self._ask_save_path(f"Bao_cao_bao_gia_{self._safe_name(payload.get('slug', ''))}.xlsx", "Excel files (*.xlsx)")
+            if not save_path:
+                return {"cancelled": True}
+            export_registry_report(payload, save_path)
+            return {"ok": True, "path": save_path}
         except Exception as e:
             return {"ok": False, "error": str(e)}
 

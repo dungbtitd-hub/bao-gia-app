@@ -222,7 +222,14 @@ def compute_detail_totals(sheet, salary_table, cql_tiers=None):
             for r in sheet.get("otherRows", [])
         )
 
-    cql_pct = resolve_cql_pct(Ccg, cql_tiers)
+    # % Cql: tu dong theo bang ty le (cql_tiers) dua tren Ccg - tru khi hang muc nay duoc "Sua ty le"
+    # rieng (cqlPctOverride, dong bo voi computeDetailTotal() trong ui.html).
+    if sheet.get("cqlPctOverride") is not None and sheet.get("cqlPctOverride") != "":
+        cql_pct = float(sheet.get("cqlPctOverride") or 0)
+        if cql_pct.is_integer():
+            cql_pct = int(cql_pct)
+    else:
+        cql_pct = resolve_cql_pct(Ccg, cql_tiers)
     Cql = Ccg * cql_pct / 100
     TN = (Ccg + Cql + Ck) * (sheet.get("tnPct", 0) or 0) / 100
     G = Ccg + Cql + Ck + TN
@@ -357,7 +364,10 @@ def _plan_detail_sheet_excel(detail, totals, show_vat, cql_tiers):
         return f"E{row_of[key]}"
 
     formulas = {}
-    formulas["cql"] = f"={E('ccg')}*({_cql_pct_formula(E('ccg'), cql_tiers)})/100"
+    if detail.get("cqlPctOverride") is not None and detail.get("cqlPctOverride") != "":
+        formulas["cql"] = f"={E('ccg')}*{float(detail.get('cqlPctOverride') or 0)}/100"
+    else:
+        formulas["cql"] = f"={E('ccg')}*({_cql_pct_formula(E('ccg'), cql_tiers)})/100"
     formulas["tn"] = f"=({E('ccg')}+{E('cql')}+{E('ck')})*{tn_pct}/100"
     formulas["cong"] = f"={E('ccg')}+{E('cql')}+{E('ck')}+{E('tn')}"
 
@@ -606,7 +616,7 @@ def export_excel_file(state, save_path):
         is_sum_row = is_main and bool(it.get("isSumRow"))
         # Dong hang muc chinh: in dam toan dong. Dong hang muc con: chu thang (mac dinh) hoac in nghieng
         # neu nguoi dung bat "In nghieng cac dong hang muc con" (xem g.subItemsItalic/row.italic ben ui.html).
-        f = bold if is_main else (italic_normal if it.get("italic") else normal)
+        f = bold if (is_main or it.get("bold")) else (italic_normal if it.get("italic") else normal)
         ws.cell(row=row, column=1, value=it.get("number", "")).font = f
         ws.cell(row=row, column=1).alignment = center
         ws.cell(row=row, column=2, value=it.get("name", "")).font = f
@@ -663,23 +673,26 @@ def export_excel_file(state, save_path):
                 c5.number_format = "#,##0"
                 c5.font = f
                 if not is_sum_row:
-                    item_amount_rows.append(row)
+                    item_amount_rows.append((row, it.get("inTotal", True) is not False, it.get("inDiscount", True) is not False))
         for col in range(1, last_col + 1):
             ws.cell(row=row, column=col).border = border
         row += 1
 
-    mode = state.get("mode", "single")
-    if mode == "single":
-        subtotal_expr = "+".join(f"{last_col_letter}{r}" for r in item_amount_rows) or "0"
+    show_total_row = state.get("showTotalRow", True) is not False
+    if state.get("discountEnabled") or show_total_row:
+        # Chi cong vao "Tong cong" cac dong duoc tich "Cong vao Tong cong"; giam gia chi tinh tren cac
+        # dong duoc tich "Ap dung giam gia" (dong bo voi render() trong ui.html).
+        subtotal_expr = "+".join(f"{last_col_letter}{r}" for r, in_total, _d in item_amount_rows if in_total) or "0"
+        disc_base_expr = "+".join(f"{last_col_letter}{r}" for r, _t, in_disc in item_amount_rows if in_disc) or "0"
         discount_row = None
         if state.get("discountEnabled"):
             pct = state.get("discountPct", 0)
             discount_label = "Giam gia dich vu" if state.get("discountMode") == "fixed" else f"Giam gia dich vu {pct}%"
             if state.get("discountMode") == "fixed":
                 fixed_amt = state.get("discountFixed", 0) or 0
-                discount_formula = f"=-MIN({fixed_amt},({subtotal_expr}))"
+                discount_formula = f"=-MIN({fixed_amt},({disc_base_expr}))"
             else:
-                discount_formula = f"=-({subtotal_expr})*{pct}/100"
+                discount_formula = f"=-ROUND(({disc_base_expr})*{pct}/100,0)"
             ws.cell(row=row, column=1).border = border
             c2 = ws.cell(row=row, column=2, value=discount_label)
             c2.font = Font(italic=True, name="Times New Roman", size=12)
@@ -694,6 +707,7 @@ def export_excel_file(state, save_path):
             discount_row = row
             row += 1
         total_formula = f"=({subtotal_expr})+{last_col_letter}{discount_row}" if discount_row else f"={subtotal_expr}"
+    if show_total_row:
         ws.cell(row=row, column=1).border = border
         c2 = ws.cell(row=row, column=2, value="Tong cong gia tri dich vu")
         c2.font = bold
@@ -741,6 +755,9 @@ def export_excel_file(state, save_path):
     ws.oddFooter.left.text = footer_caption
     ws.oddFooter.left.size = 9
     ws.oddFooter.left.font = "Times New Roman,Bold"
+    if state.get("showPageNumber", True) is not False:
+        ws.oddFooter.center.text = "Trang &P / &N"
+        ws.oddFooter.center.size = 9
 
     # ---- Buoc 2: ghi thuc su tung sheet "Du toan chi tiet" - PHAT (deploy) dung cac cong thuc + vi tri
     # da tinh san o plan (buoc 1) vao dung o, khong tu tinh lai gi them. ----
@@ -914,6 +931,9 @@ def export_excel_file(state, save_path):
         dws.column_dimensions["G"].width = 16
 
         dws.oddFooter.left.text = footer_caption
+        if state.get("showPageNumber", True) is not False:
+            dws.oddFooter.center.text = "Trang &P / &N"
+            dws.oddFooter.center.size = 9
         dws.oddFooter.left.size = 9
         dws.oddFooter.left.font = "Times New Roman,Bold"
 
@@ -947,6 +967,9 @@ def export_excel_file(state, save_path):
         sws.column_dimensions["B"].width = 18
         sws.column_dimensions["C"].width = 18
         sws.oddFooter.left.text = footer_caption
+        if state.get("showPageNumber", True) is not False:
+            sws.oddFooter.center.text = "Trang &P / &N"
+            sws.oddFooter.center.size = 9
         sws.oddFooter.left.size = 9
         sws.oddFooter.left.font = "Times New Roman,Bold"
 
@@ -1089,10 +1112,9 @@ def _add_field(paragraph, field_code, font_size_pt=9, color_rgb=None):
     return run
 
 
-def _add_page_footer(doc, caption_text, logo_bytes=None, show_logo=True):
-    """Footer lap lai o MOI trang, giong het dai chan mau (.footer-bar, nen #d9d4c4) + so trang
-    "Trang X / Y" (.page-num-label) o goc duoi ban PDF/in - khong con la 1 dong chu tab-stop don
-    gian nhu truoc, ma la 1 dai co mau nen that su va so trang tu dong theo Word field."""
+def _add_page_footer(doc, caption_text, logo_bytes=None, show_logo=True, show_page_number=True):
+    """Footer lap lai o MOI trang: 1 dai mau (#d9d4c4) gom ten cong ty (trai) - so trang "Trang X / Y"
+    (chinh giua dai mau) - logo (phai), cach mep duoi trang theo footer_distance (mac dinh 1cm)."""
     section = doc.sections[0]
     footer = section.footer
     footer.is_linked_to_previous = False
@@ -1101,15 +1123,14 @@ def _add_page_footer(doc, caption_text, logo_bytes=None, show_logo=True):
 
     usable_cm = _usable_width_cm(section)
 
-    band = footer.add_table(rows=1, cols=2, width=Cm(usable_cm))
+    band = footer.add_table(rows=1, cols=3, width=Cm(usable_cm))
     band.alignment = WD_TABLE_ALIGNMENT.CENTER
     _remove_table_borders(band)
-    _set_table_col_widths_cm(band, [usable_cm * 0.68, usable_cm * 0.32])
-    c0, c1 = band.rows[0].cells
-    _shade_cell(c0, FOOTER_BAND_HEX)
-    _shade_cell(c1, FOOTER_BAND_HEX)
-    c0.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-    c1.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    _set_table_col_widths_cm(band, [usable_cm * 0.42, usable_cm * 0.26, usable_cm * 0.32])
+    c0, c_mid, c1 = band.rows[0].cells
+    for c in (c0, c_mid, c1):
+        _shade_cell(c, FOOTER_BAND_HEX)
+        c.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
     p0 = c0.paragraphs[0]
     p0.paragraph_format.space_before = Pt(2)
@@ -1118,6 +1139,22 @@ def _add_page_footer(doc, caption_text, logo_bytes=None, show_logo=True):
     r1.bold = True
     r1.font.color.rgb = FOOTER_CAPTION_RGB
     r1.font.size = Pt(10)
+
+    p_mid = c_mid.paragraphs[0]
+    p_mid.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_mid.paragraph_format.space_before = Pt(2)
+    p_mid.paragraph_format.space_after = Pt(2)
+    if show_page_number:
+        r_lbl = p_mid.add_run("Trang ")
+        r_lbl.bold = True
+        r_lbl.font.size = Pt(9)
+        r_lbl.font.color.rgb = FOOTER_CAPTION_RGB
+        _add_field(p_mid, "PAGE", font_size_pt=9, color_rgb=FOOTER_CAPTION_RGB)
+        r_sep = p_mid.add_run(" / ")
+        r_sep.bold = True
+        r_sep.font.size = Pt(9)
+        r_sep.font.color.rgb = FOOTER_CAPTION_RGB
+        _add_field(p_mid, "NUMPAGES", font_size_pt=9, color_rgb=FOOTER_CAPTION_RGB)
 
     p1 = c1.paragraphs[0]
     p1.paragraph_format.space_before = Pt(2)
@@ -1131,7 +1168,6 @@ def _add_page_footer(doc, caption_text, logo_bytes=None, show_logo=True):
         except Exception:
             logo_ok = False
     if not logo_ok and show_logo:
-        # Anh logo khong doc duoc (hoac chua co) -> giu chu "ITD Vietnam" nhu mac dinh cu.
         r2 = p1.add_run("ITD")
         r2.bold = True
         r2.font.size = Pt(11)
@@ -1140,18 +1176,42 @@ def _add_page_footer(doc, caption_text, logo_bytes=None, show_logo=True):
         r3.font.size = Pt(8)
         r3.font.color.rgb = RGBColor(0xA8, 0x82, 0x3C)
 
-    p_num = footer.add_paragraph()
-    p_num.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    p_num.paragraph_format.space_before = Pt(2)
-    muted = RGBColor(0x6B, 0x66, 0x5A)
-    r_lbl = p_num.add_run("Trang ")
-    r_lbl.font.size = Pt(9)
-    r_lbl.font.color.rgb = muted
-    _add_field(p_num, "PAGE", font_size_pt=9, color_rgb=muted)
-    r_sep = p_num.add_run(" / ")
-    r_sep.font.size = Pt(9)
-    r_sep.font.color.rgb = muted
-    _add_field(p_num, "NUMPAGES", font_size_pt=9, color_rgb=muted)
+
+ZEBRA_HEX = "F6F3EC"
+
+
+def _cell_has_fill(cell):
+    tcPr = cell._tc.tcPr
+    if tcPr is None:
+        return False
+    return tcPr.find(qn("w:shd")) is not None
+
+
+def _apply_user_table_style(table, style, header_row_idx=0):
+    """Tuy chon trinh bay them cho tung bang (tab Dinh dang): font chu, to mau xen ke dong, dam tieu de cot."""
+    if not table or not style:
+        return
+    font_name = (style.get("font") or "").strip()
+    zebra = bool(style.get("zebra"))
+    head_bold = style.get("headBold", True) is not False
+    for ri, row in enumerate(table.rows):
+        for cell in row.cells:
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if font_name:
+                        run.font.name = font_name
+                        rPr = run._element.get_or_add_rPr()
+                        rFonts = rPr.find(qn("w:rFonts"))
+                        if rFonts is None:
+                            rFonts = OxmlElement("w:rFonts")
+                            rPr.append(rFonts)
+                        for attr in ("w:ascii", "w:hAnsi", "w:cs", "w:eastAsia"):
+                            rFonts.set(qn(attr), font_name)
+                    if ri == header_row_idx and not head_bold:
+                        run.bold = False
+        if zebra and ri > header_row_idx and (ri - header_row_idx) % 2 == 0:
+            if not any(_cell_has_fill(c) for c in row.cells):
+                _shade_row(row, ZEBRA_HEX)
 
 
 def export_word_file(state, save_path):
@@ -1174,7 +1234,16 @@ def export_word_file(state, save_path):
     logo_bytes = _decode_logo_bytes(state.get("logoDataUri")) if (show_header_logo or show_footer_logo) else None
     footer_caption = _resolve_footer_caption(state)
 
-    _add_page_footer(doc, footer_caption, logo_bytes=logo_bytes, show_logo=show_footer_logo)
+    try:
+        footer_offset_cm = float(state.get("footerOffsetCm", 1) or 1)
+    except (TypeError, ValueError):
+        footer_offset_cm = 1.0
+    for section in doc.sections:
+        section.footer_distance = Cm(max(0.3, min(footer_offset_cm, 3.0)))
+    _add_page_footer(doc, footer_caption, logo_bytes=logo_bytes, show_logo=show_footer_logo,
+                     show_page_number=state.get("showPageNumber", True) is not False)
+    table_styles = state.get("tableStyles") or {}
+    styled_tables = []
 
     show_vat = bool(state.get("showVatBreakdown"))
 
@@ -1248,11 +1317,11 @@ def export_word_file(state, save_path):
     r_unit.font.size = Pt(10)
 
     items = state.get("items", [])
-    mode = state.get("mode", "single")
+    show_total_row = state.get("showTotalRow", True) is not False
     extra_rows = 0
-    if mode == "single":
-        if state.get("discountEnabled"):
-            extra_rows += 1
+    if state.get("discountEnabled"):
+        extra_rows += 1
+    if show_total_row:
         extra_rows += 1
 
     n_cols = 5 if show_vat else 3
@@ -1280,11 +1349,12 @@ def export_word_file(state, save_path):
         # binh thuong thay vi merge/de trong nhu mac dinh.
         is_sum_row = is_main and bool(it.get("isSumRow"))
         cells = table.rows[r_idx].cells
+        row_bold = is_main or bool(it.get("bold"))
         stt_run = cells[0].paragraphs[0].add_run(str(it.get("number", "")))
-        stt_run.bold = is_main
+        stt_run.bold = row_bold
         cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         name_run = cells[1].paragraphs[0].add_run(it.get("name", ""))
-        name_run.bold = is_main
+        name_run.bold = row_bold
         if is_main and not is_sum_row:
             if show_vat:
                 cells[1].merge(cells[n_cols - 1])
@@ -1301,25 +1371,25 @@ def export_word_file(state, save_path):
                 if bv is not None:
                     p2 = cells[2].paragraphs[0]
                     r2 = p2.add_run(fmt_number(bv))
-                    r2.bold = is_main
+                    r2.bold = row_bold
                     r2.italic = is_italic
                     p2.alignment = WD_ALIGN_PARAGRAPH.RIGHT
                 if va is not None:
                     p3 = cells[3].paragraphs[0]
                     r3 = p3.add_run(fmt_number(va))
-                    r3.bold = is_main
+                    r3.bold = row_bold
                     r3.italic = is_italic
                     p3.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             amt = it.get("amount", None)
             if amt is not None:
                 p_last = cells[n_cols - 1].paragraphs[0]
                 r_last = p_last.add_run(fmt_number(amt))
-                r_last.bold = is_main
+                r_last.bold = row_bold
                 r_last.italic = is_italic
                 p_last.alignment = WD_ALIGN_PARAGRAPH.RIGHT
         r_idx += 1
 
-    if mode == "single":
+    if True:
         if state.get("discountEnabled"):
             cells = table.rows[r_idx].cells
             pct = state.get("discountPct", 0)
@@ -1336,6 +1406,7 @@ def export_word_file(state, save_path):
             r_disc_amt.font.color.rgb = ACCENT_RGB
             p_last.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             r_idx += 1
+    if show_total_row:
         cells = table.rows[r_idx].cells
         cells[1].paragraphs[0].add_run("Tổng cộng giá trị dịch vụ").bold = True
         if show_vat:
@@ -1349,6 +1420,7 @@ def export_word_file(state, save_path):
         r_idx += 1
 
     _set_table_font_size(table, 11)
+    styled_tables.append((table, "main"))
 
     doc.add_paragraph()
 
@@ -1437,6 +1509,7 @@ def export_word_file(state, save_path):
             hdr0[i].paragraphs[0].add_run(text).bold = True
             hdr0[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         _style_data_table(t0, [usable_cm * f / 100 for f in (7, 25, 10, 34, 24)])
+        styled_tables.append((t0, "summary"))
 
         for ridx, (stt, label, sym, explain, val, is_bold) in enumerate(rows_data, start=1):
             cells = t0.rows[ridx].cells
@@ -1485,6 +1558,7 @@ def export_word_file(state, save_path):
                 hdr1[i].paragraphs[0].add_run(text).bold = True
                 hdr1[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             _style_data_table(t1, [usable_cm * f / 100 for f in (7, 29, 12, 12, 10, 15, 15)])
+            styled_tables.append((t1, "expert"))
 
             sum_cells = t1.rows[1].cells
             sum_cells[1].paragraphs[0].add_run("Tổng hợp chi phí chuyên gia tư vấn").bold = True
@@ -1574,6 +1648,7 @@ def export_word_file(state, save_path):
                 hdr2[i].paragraphs[0].add_run(text).bold = True
                 hdr2[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             _style_data_table(t2, [usable_cm * f / 100 for f in (7, 33, 12, 14, 17, 17)])
+            styled_tables.append((t2, "other"))
 
             sum_cells2 = t2.rows[1].cells
             sum_cells2[1].paragraphs[0].add_run("Tổng cộng").bold = True
@@ -1632,6 +1707,7 @@ def export_word_file(state, save_path):
             hdr_sal[i].paragraphs[0].add_run(text).bold = True
             hdr_sal[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         _style_data_table(t_sal, [usable_cm * f / 100 for f in (30, 35, 35)])
+        styled_tables.append((t_sal, "salary"))
         for i, lvl in enumerate(levels, start=1):
             cells = t_sal.rows[i].cells
             cells[0].paragraphs[0].add_run(lvl.get("name", ""))
@@ -1644,6 +1720,11 @@ def export_word_file(state, save_path):
 
         _set_table_font_size(t_sal, 11)
 
+    for tbl, key in styled_tables:
+        try:
+            _apply_user_table_style(tbl, table_styles.get(key))
+        except Exception:
+            pass
     doc.save(save_path)
 
 
@@ -2218,3 +2299,94 @@ def parse_salary_excel(path):
         raise ValueError("Không đọc được mức chuyên gia nào hợp lệ trong file.")
 
     return {"levels": levels, "workDaysPerMonth": work_days, "circularName": circular_name}, warnings
+
+
+def export_registry_report(payload, save_path):
+    """Xuat bao cao tu so Quan ly bao gia (da loc/nhom tren giao dien) ra file Excel."""
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Tong hop"
+    thin = Side(style="thin", color="999999")
+    border = Border(left=thin, right=thin, top=thin, bottom=thin)
+    bold = Font(bold=True, name="Times New Roman", size=12)
+    normal = Font(name="Times New Roman", size=12)
+    head_fill = PatternFill("solid", fgColor="E2E7F4")
+    grp_fill = PatternFill("solid", fgColor="F5F7FC")
+    tot_fill = PatternFill("solid", fgColor="D9DEEA")
+    ws.cell(row=1, column=1, value=payload.get("title") or "BÁO CÁO TỔNG HỢP BÁO GIÁ").font = Font(bold=True, name="Times New Roman", size=14)
+    ws.cell(row=2, column=1, value=payload.get("subtitle") or "").font = Font(italic=True, name="Times New Roman", size=11)
+    headers = ["STT", "Số báo giá", "Ngày", "Loại báo giá", "Chủ đầu tư", "Lĩnh vực", "Số hạng mục", "Giá trị (đ)"]
+    hr = 4
+    for ci, h in enumerate(headers, start=1):
+        c = ws.cell(row=hr, column=ci, value=h)
+        c.font = bold
+        c.fill = head_fill
+        c.border = border
+        c.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    r = hr + 1
+    stt = 0
+    for grp in payload.get("groups", []):
+        if grp.get("title"):
+            ws.cell(row=r, column=1, value=grp.get("title")).font = bold
+            ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=7)
+            c = ws.cell(row=r, column=8, value=grp.get("subtotal", 0))
+            c.font = bold
+            c.number_format = "#,##0"
+            for ci in range(1, 9):
+                ws.cell(row=r, column=ci).fill = grp_fill
+                ws.cell(row=r, column=ci).border = border
+            r += 1
+        for rec in grp.get("rows", []):
+            stt += 1
+            vals = [stt, rec.get("code", ""), rec.get("dateText", ""), rec.get("type", ""), rec.get("investor", ""),
+                    rec.get("field", ""), len(rec.get("items", [])), rec.get("total", 0)]
+            for ci, v in enumerate(vals, start=1):
+                c = ws.cell(row=r, column=ci, value=v)
+                c.font = normal
+                c.border = border
+                c.alignment = Alignment(vertical="top", wrap_text=True, horizontal="center" if ci in (1, 3, 7) else None)
+            ws.cell(row=r, column=8).number_format = "#,##0"
+            r += 1
+    ws.cell(row=r, column=1, value="TỔNG CỘNG").font = bold
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=7)
+    c = ws.cell(row=r, column=8, value=payload.get("total", 0))
+    c.font = bold
+    c.number_format = "#,##0"
+    for ci in range(1, 9):
+        ws.cell(row=r, column=ci).fill = tot_fill
+        ws.cell(row=r, column=ci).border = border
+    for col, w in zip("ABCDEFGH", (6, 20, 12, 30, 40, 20, 12, 18)):
+        ws.column_dimensions[col].width = w
+
+    ws2 = wb.create_sheet("Chi tiet hang muc")
+    headers2 = ["Số báo giá", "Ngày", "Loại báo giá", "Chủ đầu tư", "TT", "Hạng mục", "Giá trị (đ)"]
+    for ci, h in enumerate(headers2, start=1):
+        c = ws2.cell(row=1, column=ci, value=h)
+        c.font = bold
+        c.fill = head_fill
+        c.border = border
+    r2 = 2
+    for grp in payload.get("groups", []):
+        for rec in grp.get("rows", []):
+            items = rec.get("items", []) or [{"name": "", "value": rec.get("total", 0)}]
+            for ii, it in enumerate(items, start=1):
+                vals = [rec.get("code", ""), rec.get("dateText", ""), rec.get("type", ""), rec.get("investor", ""), ii, it.get("name", ""), it.get("value", 0)]
+                for ci, v in enumerate(vals, start=1):
+                    c = ws2.cell(row=r2, column=ci, value=v)
+                    c.font = normal
+                    c.border = border
+                ws2.cell(row=r2, column=7).number_format = "#,##0"
+                r2 += 1
+            if rec.get("discount"):
+                ws2.cell(row=r2, column=1, value=rec.get("code", "")).font = normal
+                ws2.cell(row=r2, column=6, value="Giảm giá").font = Font(italic=True, name="Times New Roman", size=12)
+                c = ws2.cell(row=r2, column=7, value=-abs(rec.get("discount", 0)))
+                c.number_format = "#,##0"
+                for ci in range(1, 8):
+                    ws2.cell(row=r2, column=ci).border = border
+                r2 += 1
+    for col, w in zip("ABCDEFG", (20, 12, 30, 40, 6, 50, 18)):
+        ws2.column_dimensions[col].width = w
+    wb.save(save_path)
