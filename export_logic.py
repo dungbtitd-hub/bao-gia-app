@@ -17,6 +17,7 @@ from openpyxl.drawing.image import Image as XLImage
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import get_column_letter
 
+from docx.text.run import Run
 from docx import Document
 from docx.shared import Pt, Cm, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT
@@ -1073,12 +1074,12 @@ def _set_table_col_widths_cm(table, widths_cm):
 def _set_table_font_size(table, pt):
     """Thu nho font cac bang du lieu (STT/dien giai/thanh tien...) nho hon than chu chinh van (Pt(13))
     giong ty le trong CSS (table.quote-table font-size ~12.5px, extra-page table ~12px so voi body 13px)
-    - vua giong ban PDF hon, vua tranh cac tieu de cot ngan nhu "STT" bi be chu xuong dong xau xi."""
-    for row in table.rows:
-        for cell in row.cells:
-            for para in cell.paragraphs:
-                for run in para.runs:
-                    run.font.size = Pt(pt)
+    - vua giong ban PDF hon, vua tranh cac tieu de cot ngan nhu "STT" bi be chu xuong dong xau xi.
+    (Toi uu: duyet truc tiep cac phan tu <w:r> thay vi row.cells -> paragraphs -> runs, nhanh hon nhieu
+    voi bang dai/co o gop.)"""
+    size = Pt(pt)
+    for r in table._tbl.iter(qn("w:r")):
+        Run(r, None).font.size = size
 
 
 def _style_data_table(table, col_widths_cm, header_row_idx=0, header_fill=ACCENT_SOFT_HEX):
@@ -1188,30 +1189,41 @@ def _cell_has_fill(cell):
 
 
 def _apply_user_table_style(table, style, header_row_idx=0):
-    """Tuy chon trinh bay them cho tung bang (tab Dinh dang): font chu, to mau xen ke dong, dam tieu de cot."""
+    """Tuy chon trinh bay them cho tung bang (tab Dinh dang): font chu, to mau xen ke dong, dam tieu de cot.
+    (Toi uu: thao tac truc tiep tren XML cua bang thay vi row.cells -> paragraphs -> runs.)"""
     if not table or not style:
         return
     font_name = (style.get("font") or "").strip()
     zebra = bool(style.get("zebra"))
     head_bold = style.get("headBold", True) is not False
-    for ri, row in enumerate(table.rows):
-        for cell in row.cells:
-            for para in cell.paragraphs:
-                for run in para.runs:
-                    if font_name:
-                        run.font.name = font_name
-                        rPr = run._element.get_or_add_rPr()
-                        rFonts = rPr.find(qn("w:rFonts"))
-                        if rFonts is None:
-                            rFonts = OxmlElement("w:rFonts")
-                            rPr.append(rFonts)
-                        for attr in ("w:ascii", "w:hAnsi", "w:cs", "w:eastAsia"):
-                            rFonts.set(qn(attr), font_name)
-                    if ri == header_row_idx and not head_bold:
-                        run.bold = False
-        if zebra and ri > header_row_idx and (ri - header_row_idx) % 2 == 0:
-            if not any(_cell_has_fill(c) for c in row.cells):
-                _shade_row(row, ZEBRA_HEX)
+    tbl = table._tbl
+    if font_name:
+        attrs = [qn(a) for a in ("w:ascii", "w:hAnsi", "w:cs", "w:eastAsia")]
+        for r in tbl.iter(qn("w:r")):
+            rPr = r.get_or_add_rPr()
+            rFonts = rPr.find(qn("w:rFonts"))
+            if rFonts is None:
+                rFonts = rPr.get_or_add_rFonts()
+            for a in attrs:
+                rFonts.set(a, font_name)
+    trs = tbl.tr_lst
+    if not head_bold and 0 <= header_row_idx < len(trs):
+        for r in trs[header_row_idx].iter(qn("w:r")):
+            Run(r, None).bold = False
+    if zebra:
+        rows = None
+        for ri, tr in enumerate(trs):
+            if ri > header_row_idx and (ri - header_row_idx) % 2 == 0:
+                has_fill = False
+                for tc in tr.tc_lst:
+                    tcPr = tc.tcPr
+                    if tcPr is not None and tcPr.find(qn("w:shd")) is not None:
+                        has_fill = True
+                        break
+                if not has_fill:
+                    if rows is None:
+                        rows = table.rows
+                    _shade_row(rows[ri], ZEBRA_HEX)
 
 
 def export_word_file(state, save_path):

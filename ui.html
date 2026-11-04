@@ -992,6 +992,10 @@
     #reportPrint th, #reportPrint td{border:1px solid #555; padding:4px 6px; vertical-align:top;}
     #reportPrint th{background:#e2e7f4 !important;}
   }
+
+  /* Toi uu hieu nang: trang xem truoc nam ngoai vung nhin thay thi trinh duyet bo qua layout/ve */
+  #allPages .sheet{content-visibility:auto; contain-intrinsic-size:auto 210mm auto 297mm;}
+  @media print{ #allPages .sheet{content-visibility:visible !important; contain-intrinsic-size:none !important;} }
 </style>
 </head>
 <body>
@@ -2400,7 +2404,25 @@ function fmt(n){
   return Math.round(n).toLocaleString('vi-VN');
 }
 
+// ===== Toi uu hieu nang: render() chi DAT LICH ve lai (gom nhieu lan go phim lien tiep thanh 1 lan
+// ve), renderNow() moi thuc su dung lai ban xem truoc. Cac thao tac can ket qua ngay (xuat file, in,
+// luu) goi flushRender() truoc de dam bao du lieu moi nhat. =====
+let _renderTimer = null, _renderPending = false, _lastRenderMs = 0;
 function render(){
+  _renderPending = true;
+  if (_renderTimer) clearTimeout(_renderTimer);
+  const delay = _lastRenderMs > 400 ? 600 : (_lastRenderMs > 120 ? 350 : 150);
+  _renderTimer = setTimeout(flushRender, delay);
+}
+window.addEventListener('beforeprint', () => { if (_renderPending){ flushRender(); updatePageNumbers(); } });
+function flushRender(){
+  if (_renderTimer){ clearTimeout(_renderTimer); _renderTimer = null; }
+  if (!_renderPending) return;
+  _renderPending = false;
+  const t0 = performance.now();
+  try { renderNow(); } finally { _lastRenderMs = performance.now() - t0; }
+}
+function renderNow(){
   syncSheetPcts();
   applyTableStylesToPreview();
   const titleSize = document.getElementById('titleSize').value;
@@ -2446,6 +2468,7 @@ function render(){
   sheetEl.style.setProperty('--main-table-pad-y', mainTablePadY + 'px');
   sheetEl.style.setProperty('--main-table-pad-x', mainTablePadX + 'px');
   sheetEl.style.setProperty('--body-p-margin', bodyPMargin + 'px');
+  _measureSig = sheetEl.style.cssText + '|' + sheetEl.className;
 
   const companyName = document.getElementById('companyName').value;
   const companyAddr = document.getElementById('companyAddr').value;
@@ -2643,11 +2666,13 @@ function render(){
   // (dac biet la khong con du 5cm tu ten cong ty cho ky den dai mau ITD) -> tu dong nhay sang trang moi,
   // giong het co che phan trang dang dung cho cac trang "Tong hop chi phi"/"Dien giai..." o duoi. Dai mau
   // (footerBarHtml) hien lap lai o TAT CA cac trang bao gia chinh, khong chi trang cuoi.
-  document.getElementById('sheet').innerHTML = buildMainPagesHtml(
+  const mainPagesHtml = buildMainPagesHtml(
     leadingHtml, theadHtml, rowHtmlArr, footerNotesHtml, closingSignHtml, footerBarHtml,
     parseFloat(mainTableSize) || 12.5, parseFloat(mainTableLine) || 1.4,
     `${parseFloat(mainTablePadY) || 7}px ${parseFloat(mainTablePadX) || 8}px`
   );
+  const mainSheetEl = document.getElementById('sheet');
+  if (mainSheetEl._lastHtml !== mainPagesHtml){ mainSheetEl.innerHTML = mainPagesHtml; mainSheetEl._lastHtml = mainPagesHtml; }
 
   // Loc + sap xep detailSheets truoc khi dua vao _quoteState (dung cho ca Xuat Excel/Word) theo DUNG
   // hang muc DANG DUOC CHON tren bang bao gia chinh (quoteGroups -> subItems), theo DUNG THU TU xuat
@@ -2681,6 +2706,75 @@ function render(){
 
 function mmToPx(mm){ return mm * 96 / 25.4; }
 
+// ===== Bo nho dem ket qua do chieu cao (toi uu hieu nang) =====
+// Moi lan ve lai, phan lon cac bang/trang KHONG doi (chi hang muc dang sua moi doi) - ket qua do cua
+// cung 1 doan HTML + cung cau hinh dinh dang luon giong nhau, nen luu lai theo ma bam de khong phai
+// dung khung do va tinh layout lai (thao tac ton thoi gian nhat). _measureSig doi khi doi dinh dang.
+let _measureSig = '';
+const _measureCache = new Map();
+function _hashStr(str){
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++){
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (h2 >>> 0).toString(36) + '.' + (h1 >>> 0).toString(36) + '.' + str.length;
+}
+const _pageHtmlCache = new Map(); // ket qua phan trang (chuoi HTML lon) - gioi han it phan tu hon
+function cachedMeasure(key, fn, store, limit){
+  const cache = store || _measureCache;
+  const max = limit || 60000;
+  const k = _hashStr(_measureSig + '\u0002' + key);
+  if (cache.has(k)){
+    const hit = cache.get(k);
+    if (store){ cache.delete(k); cache.set(k, hit); } // LRU cho bo nho dem trang
+    return hit;
+  }
+  const v = fn();
+  cache.set(k, v);
+  if (cache.size > max){
+    let drop = Math.ceil(max / 4);
+    for (const kk of cache.keys()){ cache.delete(kk); if (--drop <= 0) break; }
+  }
+  return v;
+}
+// Khung do bang dung chung (style inline thu cong giong het cac ham do cu): border 1px, padding, giu
+// padding-left rieng, line-height, white-space pre-wrap, cot fit/num khong xuong dong.
+function measureStyledTableProbe(innerHtml, pad, lh){
+  return cachedMeasure('S' + pad + '\u0001' + lh + '\u0001' + innerHtml, () => {
+    const probe = document.createElement('div');
+    probe.style.position = 'fixed';
+    probe.style.left = '-9999px';
+    probe.style.top = '0';
+    probe.style.width = PAGE_CONTENT_WIDTH_MM + 'mm';
+    probe.style.fontFamily = "'Times New Roman', Times, serif";
+    probe.innerHTML = innerHtml;
+    styleProbeCells(probe, pad, lh);
+    document.body.appendChild(probe);
+    const h = probe.getBoundingClientRect().height;
+    document.body.removeChild(probe);
+    return h;
+  });
+}
+function styleProbeCells(probe, pad, lh){
+  probe.querySelectorAll('th, td').forEach(cell => {
+    const origPaddingLeft = cell.style.paddingLeft;
+    cell.style.border = '1px solid #000';
+    cell.style.padding = pad;
+    if (origPaddingLeft) cell.style.paddingLeft = origPaddingLeft;
+    cell.style.lineHeight = lh;
+    cell.style.whiteSpace = 'pre-wrap';
+    if (cell.classList.contains('fit')){
+      cell.style.width = '1%';
+      if (cell.tagName === 'TD') cell.style.whiteSpace = 'nowrap';
+    }
+    if (cell.classList.contains('num')){ cell.style.whiteSpace = 'nowrap'; }
+  });
+}
+
 // Trang in cố định 297mm cao, padding 20mm/20mm/30mm/25mm (top/right/bottom/left) -> chiều cao nội dung khả dụng:
 const PAGE_CONTENT_HEIGHT_PX = mmToPx(297 - 20 - 30) - 12; // trừ thêm khoảng đệm an toàn tránh sai số đo lường
 const PAGE_CONTENT_WIDTH_MM = 210 - 20 - 25; // = 165mm
@@ -2690,6 +2784,10 @@ const PAGE_CONTENT_WIDTH_MM = 210 - 20 - 25; // = 165mm
 // gắn nhãn data-g cho từng <tr> theo phần tử gốc để đo tổng chiều cao của cả nhóm như 1 đơn vị,
 // tránh phân trang cắt ngang giữa nhóm dòng đã gộp ô.
 function measureTableRows(headerHtml, rowHtmlArray, fontSizePx, lineHeight, paddingCss){
+  return cachedMeasure('R' + headerHtml + '\u0001' + rowHtmlArray.join('\u0003') + '\u0001' + fontSizePx + '|' + lineHeight + '|' + paddingCss,
+    () => measureTableRowsUncached(headerHtml, rowHtmlArray, fontSizePx, lineHeight, paddingCss));
+}
+function measureTableRowsUncached(headerHtml, rowHtmlArray, fontSizePx, lineHeight, paddingCss){
   const fs = fontSizePx || 12;
   const lh = lineHeight || 1.4;
   const pad = paddingCss || '5px 7px';
@@ -2739,10 +2837,10 @@ function measureTableRows(headerHtml, rowHtmlArray, fontSizePx, lineHeight, padd
   document.body.appendChild(probe);
   const theadTr = probe.querySelector('thead tr');
   const headerHeight = theadTr ? theadTr.getBoundingClientRect().height : 0;
-  const rowHeights = rowHtmlArray.map((_, gi) => {
-    let h = 0;
-    probe.querySelectorAll(`tbody tr[data-g="${gi}"]`).forEach(tr => { h += tr.getBoundingClientRect().height; });
-    return h;
+  const rowHeights = rowHtmlArray.map(() => 0);
+  probe.querySelectorAll('tbody tr[data-g]').forEach(tr => {
+    const gi = +tr.getAttribute('data-g');
+    rowHeights[gi] += tr.getBoundingClientRect().height;
   });
   document.body.removeChild(probe);
   return { headerHeight, rowHeights };
@@ -2821,39 +2919,13 @@ function splitOversizedRow(rowHtml, maxHeightPx, headerHtml, fontSizePx, lineHei
     // Do THUC chieu cao 1 ung vien "trang dau": STT + [1 phan mo ta] + TOAN BO n dong Muc, dung nguyen
     // cau truc rowspan se render (khong phai cong don uoc luong rieng le) de dam bao chinh xac.
     function measureGroupHeight(descHtml){
-      const probe = document.createElement('div');
-      probe.style.position = 'fixed';
-      probe.style.left = '-9999px';
-      probe.style.top = '0';
-      probe.style.width = PAGE_CONTENT_WIDTH_MM + 'mm';
-      probe.style.fontFamily = "'Times New Roman', Times, serif";
       const sttCell = `<td class="fit" rowspan="${n}">${sttHtml}</td>`;
       const descCell = `<td style="${descStyleAttr}" rowspan="${n}">${descHtml}</td>`;
       const bodyRows = allTrs.map((t, li) => {
         const numTds = levelNumericTdsList[li].map(td => td.outerHTML).join('');
         return li === 0 ? `<tr>${sttCell}${descCell}${numTds}</tr>` : `<tr>${numTds}</tr>`;
       }).join('');
-      probe.innerHTML = `<table style="width:100%; table-layout:auto; border-collapse:collapse; font-size:${fsSplit}px; margin-bottom:10px;"><thead>${headerHtml}</thead><tbody>${bodyRows}</tbody></table>`;
-      probe.querySelectorAll('th, td').forEach(cell => {
-        // Giu lai padding-left rieng (dong "isSub") - xem giai thich o measureTableRows.
-        const origPaddingLeft = cell.style.paddingLeft;
-        cell.style.border = '1px solid #000';
-        cell.style.padding = paddingCss || '5px 7px';
-        if (origPaddingLeft) cell.style.paddingLeft = origPaddingLeft;
-        cell.style.lineHeight = String(lhSplit);
-        // Khớp CSS thật (white-space:pre-wrap) LÀM NỀN TRƯỚC, tránh đo thiếu chiều cao do \n thật
-        // giữa các <div> mục con bị co lại vô hình khi đo (xem measureTableRows).
-        cell.style.whiteSpace = 'pre-wrap';
-        if (cell.classList.contains('fit')){
-          cell.style.width = '1%';
-          if (cell.tagName === 'TD') cell.style.whiteSpace = 'nowrap';
-        }
-        if (cell.classList.contains('num')){ cell.style.whiteSpace = 'nowrap'; }
-      });
-      document.body.appendChild(probe);
-      const h = probe.getBoundingClientRect().height;
-      document.body.removeChild(probe);
-      return h;
+      return measureStyledTableProbe(`<table style="width:100%; table-layout:auto; border-collapse:collapse; font-size:${fsSplit}px; margin-bottom:10px;"><thead>${headerHtml}</thead><tbody>${bodyRows}</tbody></table>`, paddingCss || '5px 7px', String(lhSplit));
     }
 
     // Nhi phan tim so "don vi" (dong/tu) mo ta toi da co the di kem CUNG cac dong Muc tren trang dau.
@@ -2948,37 +3020,12 @@ function splitOversizedRow(rowHtml, maxHeightPx, headerHtml, fontSizePx, lineHei
   // te (<div> xuong dong tung diem chiem nhieu dong hon van ban chay lien tuc neu do tren text tho).
   function measureChunkCandidateHeight(unitsSlice, hasMore){
     const chunkText = formatWithSubClauseBreaks(unitsSlice.join(joinChar) + (hasMore ? ' …' : ''));
-    const probe2 = document.createElement('div');
-    probe2.style.position = 'fixed';
-    probe2.style.left = '-9999px';
-    probe2.style.top = '0';
-    probe2.style.width = PAGE_CONTENT_WIDTH_MM + 'mm';
-    probe2.style.fontFamily = "'Times New Roman', Times, serif";
     const newTds = tds.map((td, i) => {
       const styleAttr = td.getAttribute('style') || '';
       if (i === targetIdx) return `<td style="${styleAttr}">${chunkText}</td>`;
       return `<td style="${styleAttr}"></td>`;
     });
-    probe2.innerHTML = `<table style="width:100%; table-layout:auto; border-collapse:collapse; font-size:${fsSplit}px; margin-bottom:10px;"><thead>${headerHtml}</thead><tbody><tr>${newTds.join('')}</tr></tbody></table>`;
-    probe2.querySelectorAll('th, td').forEach(cell => {
-      // Giu lai padding-left rieng (dong "isSub") - xem giai thich o measureTableRows.
-      const origPaddingLeft = cell.style.paddingLeft;
-      cell.style.border = '1px solid #000';
-      cell.style.padding = paddingCss || '5px 7px';
-      if (origPaddingLeft) cell.style.paddingLeft = origPaddingLeft;
-      cell.style.lineHeight = String(lhSplit);
-      // Khớp CSS thật (white-space:pre-wrap) LÀM NỀN TRƯỚC — xem giải thích ở measureTableRows.
-      cell.style.whiteSpace = 'pre-wrap';
-      if (cell.classList.contains('fit')){
-        cell.style.width = '1%';
-        if (cell.tagName === 'TD') cell.style.whiteSpace = 'nowrap';
-      }
-      if (cell.classList.contains('num')){ cell.style.whiteSpace = 'nowrap'; }
-    });
-    document.body.appendChild(probe2);
-    const h = probe2.getBoundingClientRect().height;
-    document.body.removeChild(probe2);
-    return h;
+    return measureStyledTableProbe(`<table style="width:100%; table-layout:auto; border-collapse:collapse; font-size:${fsSplit}px; margin-bottom:10px;"><thead>${headerHtml}</thead><tbody><tr>${newTds.join('')}</tr></tbody></table>`, paddingCss || '5px 7px', String(lhSplit));
   }
 
   // Xay 1 <tr> ung vien (giong cau truc tra ve o duoi) cho 1 mieng van ban - dung khi do ca trang cho
@@ -3070,6 +3117,10 @@ const CONTINUATION_BAND_GAP_MM = 10;
 // sao chep y het inline style cua no sang khung do, dam bao do dung font-size/line-height nguoi dung
 // dang cau hinh thay vi gia tri mac dinh cua var().
 function measureBlockHeight(html){
+  const allPagesEl0 = document.getElementById('allPages');
+  return cachedMeasure('B' + (allPagesEl0 ? allPagesEl0.style.cssText : '') + '\u0001' + html, () => measureBlockHeightUncached(html));
+}
+function measureBlockHeightUncached(html){
   const allPagesEl = document.getElementById('allPages');
   const probe = document.createElement('div');
   probe.style.cssText = allPagesEl ? allPagesEl.style.cssText : '';
@@ -3242,7 +3293,15 @@ function buildMainPagesHtml(leadingHtml, theadHtml, rowHtmlArr, footerNotesHtml,
 // lay noi dung cua the tieu de dau tien (h1..h6) neu co, TRANH truong hop titleHtml goc gom nhieu khoi
 // (vd <h3>...</h3><p>...</p> cua bang luong chuyen gia) bi go sach the va DINH LIEN CHU VAO NHAU khi chi
 // don gian strip het the (vd "Bảng lương chuyên giaÁp dụng theo: ..." - thieu khoang trang giua 2 khoi).
+const _contTitleMemo = new Map();
 function extractContinuationTitleText(html){
+  if (_contTitleMemo.has(html)) return _contTitleMemo.get(html);
+  const v = extractContinuationTitleTextRaw(html);
+  if (_contTitleMemo.size > 500) _contTitleMemo.clear();
+  _contTitleMemo.set(html, v);
+  return v;
+}
+function extractContinuationTitleTextRaw(html){
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
   const heading = tmp.querySelector('h1,h2,h3,h4,h5,h6');
@@ -3253,6 +3312,10 @@ function extractContinuationTitleText(html){
 }
 
 function paginateTable(titleHtml, headerHtml, leadingRowsHtml, dataRowsHtml, reservedTopPx, tableClass, fontSizePx, lineHeight, descColIndex){
+  return cachedMeasure('PT' + [titleHtml, headerHtml, leadingRowsHtml.join('\u0003'), dataRowsHtml.join('\u0003'), reservedTopPx, tableClass, fontSizePx, lineHeight, descColIndex].join('\u0001'),
+    () => paginateTableUncached(titleHtml, headerHtml, leadingRowsHtml, dataRowsHtml, reservedTopPx, tableClass, fontSizePx, lineHeight, descColIndex), _pageHtmlCache, 120);
+}
+function paginateTableUncached(titleHtml, headerHtml, leadingRowsHtml, dataRowsHtml, reservedTopPx, tableClass, fontSizePx, lineHeight, descColIndex){
   // Ngan sach uoc luong cho 1 trang HOAN TOAN TRONG (chi co header bang) - CHI dung lam maxHeightPx cho
   // cac MIENG TIEP THEO (sau mieng dau) ma splitOversizedRow tu de quy tach tiep khi phan con lai van
   // qua dai cho 1 trang (cac mieng do chac chan se nam tren (cac) trang HOAN TOAN MOI). Khong con dung
@@ -3268,34 +3331,56 @@ function paginateTable(titleHtml, headerHtml, leadingRowsHtml, dataRowsHtml, res
   // selector PHAI co ancestor ".extra-page" (vd ".extra-page table th, .extra-page table td") nen se
   // KHONG ap dung len 1 probe <div> tran - gay do SAI (thieu border/padding, sai font-size that su dang
   // dung). Dung 1 ham do DUY NHAT cho moi buoc dam bao chung khop voi nhau.
-  function measurePageCandidateHeight(isFirstPage, rowsSlice){
+  function pageCandidateInnerHtml(isFirstPage, rowsSlice){
     const headBlock = isFirstPage ? titleHtml : `<h4>${extractContinuationTitleText(titleHtml)} (tiếp theo)</h4>`;
+    return `${headBlock}<table style="width:100%; table-layout:auto; border-collapse:collapse; font-size:${fontSizePx || 12}px; margin-bottom:10px;"><thead>${headerHtml}</thead><tbody>${rowsSlice.join('')}</tbody></table>`;
+  }
+  function measurePageCandidateHeight(isFirstPage, rowsSlice){
+    return measureStyledTableProbe(pageCandidateInnerHtml(isFirstPage, rowsSlice), '5px 7px', String(lineHeight || 1.4));
+  }
+  // Uoc luong NHANH so dong (tinh tu queue[qi]) con vua trang hien tai: dung 1 khung do DUY NHAT chua
+  // [cac dong da co tren trang + toi da 80 dong ung vien], doc vi tri day cua tung dong (1 lan layout).
+  // Sau do KIEM TRA LAI bang phep do that (fits(k) dung va fits(k+1) sai) - ket qua dam bao GIONG HET
+  // cach cu (them tung dong mot), chi nhanh hon nhieu lan voi bang dai.
+  function estimateFittingCount(isFirstPage, baseRows, cand){
     const probe = document.createElement('div');
     probe.style.position = 'fixed';
     probe.style.left = '-9999px';
     probe.style.top = '0';
     probe.style.width = PAGE_CONTENT_WIDTH_MM + 'mm';
     probe.style.fontFamily = "'Times New Roman', Times, serif";
-    probe.innerHTML = `${headBlock}<table style="width:100%; table-layout:auto; border-collapse:collapse; font-size:${fontSizePx || 12}px; margin-bottom:10px;"><thead>${headerHtml}</thead><tbody>${rowsSlice.join('')}</tbody></table>`;
-    probe.querySelectorAll('th, td').forEach(cell => {
-      // Giu lai padding-left rieng (dong "isSub") - xem giai thich o measureTableRows.
-      const origPaddingLeft = cell.style.paddingLeft;
-      cell.style.border = '1px solid #000';
-      cell.style.padding = '5px 7px';
-      if (origPaddingLeft) cell.style.paddingLeft = origPaddingLeft;
-      cell.style.lineHeight = String(lineHeight || 1.4);
-      // Khớp CSS thật (white-space:pre-wrap) LÀM NỀN TRƯỚC — xem giải thích ở measureTableRows.
-      cell.style.whiteSpace = 'pre-wrap';
-      if (cell.classList.contains('fit')){
-        cell.style.width = '1%';
-        if (cell.tagName === 'TD') cell.style.whiteSpace = 'nowrap';
-      }
-      if (cell.classList.contains('num')){ cell.style.whiteSpace = 'nowrap'; }
-    });
+    const tagged = cand.map((r, i) => r.replace(/<tr(\s|>)/g, `<tr data-q="${i}"$1`));
+    probe.innerHTML = pageCandidateInnerHtml(isFirstPage, baseRows.concat(tagged));
+    styleProbeCells(probe, '5px 7px', String(lineHeight || 1.4));
     document.body.appendChild(probe);
-    const h = probe.getBoundingClientRect().height;
+    const top = probe.getBoundingClientRect().top;
+    const totalH = probe.getBoundingClientRect().height;
+    const table = probe.querySelector('table');
+    const tableBottom = table ? table.getBoundingClientRect().bottom - top : totalH;
+    const tail = Math.max(0, totalH - tableBottom);
+    const bottoms = cand.map(() => 0);
+    probe.querySelectorAll('tr[data-q]').forEach(tr => {
+      const i = +tr.getAttribute('data-q');
+      const b = tr.getBoundingClientRect().bottom - top;
+      if (b > bottoms[i]) bottoms[i] = b;
+    });
     document.body.removeChild(probe);
-    return h;
+    let k = 0;
+    for (let i = 0; i < bottoms.length; i++){
+      if (bottoms[i] + tail + 1 <= PAGE_CONTENT_HEIGHT_PX) k = i + 1; else break;
+    }
+    return k;
+  }
+  function countFittingRows(isFirstPage, baseRows, queueArr, startIdx){
+    const remaining = queueArr.length - startIdx;
+    if (remaining <= 1) return 0;
+    const cand = queueArr.slice(startIdx, startIdx + Math.min(remaining, 80));
+    const fits = (k) => k === 0 || measurePageCandidateHeight(isFirstPage, baseRows.concat(cand.slice(0, k))) <= PAGE_CONTENT_HEIGHT_PX;
+    let k = estimateFittingCount(isFirstPage, baseRows, cand);
+    // Hieu chinh lai bang do that (thuong chi 0-1 buoc)
+    while (k > 0 && !fits(k)) k--;
+    while (k < cand.length && fits(k + 1)) k++;
+    return k;
   }
 
   // HTML THUC (dung nguyen cau truc se render: [tieu de neu la trang dau] + bang hoan chinh) cua 1 trang -
@@ -3331,6 +3416,7 @@ function paginateTable(titleHtml, headerHtml, leadingRowsHtml, dataRowsHtml, res
 
   const queue = dataRowsHtml.slice();
   let qi = 0;
+  let noBulkAt = -1;
   let guard = 0;
   // An toan chong vong lap vo han (khong nen bao gio cham toi trong thuc te - so vong lap thuc te ti le
   // voi so TRANG can tach, khong phai so DONG, nen he so nhan lon van du du cho ca truong hop cuc doan).
@@ -3341,6 +3427,14 @@ function paginateTable(titleHtml, headerHtml, leadingRowsHtml, dataRowsHtml, res
       // hien tai de tranh treo trang, con hon la mat du lieu.
       pageRows.push(...queue.slice(qi));
       break;
+    }
+    const bulk = (qi === noBulkAt) ? 0 : countFittingRows(isFirstPage, pageRows, queue, qi);
+    if (bulk >= 1) noBulkAt = qi + bulk; // dong ngay sau nhom nay da biet chac la KHONG vua trang hien tai
+    if (bulk > 1){
+      // Cac dong nay chac chan vua (da kiem tra bang do that) - them mot lan, giu nguyen dong cuoi cung
+      // cho vong lap xu ly theo dung logic cu (vua nguyen ven / tach / sang trang moi).
+      pageRows.push(...queue.slice(qi, qi + bulk - 1));
+      qi += bulk - 1;
     }
     const rowHtml = queue[qi];
     const wholeH = measurePageCandidateHeight(isFirstPage, pageRows.concat([rowHtml]));
@@ -3583,7 +3677,12 @@ function renderExtraPages(){
     html += paginateTable(titleHtml, headerHtml, [], dataRows, 50, 'salary-table-print', document.getElementById('salaryTableSize').value, document.getElementById('salaryTableLine').value, 3);
   }
 
-  c.innerHTML = html;
+  const footerSig = window._footerBarHtml || '';
+  if (c._lastHtml !== html || c._lastFooter !== footerSig){
+    c.innerHTML = html;
+    c._lastHtml = html; c._lastFooter = footerSig;
+    c._footerDone = false;
+  }
   requestAnimationFrame(updatePageNumbers);
 }
 
@@ -3959,6 +4058,7 @@ function loadQuoteFile(file){
 
 async function exportExcel(){
   if (!window.pywebview){ alert('Chức năng xuất file chỉ hoạt động trong ứng dụng desktop.'); return; }
+  flushRender();
   const s = window._quoteState;
   const result = await window.pywebview.api.export_excel(s);
   showExportResult(result);
@@ -3966,6 +4066,7 @@ async function exportExcel(){
 
 async function exportWord(){
   if (!window.pywebview){ alert('Chức năng xuất file chỉ hoạt động trong ứng dụng desktop.'); return; }
+  flushRender();
   const s = window._quoteState;
   const result = await window.pywebview.api.export_word(s);
   showExportResult(result);
@@ -4532,6 +4633,8 @@ document.addEventListener('click', () => { const m = document.getElementById('ex
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && rowModal) closeRowModal(); });
 function printQuote(){
   document.body.classList.remove('printing-report');
+  flushRender();
+  updatePageNumbers();
   window.print();
 }
 
@@ -4587,6 +4690,9 @@ function applyTableStylesToPreview(){
   el.style.setProperty('--footer-offset', (cm * 10) + 'mm');
 }
 function appendFooterToExtraPages(){
+  const c = document.getElementById('extraPages');
+  if (c && c._footerDone) return;
+  if (c) c._footerDone = true;
   const html = window._footerBarHtml || '';
   document.querySelectorAll('#extraPages .sheet').forEach(pg => {
     if (!pg.querySelector('.footer-bar')) pg.insertAdjacentHTML('beforeend', html);
@@ -4723,6 +4829,7 @@ async function persistRegistry(){
   } catch (e){ console.error(e); }
 }
 function buildRegistryRecord(filePath){
+  flushRender();
   const st = window._quoteState || {};
   const items = (st.items || []).filter(it => !it.isMain).map(it => ({ name: it.name, value: Math.round(it.amount || 0) }));
   const dd = String(st.qDay || '').padStart(2, '0'), mm = String(st.qMonth || '').padStart(2, '0');
