@@ -66,6 +66,37 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
+
+def _send_to_trash(path):
+    """Dua 1 file vao Thung rac cua he dieu hanh (Recycle Bin / Trash)."""
+    import subprocess
+    path = os.path.abspath(path)
+    if sys.platform.startswith("win"):
+        import ctypes
+        from ctypes import wintypes
+
+        class SHFILEOPSTRUCTW(ctypes.Structure):
+            _fields_ = [("hwnd", wintypes.HWND), ("wFunc", wintypes.UINT), ("pFrom", wintypes.LPCWSTR),
+                        ("pTo", wintypes.LPCWSTR), ("fFlags", ctypes.c_uint16), ("fAnyOperationsAborted", wintypes.BOOL),
+                        ("hNameMappings", ctypes.c_void_p), ("lpszProgressTitle", wintypes.LPCWSTR)]
+        FO_DELETE, FOF_SILENT, FOF_NOCONFIRMATION, FOF_ALLOWUNDO, FOF_NOERRORUI = 3, 0x4, 0x10, 0x40, 0x400
+        op = SHFILEOPSTRUCTW(None, FO_DELETE, path + "\0", None,
+                             FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI, False, None, None)
+        rc = ctypes.windll.shell32.SHFileOperationW(ctypes.byref(op))
+        if rc != 0 or op.fAnyOperationsAborted:
+            raise OSError("Không chuyển được vào Thùng rác (mã lỗi %s)" % rc)
+    elif sys.platform == "darwin":
+        try:
+            from Foundation import NSURL, NSFileManager
+            ok, _url, err = NSFileManager.defaultManager().trashItemAtURL_resultingItemURL_error_(
+                NSURL.fileURLWithPath_(path), None, None)
+            if not ok:
+                raise OSError(str(err))
+        except ImportError:
+            subprocess.run(["osascript", "-e", 'tell application "Finder" to delete POSIX file "%s"' % path.replace('"', '\\"')], check=True)
+    else:
+        subprocess.run(["gio", "trash", path], check=True)
+
 class Api:
     """Các hàm Python được gọi từ JavaScript (window.pywebview.api.<tên_hàm>)."""
 
@@ -119,6 +150,81 @@ class Api:
             with open(open_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             return {"ok": True, "data": data, "path": open_path}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    def pick_quote_files(self):
+        """Chon NHIEU file bao gia (.json) de cap nhat vao so Quan ly bao gia - chi doc du lieu, khong mo len soan thao."""
+        try:
+            result = webview.windows[0].create_file_dialog(
+                webview.OPEN_DIALOG,
+                directory="",
+                allow_multiple=True,
+                file_types=("Quote project files (*.json)", "All files (*.*)"),
+            )
+            if not result:
+                return {"cancelled": True}
+            paths = list(result) if isinstance(result, (list, tuple)) else [result]
+            files = []
+            for pth in paths:
+                try:
+                    with open(pth, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    if isinstance(data, dict):
+                        data.pop("logoDataUri", None)  # khong can cho so quan ly, giam dung luong truyen
+                    try:
+                        mtime = os.path.getmtime(pth) * 1000
+                    except Exception:
+                        mtime = 0
+                    files.append({"path": pth, "data": data, "mtime": mtime})
+                except Exception as e:
+                    files.append({"path": pth, "error": str(e)})
+            return {"ok": True, "files": files}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    def paths_exist(self, paths):
+        """Kiem tra cac file trong so Quan ly bao gia con ton tai khong (de nhan biet file da bi di chuyen)."""
+        out = {}
+        for pth in paths or []:
+            try:
+                out[pth] = bool(pth) and os.path.isfile(pth)
+            except Exception:
+                out[pth] = False
+        return out
+
+    def move_to_trash(self, paths):
+        """Chuyen cac file bao gia trung noi dung vao Thung rac (khoi phuc lai duoc), khong xoa vinh vien."""
+        done, failed = [], []
+        for pth in paths or []:
+            try:
+                if not pth or not os.path.isfile(pth):
+                    raise FileNotFoundError("Không tìm thấy file")
+                _send_to_trash(pth)
+                done.append(pth)
+            except Exception as e:
+                failed.append({"path": pth, "error": str(e)})
+        return {"ok": True, "done": done, "failed": failed}
+
+    def reveal_in_folder(self, path):
+        """Mo thu muc chua file bao gia (va chon san file do) trong Explorer/Finder."""
+        try:
+            if not path:
+                return {"ok": False, "error": "Báo giá này chưa có đường dẫn file."}
+            folder = path if os.path.isdir(path) else os.path.dirname(path)
+            if not os.path.isdir(folder):
+                return {"ok": False, "error": "Không tìm thấy thư mục (có thể đã bị di chuyển hoặc xóa): " + str(folder)}
+            import subprocess
+            if sys.platform.startswith("win"):
+                if os.path.isfile(path):
+                    subprocess.Popen(["explorer", "/select,", os.path.normpath(path)])
+                else:
+                    os.startfile(folder)
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", "-R", path] if os.path.isfile(path) else ["open", folder])
+            else:
+                subprocess.Popen(["xdg-open", folder])
+            return {"ok": True}
         except Exception as e:
             return {"ok": False, "error": str(e)}
 

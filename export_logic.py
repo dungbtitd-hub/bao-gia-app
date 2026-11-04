@@ -2329,7 +2329,7 @@ def export_registry_report(payload, save_path):
     tot_fill = PatternFill("solid", fgColor="D9DEEA")
     ws.cell(row=1, column=1, value=payload.get("title") or "BÁO CÁO TỔNG HỢP BÁO GIÁ").font = Font(bold=True, name="Times New Roman", size=14)
     ws.cell(row=2, column=1, value=payload.get("subtitle") or "").font = Font(italic=True, name="Times New Roman", size=11)
-    headers = ["STT", "Số báo giá", "Ngày", "Loại báo giá", "Chủ đầu tư", "Lĩnh vực", "Số hạng mục", "Giá trị (đ)"]
+    headers = ["STT", "Số báo giá", "Ngày", "Loại báo giá", "Chủ đầu tư", "Lĩnh vực", "Số hạng mục", "Giá trị (đ)", "File báo giá (đường dẫn)"]
     hr = 4
     for ci, h in enumerate(headers, start=1):
         c = ws.cell(row=hr, column=ci, value=h)
@@ -2346,14 +2346,14 @@ def export_registry_report(payload, save_path):
             c = ws.cell(row=r, column=8, value=grp.get("subtotal", 0))
             c.font = bold
             c.number_format = "#,##0"
-            for ci in range(1, 9):
+            for ci in range(1, 10):
                 ws.cell(row=r, column=ci).fill = grp_fill
                 ws.cell(row=r, column=ci).border = border
             r += 1
         for rec in grp.get("rows", []):
             stt += 1
             vals = [stt, rec.get("code", ""), rec.get("dateText", ""), rec.get("type", ""), rec.get("investor", ""),
-                    rec.get("field", ""), len(rec.get("items", [])), rec.get("total", 0)]
+                    rec.get("field", ""), len(rec.get("items", [])), rec.get("total", 0), rec.get("filePath", "")]
             for ci, v in enumerate(vals, start=1):
                 c = ws.cell(row=r, column=ci, value=v)
                 c.font = normal
@@ -2366,10 +2366,10 @@ def export_registry_report(payload, save_path):
     c = ws.cell(row=r, column=8, value=payload.get("total", 0))
     c.font = bold
     c.number_format = "#,##0"
-    for ci in range(1, 9):
+    for ci in range(1, 10):
         ws.cell(row=r, column=ci).fill = tot_fill
         ws.cell(row=r, column=ci).border = border
-    for col, w in zip("ABCDEFGH", (6, 20, 12, 30, 40, 20, 12, 18)):
+    for col, w in zip("ABCDEFGHI", (6, 20, 12, 30, 40, 20, 12, 18, 60)):
         ws.column_dimensions[col].width = w
 
     ws2 = wb.create_sheet("Chi tiet hang muc")

@@ -1003,6 +1003,17 @@
   .reg-grp{display:flex; align-items:center; gap:10px; padding:8px 14px; background:#f5f7fc; border-top:1px solid var(--ui-line); font-size:12.5px;}
   .reg-detail{margin:0 14px 12px 58px; border:1px solid var(--ui-line-soft); border-radius:8px; background:#fafbfe; font-size:12.5px;}
   .reg-detail > div{display:grid; grid-template-columns:40px 1fr 150px; padding:6px 10px; border-bottom:1px solid #eef1f8;}
+  .dup-grp{border:1px solid var(--ui-line-soft); border-radius:8px; margin-top:10px; overflow:hidden; font-size:12.5px;}
+  .dup-h{background:#eef1f8; padding:7px 10px; font-weight:700;}
+  .dup-cols, .dup-row{display:grid; grid-template-columns:52px 40px 1fr 150px; align-items:center; gap:6px; padding:6px 10px; border-top:1px solid #eef1f8; margin:0; font-weight:400;}
+  .dup-cols{font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; padding:4px 10px; background:#fafbfe;}
+  .dup-row input{margin:0 auto; width:auto;}
+  .dup-row .ell{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .dup-tag{flex:0 0 auto; font-size:11px; font-weight:700; padding:1px 7px; border-radius:10px; background:#fbe9e6; color:#9b2c2c;}
+  .dup-tag.keep{background:#e3f1e6; color:#22663a;}
+  .reg-detail > div.reg-file{display:flex; align-items:center; gap:12px; background:#f3f5fb; padding:8px 10px;}
+  .reg-file .rf-info{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;}
+  .reg-file .rf-btns{display:flex; gap:6px; flex:0 0 auto;}
   .reg-total{display:flex; justify-content:space-between; padding:10px 14px; background:var(--ui-navy); color:#fff; font-weight:700; font-size:13px;}
   #reportPrint{display:none;}
 
@@ -5030,11 +5041,13 @@ function buildRegistryRecord(filePath){
     uid: quoteUid, code: st.quoteCode || '', date: `${st.qYear || ''}-${mm}-${dd}`, type: quoteType || '',
     investor, field: (document.getElementById('fieldName').value || '').trim(),
     items, discount: Math.round(st.discountEnabled ? (st.discountAmount || 0) : 0), total: Math.round(st.grandTotal || 0),
-    filePath: filePath || currentFilePath || '', savedAt: new Date().toISOString()
+    filePath: filePath || currentFilePath || '', savedAt: new Date().toISOString(),
+    fp: quoteFingerprint(collectFullState())
   };
 }
 function upsertRegistry(rec){
-  const i = registry.findIndex(r => r.uid === rec.uid);
+  let i = registry.findIndex(r => r.uid === rec.uid);
+  if (i < 0 && rec.filePath) i = registry.findIndex(r => r.filePath === rec.filePath);
   if (i >= 0) registry[i] = rec; else registry.push(rec);
   persistRegistry();
   renderFieldList();
@@ -5060,7 +5073,7 @@ function regFilteredList(){
     if (F.type !== 'all' && r.type !== F.type) return false;
     if (F.investor !== 'all' && r.investor !== F.investor) return false;
     if (F.field !== 'all' && r.field !== F.field) return false;
-    if (txt && (`${r.code} ${r.type} ${r.investor} ${r.field} ` + (r.items || []).map(i => i.name).join(' ')).toLowerCase().indexOf(txt) < 0) return false;
+    if (txt && (`${r.code} ${r.type} ${r.investor} ${r.field} ${r.filePath || ''} ` + (r.items || []).map(i => i.name).join(' ')).toLowerCase().indexOf(txt) < 0) return false;
     return true;
   }).sort((a, b) => (a.date < b.date ? 1 : (a.date > b.date ? -1 : 0)));
 }
@@ -5114,6 +5127,17 @@ function renderRegistry(){
         </div>
       </div>
       ${open ? `<div class="reg-detail">
+        <div class="reg-file">
+          <div class="rf-info">
+            <div><span class="muted">Gửi:</span> <strong>${esc(r.investor || '(chưa ghi chủ đầu tư)')}</strong></div>
+            ${r.filePath ? `<div class="ell" title="${esc(r.filePath)}"><span class="muted">Thư mục:</span> ${esc(r.filePath.replace(/[\\/][^\\/]*$/, '') || r.filePath)}</div>
+            <div class="ell"><span class="muted">File:</span> ${esc(r.filePath.split(/[\\/]/).pop())}</div>` : `<div class="muted">Chưa có đường dẫn file (lưu lại báo giá trong phần mềm để ghi nhận).</div>`}
+          </div>
+          ${r.filePath ? `<div class="rf-btns">
+            <button type="button" class="btn-f" style="padding:4px 10px;font-size:12px;" onclick="openRegistryFile('${r.uid}')">Mở báo giá</button>
+            <button type="button" class="btn-o" style="padding:4px 10px;font-size:12px;" onclick="revealRegistryFile('${r.uid}')">Mở thư mục</button>
+          </div>` : ''}
+        </div>
         ${(r.items || []).map((it, i) => `<div><span class="muted">${i + 1}.</span><span>${esc(it.name)}</span><span style="text-align:right;">${fmt(it.value || 0)}</span></div>`).join('')}
         ${r.discount ? `<div style="color:#8a3b2d;font-style:italic;"><span></span><span>Giảm giá</span><span style="text-align:right;">-${fmt(r.discount)}</span></div>` : ''}
         <div style="font-weight:700;background:#eef1f8;"><span></span><span>Giá trị báo giá</span><span style="text-align:right;">${fmt(r.total || 0)}</span></div>
@@ -5124,6 +5148,7 @@ function renderRegistry(){
     <div class="pane-title">
       <div class="ttl-lg">Quản lý báo giá</div>
       <div class="pane-title-actions">
+        <button type="button" class="btn-o" onclick="importQuoteFilesToRegistry()" title="Chọn một hoặc nhiều file báo giá (.json) để đọc và cập nhật vào sổ, không mở lên soạn thảo">Cập nhật từ file báo giá…</button>
         <button type="button" class="btn-o" onclick="exportRegistryExcel()">Xuất báo cáo Excel</button>
         <button type="button" class="btn-f" onclick="printRegistryReport()">In / Xuất PDF báo cáo</button>
       </div>
@@ -5180,8 +5205,15 @@ async function openRegistryFile(uid){
   if (!(window.pywebview && window.pywebview.api && window.pywebview.api.open_quote_path)){ alert('Chức năng mở file chỉ dùng được trong phần mềm desktop.'); return; }
   const res = await window.pywebview.api.open_quote_path(r.filePath);
   if (res && res.ok){
-    if (applyLoadedQuoteData(res.data)){ currentFilePath = res.path; setMainTab('items'); }
+    if (applyLoadedQuoteData(res.data)){ currentFilePath = res.path; currentFileName = ''; updateQuoteTitle(); setMainTab('items'); }
   } else alert((res && res.error) || 'Không mở được file.');
+}
+async function revealRegistryFile(uid){
+  const r = registry.find(x => x.uid === uid);
+  if (!r) return;
+  if (!(window.pywebview && window.pywebview.api && window.pywebview.api.reveal_in_folder)){ alert('Chức năng mở thư mục chỉ dùng được trong phần mềm desktop.'); return; }
+  const res = await window.pywebview.api.reveal_in_folder(r.filePath);
+  if (!res || !res.ok) alert((res && res.error) || 'Không mở được thư mục.');
 }
 function registryPayload(){
   const list = regFilteredList();
@@ -5194,6 +5226,232 @@ function registryPayload(){
   return { title: 'BÁO CÁO TỔNG HỢP BÁO GIÁ', subtitle: 'Kỳ báo cáo: ' + regPeriodLabel() + (parts.length ? ' — ' + parts.join('; ') : ''),
     slug: regPeriodLabel().replace(/[\s\/–]+/g, '_'), groups, total: list.reduce((s, r) => s + (r.total || 0), 0), count: list.length };
 }
+// ---------- Cập nhật sổ Quản lý báo giá từ nhiều file báo giá (chỉ đọc, không mở lên soạn thảo) ----------
+// Tính giá trị đúng như khi mở báo giá: dùng bảng lương, bảng tỷ lệ Cql, % VAT/TN, giảm giá, cờ "Cộng vào
+// Tổng cộng"/"Áp dụng giảm giá" lưu trong CHÍNH file đó. Không đụng tới báo giá đang soạn.
+function registryRecordFromQuoteData(raw, filePath, fileName){
+  if (!raw || typeof raw !== 'object') throw new Error('File không đúng định dạng báo giá');
+  if (raw._fileType && raw._fileType !== 'baogia-itd-project') throw new Error('Không phải file báo giá của phần mềm');
+  if (!raw.detailSheets && !raw.quoteGroups && !raw.items) throw new Error('Không có dữ liệu hạng mục báo giá');
+  const data = normalizeLoadedData(JSON.parse(JSON.stringify(raw)));
+  const keepSalary = salaryTable, keepTiers = cqlTiers;
+  try {
+    salaryTable = data.salaryTable;
+    cqlTiers = data.cqlTiers;
+    const sync = !!data.syncAllPcts;
+    data.detailSheets.forEach(sh => {
+      if (sync){ sh.ownVat = null; sh.ownTn = null; sh.cqlPctOverride = null; }
+      sh.vatPct = (sh.ownVat != null && sh.ownVat !== '') ? parseFloat(sh.ownVat) : data.globalVatPct;
+      sh.tnPct = (sh.ownTn != null && sh.ownTn !== '') ? parseFloat(sh.ownTn) : data.globalTnPct;
+    });
+    let subtotal = 0, base = 0;
+    const items = [];
+    data.quoteGroups.forEach(g => g.subItems.forEach(it => {
+      const sh = data.detailSheets.find(x => x.id === it.detailId);
+      const amt = sh ? computeDetailTotal(sh).roundedTotal : 0;
+      if (g.inTotal !== false) subtotal += amt;
+      if (g.inDiscount !== false) base += amt;
+      items.push({ name: sh ? sh.name : '(chưa chọn hạng mục)', value: Math.round(amt || 0) });
+    }));
+    const discEnabled = !!data.discountEnabled && data.mode !== 'multi';
+    const baseR = Math.round(base);
+    const discount = !discEnabled ? 0 : (data.discountMode === 'fixed'
+      ? Math.min(Math.round(parseFloat(data.discountFixed) || 0), baseR)
+      : Math.round(baseR * (parseFloat(data.discountPct) || 0) / 100));
+    const total = Math.round(subtotal) - discount;
+    const investor = String(data.investorName || '').trim() || String(data.recipient || '').trim();
+    return {
+      uid: data.quoteUid || ('f' + _hashStr(String(filePath || fileName || '') + '|' + (data.quoteCode || ''))),
+      code: data.quoteCode || '', date: quoteDateKey(data.qDay, data.qMonth, data.qYear), type: data.quoteType || '',
+      investor, field: String(data.fieldName || '').trim(), items, discount, total,
+      filePath: filePath || '', savedAt: new Date().toISOString()
+    };
+  } finally {
+    salaryTable = keepSalary;
+    cqlTiers = keepTiers;
+  }
+}
+// "Dấu vân tay" nội dung báo giá: bỏ qua các thông tin không phải nội dung (mã nội bộ, số báo giá, thời
+// điểm lưu, tab đang chọn, logo, mật khẩu) -> 2 file khác tên/khác số nhưng nội dung giống hệt sẽ trùng dấu.
+const FP_SKIP_KEYS = new Set(['_savedAt', 'savedAt', '_version', 'quoteUid', 'activeDetailTab', 'logoDataUri', 'quoteCode', 'quoteSeq', 'quoteSeqDate', 'quoteCodeManuallyEdited', 'editPassword']);
+function canonicalJson(v){
+  if (Array.isArray(v)) return '[' + v.map(canonicalJson).join(',') + ']';
+  if (v && typeof v === 'object') return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canonicalJson(v[k])).join(',') + '}';
+  return JSON.stringify(v === undefined ? null : v);
+}
+function quoteFingerprint(data){
+  const o = {};
+  Object.keys(data || {}).forEach(k => { if (!FP_SKIP_KEYS.has(k)) o[k] = data[k]; });
+  return _hashStr(canonicalJson(o));
+}
+const fileBase = p => String(p || '').split(/[\\/]/).pop();
+async function importQuoteRecords(files){
+  let added = 0, updated = 0, removedDupRecords = 0;
+  const errors = [], entries = [], dupGroups = [];
+  files.forEach(f => {
+    const label = f.path || f.name || '';
+    if (f.error){ errors.push(fileBase(label) + ': ' + f.error); return; }
+    try {
+      const rec = registryRecordFromQuoteData(f.data, f.path || '', f.name || '');
+      rec.fp = quoteFingerprint(f.data);
+      entries.push({ rec, label, mtime: f.mtime || 0 });
+    } catch (e){ errors.push(fileBase(label) + ': ' + (e && e.message ? e.message : e)); }
+  });
+  // Nhóm các file có cùng nội dung trong lần chọn này
+  const byFp = new Map();
+  entries.forEach(e => { if (!byFp.has(e.rec.fp)) byFp.set(e.rec.fp, []); byFp.get(e.rec.fp).push(e); });
+  // File trong sổ (khác đường dẫn) có cùng nội dung: kiểm tra file đó còn tồn tại không (bị di chuyển/đổi tên thì cập nhật đường dẫn)
+  const batchPaths = new Set(entries.map(e => e.rec.filePath).filter(Boolean));
+  const extPaths = registry.filter(r => r.fp && byFp.has(r.fp) && r.filePath && !batchPaths.has(r.filePath)).map(r => r.filePath);
+  let alive = {};
+  if (extPaths.length && window.pywebview && window.pywebview.api && window.pywebview.api.paths_exist){
+    try { alive = await window.pywebview.api.paths_exist(extPaths) || {}; } catch (e){ alive = {}; }
+  } else extPaths.forEach(pth => { alive[pth] = true; });
+  const takenUids = new Set();
+  byFp.forEach((group, fp) => {
+    const inReg = path => path && registry.some(r => r.filePath === path);
+    group.sort((a, b) => (inReg(b.rec.filePath) - inReg(a.rec.filePath)) || (b.mtime - a.mtime));
+    const extAlive = registry.find(r => r.fp === fp && r.filePath && !batchPaths.has(r.filePath) && alive[r.filePath]);
+    let keepLabel, keepIsExisting = false, dups, keepRec, keepMtime = 0;
+    if (extAlive){
+      // Nội dung này đã có trong sổ với 1 file khác vẫn còn -> tất cả file trong lần chọn đều là bản trùng
+      keepLabel = extAlive.filePath; keepIsExisting = true; dups = group; keepRec = extAlive;
+    } else {
+      const keeper = group[0];
+      dups = group.slice(1);
+      keepLabel = keeper.label;
+      const rec = keeper.rec;
+      let i = rec.filePath ? registry.findIndex(r => r.filePath === rec.filePath) : -1;
+      if (i < 0) i = registry.findIndex(r => r.fp === fp && r.filePath && !alive[r.filePath] && !batchPaths.has(r.filePath)); // file cũ đã bị di chuyển/đổi tên
+      if (i < 0){
+        const j = registry.findIndex(r => r.uid === rec.uid);
+        if (j >= 0 && (!registry[j].filePath || registry[j].filePath === rec.filePath)) i = j;
+        else if (j >= 0) rec.uid = rec.uid + '@' + _hashStr(rec.filePath || keeper.label); // trùng mã nội bộ nhưng là báo giá khác
+      }
+      if (takenUids.has(rec.uid)) rec.uid = rec.uid + '@' + _hashStr(keeper.label);
+      takenUids.add(rec.uid);
+      keepRec = rec; keepMtime = keeper.mtime;
+      if (i >= 0){ registry[i] = rec; updated++; } else { registry.push(rec); added++; }
+    }
+    if (dups.length){
+      // Bản ghi cũ trong sổ trỏ tới các file trùng -> bỏ khỏi sổ (chỉ giữ 1 báo giá)
+      dups.forEach(d => {
+        const k = d.rec.filePath ? registry.findIndex(r => r.filePath === d.rec.filePath) : -1;
+        if (k >= 0){ registry.splice(k, 1); removedDupRecords++; }
+      });
+      dupGroups.push({ code: group[0].rec.code, investor: group[0].rec.investor, regUid: keepRec.uid,
+        cands: [{ path: keepRec.filePath, label: keepLabel, mtime: keepMtime, rec: keepRec, existing: keepIsExisting }]
+          .concat(dups.map(d => ({ path: d.rec.filePath, label: d.label, mtime: d.mtime, rec: d.rec }))) });
+    }
+  });
+  if (added || updated || removedDupRecords){ persistRegistry(); renderFieldList(); }
+  if (activeMainTab === 'registry') renderRegistry();
+  if (!quoteLoadedFromFile && !quoteCodeManuallyEdited && !currentFilePath){ quoteSeq = null; quoteSeqDate = ''; render(); }
+  const dupCount = dupGroups.reduce((n, g) => n + g.cands.length - 1, 0);
+  const msg = `Đã cập nhật sổ: ${added} báo giá mới, ${updated} báo giá cập nhật lại` + (dupCount ? `, bỏ qua ${dupCount} file trùng nội dung` : '') + (errors.length ? `, ${errors.length} file lỗi` : '') + '.';
+  showToast(msg);
+  if (dupGroups.length) showDuplicateDialog(dupGroups, msg, errors);
+  else if (errors.length) alert(msg + '\n\nCác file không đọc được:\n' + errors.slice(0, 20).join('\n') + (errors.length > 20 ? `\n... và ${errors.length - 20} file khác` : ''));
+}
+let _dupGroups = [];
+function showDuplicateDialog(groups, msg, errors){
+  _dupGroups = groups;
+  const canTrash = !!(window.pywebview && window.pywebview.api && window.pywebview.api.move_to_trash);
+  const when = ms => ms ? new Date(ms).toLocaleString('vi-VN') : '';
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="modal-ov">
+      <div class="modal" role="dialog" style="width:880px;">
+        <div class="modal-h">Cảnh báo: có file báo giá trùng nội dung<button type="button" class="x" onclick="closeDuplicateDialog()" aria-label="Đóng">✕</button></div>
+        <div class="modal-b">
+          <p style="margin:0 0 6px;font-size:13px;">${esc(msg)}</p>
+          <p style="margin:0 0 8px;font-size:13px;">Mỗi nhóm dưới đây là các file có nội dung giống hệt nhau (chỉ khác tên file hoặc số báo giá). Sổ Quản lý báo giá chỉ lưu <strong>1 báo giá</strong> cho mỗi nhóm, lấy file được chọn ở cột <strong>"Nguồn"</strong> để tra cứu và mở lại. Các file gốc trên máy được <strong>giữ nguyên</strong>, trừ khi bạn tích chọn <strong>"Xoá"</strong>.</p>
+          ${groups.map((g, gi) => `
+            <div class="dup-grp">
+              <div class="dup-h">Nhóm ${gi + 1}: ${esc(g.code || '')}${g.investor ? ' — ' + esc(g.investor) : ''}</div>
+              <div class="dup-cols"><span>Nguồn</span><span>Xoá</span><span>File</span><span>Sửa lần cuối</span></div>
+              ${g.cands.map((c, ci) => `<div class="dup-row">
+                <input type="radio" name="dupsrc-${gi}" value="${ci}" ${ci === 0 ? 'checked' : ''} onchange="onDupSourceChange(${gi})" title="Dùng file này làm nguồn trong sổ">
+                <input type="checkbox" class="dup-chk" data-g="${gi}" data-c="${ci}" ${(!canTrash || !c.path || ci === 0) ? 'disabled' : ''} title="Chuyển file này vào Thùng rác">
+                <span class="ell" title="${esc(c.label)}">${esc(c.label)}${c.existing ? ' <span class="muted">(đang có trong sổ)</span>' : ''}</span>
+                <span class="muted">${esc(when(c.mtime))}</span>
+              </div>`).join('')}
+            </div>`).join('')}
+          ${errors && errors.length ? `<div class="dup-grp"><div class="dup-h">File không đọc được (${errors.length})</div>${errors.slice(0, 20).map(e => `<div class="muted" style="font-size:12px;padding:3px 10px;">${esc(e)}</div>`).join('')}</div>` : ''}
+          ${canTrash ? '' : `<p class="muted" style="font-size:12px;margin-top:8px;">Xoá file trùng chỉ dùng được trong phần mềm desktop.</p>`}
+        </div>
+        <div class="modal-f">
+          <button type="button" class="btn-g" onclick="applyDuplicateChoices(false)">Giữ tất cả file (chỉ cập nhật sổ)</button>
+          ${canTrash ? `<button type="button" class="btn-danger" onclick="applyDuplicateChoices(true)">Xoá các file đã tích &amp; cập nhật sổ</button>` : ''}
+          <button type="button" class="btn-f right" onclick="closeDuplicateDialog()">Đóng</button>
+        </div>
+      </div>
+    </div>`;
+}
+// File đang chọn làm "Nguồn" thì không được xoá
+function onDupSourceChange(gi){
+  const src = +((document.querySelector(`#modalRoot input[name="dupsrc-${gi}"]:checked`) || {}).value || 0);
+  document.querySelectorAll(`#modalRoot .dup-chk[data-g="${gi}"]`).forEach(c => {
+    const cand = _dupGroups[gi].cands[+c.dataset.c];
+    const lock = +c.dataset.c === src || !cand.path || !(window.pywebview && window.pywebview.api && window.pywebview.api.move_to_trash);
+    c.disabled = lock;
+    if (lock) c.checked = false;
+  });
+}
+function closeDuplicateDialog(){ document.getElementById('modalRoot').innerHTML = ''; _dupGroups = []; }
+async function applyDuplicateChoices(withDelete){
+  // 1) Đổi file nguồn trong sổ theo lựa chọn
+  let changed = false;
+  _dupGroups.forEach((g, gi) => {
+    const src = +((document.querySelector(`#modalRoot input[name="dupsrc-${gi}"]:checked`) || {}).value || 0);
+    if (src === 0) return;
+    const chosen = g.cands[src];
+    const k = registry.findIndex(r => r.uid === g.regUid);
+    const rec = Object.assign({}, chosen.rec, { savedAt: new Date().toISOString() });
+    if (registry.some((r, idx) => idx !== k && r.uid === rec.uid)) rec.uid = g.regUid;
+    if (k >= 0) registry[k] = rec; else registry.push(rec);
+    changed = true;
+  });
+  // 2) Xoá (chuyển vào Thùng rác) các file đã tích
+  let done = [], failed = [];
+  if (withDelete){
+    const paths = Array.from(document.querySelectorAll('#modalRoot .dup-chk:checked:not(:disabled)')).map(c => {
+      const g = _dupGroups[+c.dataset.g]; return g && g.cands[+c.dataset.c] && g.cands[+c.dataset.c].path;
+    }).filter(Boolean);
+    if (!paths.length){ showToast('Chưa tích chọn file nào để xoá.'); if (changed){ persistRegistry(); if (activeMainTab === 'registry') renderRegistry(); } return; }
+    if (!confirm(`Chuyển ${paths.length} file trùng vào Thùng rác? (Có thể khôi phục lại từ Thùng rác nếu cần)`)) return;
+    const r = await window.pywebview.api.move_to_trash(paths);
+    done = (r && r.done) || []; failed = (r && r.failed) || [];
+    done.forEach(pth => { const k = registry.findIndex(x => x.filePath === pth); if (k >= 0){ registry.splice(k, 1); changed = true; } });
+  }
+  if (changed){ persistRegistry(); renderFieldList(); }
+  if (activeMainTab === 'registry') renderRegistry();
+  closeDuplicateDialog();
+  showToast(withDelete
+    ? `Đã chuyển ${done.length} file trùng vào Thùng rác` + (failed.length ? `, ${failed.length} file không chuyển được` : '') + '. Sổ đã cập nhật.'
+    : 'Đã giữ nguyên tất cả file; sổ chỉ lưu 1 báo giá cho mỗi nhóm trùng.');
+  if (failed.length) alert('Không chuyển được vào Thùng rác:\n' + failed.map(f => fileBase(f.path) + ': ' + f.error).join('\n'));
+}
+async function importQuoteFilesToRegistry(){
+  if (window.pywebview && window.pywebview.api && window.pywebview.api.pick_quote_files){
+    const r = await window.pywebview.api.pick_quote_files();
+    if (!r || r.cancelled) return;
+    if (!r.ok){ alert('Không chọn được file: ' + (r.error || 'không rõ nguyên nhân')); return; }
+    importQuoteRecords(r.files || []);
+    return;
+  }
+  // Bản chạy trên trình duyệt: dùng ô chọn file (cho chọn nhiều file)
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json,application/json'; inp.multiple = true;
+  inp.onchange = async () => {
+    const files = await Promise.all(Array.from(inp.files || []).map(file => file.text()
+      .then(t => ({ name: file.name, data: JSON.parse(t), mtime: file.lastModified || 0 }))
+      .catch(e => ({ name: file.name, error: 'không đọc được nội dung JSON' }))));
+    importQuoteRecords(files);
+  };
+  inp.click();
+}
+
 async function exportRegistryExcel(){
   if (!(window.pywebview && window.pywebview.api && window.pywebview.api.export_registry_excel)){ alert('Chức năng xuất file chỉ hoạt động trong ứng dụng desktop.'); return; }
   const res = await window.pywebview.api.export_registry_excel(registryPayload());
