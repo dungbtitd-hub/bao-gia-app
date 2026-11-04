@@ -770,8 +770,14 @@
     background:transparent; color:#dfe4f5; font-size:12.5px; font-weight:600; cursor:pointer; font-family:Arial, sans-serif;}
   .tb:hover{background:rgba(255,255,255,0.08);}
   .tb-main{background:#2b3a7a; color:#fff;}
-  @media (max-width:1560px){ .app-name .an-long{display:none;} }
-  @media (max-width:1300px){ .app-name{display:none;} }
+  @media (max-width:1760px){ .app-name .an-long{display:none;} }
+  @media (max-width:1640px){ .app-name{display:none;} }
+  .qtitle-wrap{flex:1 1 0; min-width:120px; display:flex; justify-content:center; overflow:hidden; padding:0 6px;}
+  .qtitle{display:flex; align-items:center; gap:7px; max-width:100%; min-width:0; padding:5px 14px; border:1px solid #6c78b3; border-radius:8px;
+    background:rgba(255,255,255,0.10); color:#fff; font-size:13px; font-weight:700; white-space:nowrap; font-family:Arial, sans-serif;}
+  .qtitle svg{flex:0 0 auto; opacity:.85;}
+  .qtitle .qt-name{overflow:hidden; text-overflow:ellipsis; min-width:0;}
+  .qtitle.unsaved{border-style:dashed; color:#c9d0ea; font-weight:600;}
   .app-name{margin-left:10px; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; font-weight:700; white-space:nowrap;}
   .menu-wrap{position:relative;}
   .menu{display:none; position:absolute; right:0; top:calc(100% + 6px); width:190px; background:#fff; border:1px solid var(--ui-line);
@@ -1038,6 +1044,7 @@
       Quản lý báo giá
     </button>
   </nav>
+  <div class="qtitle-wrap"><div class="qtitle unsaved" id="quoteTitleBox"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path></svg><span class="qt-name">Báo giá mới (chưa lưu)</span></div></div>
   <div class="appbar-right">
     <button type="button" class="tb" onclick="newQuote()" title="Soạn báo giá mới (dùng cấu hình mặc định)">Mới</button>
     <button type="button" class="tb" onclick="openQuoteFile()">Mở</button>
@@ -1442,6 +1449,34 @@ function resetLogoToDefault(){
 }
 
 let quoteCodeManuallyEdited = false;
+// Số thứ tự báo giá trong ngày: mã tự sinh dạng MMDD-n.YYYY.ITDVN (n = 1, 2, 3... theo số báo giá đã có
+// trong sổ Quản lý báo giá cùng ngày). Giữ cố định cho báo giá đã có số; chỉ cấp số mới khi đổi ngày hoặc Lưu bản mới.
+let quoteSeq = null, quoteSeqDate = '';
+let currentFileName = '';
+function quoteDateKey(d, m, y){ return `${y || ''}-${String(m || '').padStart(2, '0')}-${String(d || '').padStart(2, '0')}`; }
+function seqFromCode(code){ const mm = /^\d+-(\d+)\./.exec(code || ''); return mm ? parseInt(mm[1], 10) : 0; }
+function resolveQuoteSeq(dateKey){
+  if (quoteSeq && quoteSeqDate === dateKey) return quoteSeq;
+  const own = (registry || []).find(r => r && r.uid === quoteUid && r.date === dateKey && seqFromCode(r.code));
+  if (own){ quoteSeq = seqFromCode(own.code); quoteSeqDate = dateKey; return quoteSeq; }
+  const others = (registry || []).filter(r => r && r.uid !== quoteUid && r.date === dateKey);
+  const maxN = others.reduce((mx, r) => Math.max(mx, seqFromCode(r.code)), 0);
+  quoteSeq = Math.max(maxN, others.length) + 1;
+  quoteSeqDate = dateKey;
+  return quoteSeq;
+}
+function updateQuoteTitle(){
+  const box = document.getElementById('quoteTitleBox');
+  const path = currentFilePath || currentFileName || '';
+  const base = path ? path.split(/[\\/]/).pop().replace(/\.(json|bgitd|baogia)$/i, '') : '';
+  const code = (document.getElementById('quoteCode') || {}).value || '';
+  if (box){
+    box.classList.toggle('unsaved', !base);
+    box.querySelector('.qt-name').textContent = base || 'Báo giá mới (chưa lưu)';
+    box.title = (path ? path : 'Chưa lưu thành file') + (code ? '\nSố báo giá: ' + code : '');
+  }
+  document.title = (base ? base + ' — ' : '') + 'Phần mềm Báo giá - ITD Việt Nam';
+}
 function onQuoteCodeManualEdit(){
   quoteCodeManuallyEdited = true;
 }
@@ -2501,10 +2536,12 @@ function renderNow(){
   const qMonth = document.getElementById('qMonth').value;
   const qYear = document.getElementById('qYear').value;
   if (!quoteCodeManuallyEdited){
-    const autoCode = `${padMonth(qMonth)}${padDay(qDay)}.${qYear}.ITDVN`;
+    const seqN = resolveQuoteSeq(quoteDateKey(qDay, qMonth, qYear));
+    const autoCode = `${padMonth(qMonth)}${padDay(qDay)}-${seqN}.${qYear}.ITDVN`;
     document.getElementById('quoteCode').value = autoCode;
   }
   const quoteCode = document.getElementById('quoteCode').value;
+  updateQuoteTitle();
   const recipient = document.getElementById('recipient').value;
   const introPrefix = document.getElementById('introPrefix').value;
   const fixedClause = document.getElementById('fixedClauseInput').value;
@@ -3731,6 +3768,7 @@ function collectFullState(){
     qYear: document.getElementById('qYear').value,
     quoteCode: document.getElementById('quoteCode').value,
     quoteCodeManuallyEdited,
+    quoteSeq, quoteSeqDate,
     recipient: document.getElementById('recipient').value,
     introPrefix: document.getElementById('introPrefix').value,
     fixedClause: document.getElementById('fixedClauseInput').value,
@@ -3782,8 +3820,21 @@ function collectFullState(){
 async function saveQuoteFile(asNew){
   render();
   if (!quoteType){ showTypeDialog(!!asNew); return; }
-  const prevUid = quoteUid;
-  if (asNew) quoteUid = newUid();
+  const prevUid = quoteUid, prevSeq = quoteSeq, prevSeqDate = quoteSeqDate;
+  if (asNew){
+    quoteUid = newUid();
+    // Bản mới = báo giá mới trong ngày -> cấp số thứ tự mới (nếu số đang để tự sinh)
+    if (!quoteCodeManuallyEdited){ quoteSeq = null; quoteSeqDate = ''; }
+  }
+  flushRender(); render(); flushRender();
+  // Cảnh báo trùng số báo giá với báo giá khác trong sổ (khi người dùng tự sửa số)
+  const codeNow = (document.getElementById('quoteCode').value || '').trim();
+  const dup = codeNow && (registry || []).find(r => r && r.uid !== quoteUid && (r.code || '').trim() === codeNow);
+  if (dup && !confirm(`Số báo giá "${codeNow}" đã dùng cho báo giá khác${dup.investor ? ' (' + dup.investor + ')' : ''}. Vẫn lưu với số này?`)){
+    quoteUid = prevUid; quoteSeq = prevSeq; quoteSeqDate = prevSeqDate; render();
+    return;
+  }
+  const restorePrev = () => { quoteUid = prevUid; quoteSeq = prevSeq; quoteSeqDate = prevSeqDate; render(); };
   const state = collectFullState();
 
   if (window.pywebview){
@@ -3792,11 +3843,12 @@ async function saveQuoteFile(asNew){
     if (result && result.ok){
       currentFilePath = result.path;
       upsertRegistry(buildRegistryRecord(result.path));
+      updateQuoteTitle();
       showToast('Đã lưu báo giá: ' + result.path + ' — đã cập nhật sổ Quản lý báo giá');
     } else if (result && result.cancelled){
-      quoteUid = prevUid;
+      restorePrev();
     } else {
-      quoteUid = prevUid;
+      restorePrev();
       alert('Có lỗi khi lưu báo giá: ' + ((result && result.error) || 'không rõ nguyên nhân'));
     }
     return;
@@ -3815,7 +3867,9 @@ async function saveQuoteFile(asNew){
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  currentFileName = fname;
   upsertRegistry(buildRegistryRecord(''));
+  updateQuoteTitle();
   showToast('Đã lưu báo giá — đã cập nhật sổ Quản lý báo giá');
 }
 
@@ -3944,6 +3998,10 @@ function applyLoadedQuoteData(rawData){
     document.getElementById('qMonth').value = data.qMonth || '';
     document.getElementById('qYear').value = data.qYear || '';
     quoteCodeManuallyEdited = !!data.quoteCodeManuallyEdited;
+    quoteSeq = data.quoteSeq ? (parseInt(data.quoteSeq, 10) || null) : null;
+    quoteSeqDate = data.quoteSeqDate || '';
+    // File lưu từ bản cũ (chưa có số thứ tự trong ngày): giữ nguyên số báo giá đã lưu, không tự đổi số
+    if (!quoteCodeManuallyEdited && !quoteSeq && data.quoteCode) quoteCodeManuallyEdited = true;
     if (quoteCodeManuallyEdited && data.quoteCode){
       document.getElementById('quoteCode').value = data.quoteCode;
     }
@@ -4050,7 +4108,7 @@ async function openQuoteFile(){
   if (window.pywebview){
     const result = await window.pywebview.api.open_quote_project();
     if (result && result.ok){
-      if (applyLoadedQuoteData(result.data)) currentFilePath = result.path || '';
+      if (applyLoadedQuoteData(result.data)){ currentFilePath = result.path || ''; currentFileName = ''; updateQuoteTitle(); }
     } else if (result && result.cancelled){
       // người dùng bấm Cancel, không làm gì
     } else {
@@ -4074,7 +4132,7 @@ function loadQuoteFile(file){
       alert('File không đúng định dạng báo giá (không phải JSON hợp lệ).');
       return;
     }
-    applyLoadedQuoteData(data);
+    if (applyLoadedQuoteData(data)){ currentFilePath = ''; currentFileName = file.name; updateQuoteTitle(); }
   };
   reader.readAsText(file, 'utf-8');
 }
@@ -4945,6 +5003,8 @@ async function loadAppData(){
   renderFieldList();
   refreshParamChips();
   if (activeMainTab === 'registry') renderRegistry();
+  if (!quoteLoadedFromFile && !quoteCodeManuallyEdited){ quoteSeq = null; quoteSeqDate = ''; }
+  render();
 }
 let appDataLoaded = false;
 function initAppDataOnce(){ if (appDataLoaded) return; appDataLoaded = true; loadAppData(); }
