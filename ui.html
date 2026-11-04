@@ -947,6 +947,29 @@
   .modal-b label{margin-top:10px;}
   .modal-f{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:12px 18px; border-top:1px solid var(--ui-line-soft); background:#f5f7fc; position:sticky; bottom:0;}
   .modal-f .right{margin-left:auto;}
+  /* Popup nhập dòng: nổi tự do, kéo/đổi kích thước được; chỉ làm mờ vùng nhập liệu */
+  .row-ov{position:fixed; left:0; top:0; width:0; height:0; background:rgba(19,29,69,0.38); z-index:100;}
+  .modal.row-modal{position:fixed; z-index:101; display:flex; flex-direction:column; max-width:none; max-height:none; overflow:hidden;
+    min-width:420px; min-height:260px; font-family:Arial, Helvetica, sans-serif; box-shadow:0 14px 44px rgba(10,18,48,0.38);}
+  .modal.row-modal.attn{animation:rowModalAttn .35s;}
+  @keyframes rowModalAttn{0%,100%{transform:none} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)}}
+  .row-modal .modal-h{position:static; cursor:move; user-select:none; touch-action:none; flex:0 0 auto;}
+  .row-modal .modal-h .x{cursor:pointer;}
+  .row-modal .modal-b{flex:1 1 auto; min-height:0; overflow:auto; display:flex; flex-direction:column;}
+  .row-modal .modal-b > *{flex-shrink:0;}
+  .row-modal .modal-b > #rowDesc{flex:1 1 auto; min-height:110px; resize:none;}
+  .row-modal .modal-f{position:static; flex:0 0 auto;}
+  .row-modal .rz{position:absolute; z-index:3; touch-action:none;}
+  .row-modal .rz-n{top:0; left:10px; right:10px; height:6px; cursor:ns-resize;}
+  .row-modal .rz-s{bottom:0; left:10px; right:10px; height:6px; cursor:ns-resize;}
+  .row-modal .rz-w{left:0; top:10px; bottom:10px; width:6px; cursor:ew-resize;}
+  .row-modal .rz-e{right:0; top:10px; bottom:10px; width:6px; cursor:ew-resize;}
+  .row-modal .rz-nw{left:0; top:0; width:12px; height:12px; cursor:nwse-resize;}
+  .row-modal .rz-ne{right:0; top:0; width:12px; height:12px; cursor:nesw-resize;}
+  .row-modal .rz-sw{left:0; bottom:0; width:12px; height:12px; cursor:nesw-resize;}
+  .row-modal .rz-se{right:0; bottom:0; width:16px; height:16px; cursor:nwse-resize;
+    background:linear-gradient(135deg, transparent 0 55%, #8d97b5 55% 62%, transparent 62% 72%, #8d97b5 72% 79%, transparent 79%);}
+  body.row-dragging, body.row-dragging *{user-select:none !important;}
   .lv-row{display:grid; grid-template-columns:1fr 110px 110px 34px; gap:8px; align-items:end; padding:8px 10px; border:1px solid var(--ui-line-soft); border-radius:8px; background:#f8f9fd; margin-top:6px;}
   .lv-row label{margin:0 0 3px;}
   .depth-row{display:flex; align-items:center; gap:8px; margin-top:8px; font-size:12.5px;}
@@ -4103,6 +4126,7 @@ function newUid(){ return 'q' + Date.now().toString(36) + Math.random().toString
 
 // ---------- Tab chính ----------
 function setMainTab(tab){
+  if (rowModal && tab !== 'items') closeRowModal();
   activeMainTab = tab;
   document.querySelectorAll('.tab1').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.dataset.pane === tab));
@@ -4451,6 +4475,104 @@ function renderOtherPane(s){
 
 // ---------- Popup nhập chi tiết 1 dòng ----------
 function openRowModal(kind, idx){ rowModal = { kind, idx }; renderRowModal(); }
+// ---- Vị trí / kích thước popup nhập dòng (kéo tiêu đề để di chuyển, kéo cạnh/góc để đổi kích thước) ----
+let rowModalGeom = null;
+try { const g0 = JSON.parse(localStorage.getItem('baogia_rowmodal_geom') || 'null'); if (g0 && g0.width && g0.height) rowModalGeom = g0; } catch (e) {}
+function saveRowModalGeom(){ try { localStorage.setItem('baogia_rowmodal_geom', JSON.stringify(rowModalGeom)); } catch (e) {} }
+function defaultRowModalGeom(){
+  const p = document.querySelector('.panel');
+  const r = p ? p.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+  const w = Math.max(420, Math.min(720, r.width - 40));
+  const h = Math.max(260, Math.min(620, window.innerHeight - 120));
+  return { left: r.left + Math.max(0, (r.width - w) / 2), top: Math.max(60, (window.innerHeight - h) / 2), width: w, height: h };
+}
+function clampRowModalGeom(g){
+  const W = window.innerWidth, H = window.innerHeight;
+  g.width = Math.max(420, Math.min(g.width, W - 8));
+  g.height = Math.max(260, Math.min(g.height, H - 8));
+  g.left = Math.max(0, Math.min(g.left, W - g.width));
+  g.top = Math.max(0, Math.min(g.top, H - g.height));
+  return g;
+}
+function applyRowModalGeom(){
+  const m = document.querySelector('#modalRoot .row-modal');
+  if (!m) return;
+  if (!rowModalGeom) rowModalGeom = defaultRowModalGeom();
+  clampRowModalGeom(rowModalGeom);
+  m.style.left = rowModalGeom.left + 'px';
+  m.style.top = rowModalGeom.top + 'px';
+  m.style.width = rowModalGeom.width + 'px';
+  m.style.height = rowModalGeom.height + 'px';
+}
+// Lớp mờ chỉ phủ vùng nhập liệu (cột trái) — vùng xem trước vẫn sáng, cuộn/phóng to bình thường.
+function positionRowOverlay(){
+  const ov = document.querySelector('#modalRoot .row-ov');
+  if (!ov) return;
+  const p = document.querySelector('.panel');
+  if (!p){ ov.style.width = '0'; return; }
+  const r = p.getBoundingClientRect();
+  ov.style.left = r.left + 'px'; ov.style.top = r.top + 'px';
+  ov.style.width = r.width + 'px'; ov.style.height = r.height + 'px';
+}
+function rowModalAttention(){
+  const m = document.querySelector('#modalRoot .row-modal');
+  if (!m) return;
+  m.classList.remove('attn'); void m.offsetWidth; m.classList.add('attn');
+}
+function startRowModalDrag(e){
+  if (e.button !== 0 || e.target.closest('button')) return;
+  const m = document.querySelector('#modalRoot .row-modal');
+  if (!m) return;
+  e.preventDefault();
+  const g0 = Object.assign({}, rowModalGeom), x0 = e.clientX, y0 = e.clientY;
+  const h = e.currentTarget;
+  h.setPointerCapture(e.pointerId);
+  document.body.classList.add('row-dragging');
+  const move = (ev) => {
+    rowModalGeom.left = g0.left + ev.clientX - x0;
+    rowModalGeom.top = g0.top + ev.clientY - y0;
+    applyRowModalGeom();
+  };
+  const up = () => {
+    h.removeEventListener('pointermove', move); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up);
+    document.body.classList.remove('row-dragging');
+    saveRowModalGeom();
+  };
+  h.addEventListener('pointermove', move); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up);
+}
+function startRowModalResize(e, dir){
+  if (e.button !== 0) return;
+  e.preventDefault(); e.stopPropagation();
+  const g0 = Object.assign({}, rowModalGeom), x0 = e.clientX, y0 = e.clientY;
+  const h = e.currentTarget;
+  h.setPointerCapture(e.pointerId);
+  document.body.classList.add('row-dragging');
+  const MINW = 420, MINH = 260;
+  const move = (ev) => {
+    const dx = ev.clientX - x0, dy = ev.clientY - y0;
+    const g = Object.assign({}, g0);
+    if (dir.includes('e')) g.width = Math.max(MINW, Math.min(g0.width + dx, window.innerWidth - g0.left));
+    if (dir.includes('s')) g.height = Math.max(MINH, Math.min(g0.height + dy, window.innerHeight - g0.top));
+    if (dir.includes('w')){ const nl = Math.max(0, Math.min(g0.left + dx, g0.left + g0.width - MINW)); g.width = g0.width + (g0.left - nl); g.left = nl; }
+    if (dir.includes('n')){ const nt = Math.max(0, Math.min(g0.top + dy, g0.top + g0.height - MINH)); g.height = g0.height + (g0.top - nt); g.top = nt; }
+    rowModalGeom = g;
+    applyRowModalGeom();
+  };
+  const up = () => {
+    h.removeEventListener('pointermove', move); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up);
+    document.body.classList.remove('row-dragging');
+    saveRowModalGeom();
+  };
+  h.addEventListener('pointermove', move); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up);
+}
+window.addEventListener('resize', () => { if (rowModal){ positionRowOverlay(); applyRowModalGeom(); } });
+(function watchPanelForRowOverlay(){
+  const go = () => {
+    const p = document.querySelector('.panel');
+    if (p && window.ResizeObserver) new ResizeObserver(() => { if (rowModal) positionRowOverlay(); }).observe(p);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
 function closeRowModal(){
   rowModal = null;
   const root = document.getElementById('modalRoot');
@@ -4538,19 +4660,29 @@ function renderRowModal(){
   }
   const active = document.activeElement;
   const keepFocusId = active && active.id === 'rowDesc' ? 'rowDesc' : null;
+  const keepSel = keepFocusId ? [active.selectionStart, active.selectionEnd, active.scrollTop] : null;
+  const oldBody = root.querySelector('.row-modal .modal-b');
+  const keepBodyScroll = oldBody ? oldBody.scrollTop : 0;
   root.innerHTML = `
-    <div class="modal-ov" onclick="if(event.target===this) closeRowModal()">
-      <div class="modal" role="dialog" aria-modal="true">
-        <div class="modal-h">${esc(title)}<button type="button" class="x" onclick="closeRowModal()" aria-label="Đóng">✕</button></div>
-        <div class="modal-b">${body}</div>
-        <div class="modal-f">
-          <button type="button" class="btn-danger" onclick="modalDeleteRow()">Xoá dòng</button>
-          ${extraBtns}
-          <button type="button" class="btn-f right" onclick="closeRowModal()">Xong</button>
-        </div>
+    <div class="row-ov" onclick="rowModalAttention()"></div>
+    <div class="modal row-modal" role="dialog">
+      <div class="modal-h" onpointerdown="startRowModalDrag(event)" title="Kéo để di chuyển">${esc(title)}<button type="button" class="x" onclick="closeRowModal()" aria-label="Đóng">✕</button></div>
+      <div class="modal-b">${body}</div>
+      <div class="modal-f">
+        <button type="button" class="btn-danger" onclick="modalDeleteRow()">Xoá dòng</button>
+        ${extraBtns}
+        <button type="button" class="btn-f right" onclick="closeRowModal()">Xong</button>
       </div>
+      ${['n','s','e','w','nw','ne','sw','se'].map(d => `<div class="rz rz-${d}" onpointerdown="startRowModalResize(event,'${d}')"></div>`).join('')}
     </div>`;
-  if (keepFocusId){ const el = document.getElementById(keepFocusId); if (el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
+  positionRowOverlay();
+  applyRowModalGeom();
+  const newBody = root.querySelector('.row-modal .modal-b');
+  if (newBody) newBody.scrollTop = keepBodyScroll;
+  if (keepFocusId){
+    const el = document.getElementById(keepFocusId);
+    if (el){ el.focus(); try { el.setSelectionRange(keepSel[0], keepSel[1]); el.scrollTop = keepSel[2]; } catch (e) { el.setSelectionRange(el.value.length, el.value.length); } }
+  }
 }
 
 // ---------- Loại báo giá ----------
