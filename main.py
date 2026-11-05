@@ -141,7 +141,7 @@ class Api:
         try:
             result = webview.windows[0].create_file_dialog(
                 webview.OPEN_DIALOG,
-                directory="",
+                directory=self._default_dir(),
                 file_types=("Quote project files (*.json)", "All files (*.*)"),
             )
             if not result:
@@ -158,7 +158,7 @@ class Api:
         try:
             result = webview.windows[0].create_file_dialog(
                 webview.OPEN_DIALOG,
-                directory="",
+                directory=self._default_dir(),
                 allow_multiple=True,
                 file_types=("Quote project files (*.json)", "All files (*.*)"),
             )
@@ -437,10 +437,59 @@ class Api:
     def _safe_name(name):
         return "".join(c if (c.isalnum() or c in "._-") else "_" for c in name)
 
+    def _default_dir(self):
+        """Thu muc mac dinh cho hop chon noi luu/mo file (cai trong Tham so & thiet lap)."""
+        try:
+            d = (_read_json("defaults.json", {}) or {}).get("saveDir") or ""
+            return d if d and os.path.isdir(d) else ""
+        except Exception:
+            return ""
+
+    def pick_folder(self):
+        """Chon thu muc mac dinh de luu bao gia."""
+        try:
+            result = webview.windows[0].create_file_dialog(webview.FOLDER_DIALOG, directory=self._default_dir())
+            if not result:
+                return {"cancelled": True}
+            folder = result[0] if isinstance(result, (list, tuple)) else result
+            return {"ok": True, "path": folder}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    def folder_exists(self, path):
+        try:
+            return bool(path) and os.path.isdir(path)
+        except Exception:
+            return False
+
+    # ---- Dong bo du lieu giua cac may (so Quan ly bao gia + tham so/cau hinh mac dinh) ----
+
+    def export_sync(self, payload, default_name):
+        try:
+            save_path = self._ask_save_path(default_name or "DongBo_BaoGiaITD.json", "Sync files (*.json)")
+            if not save_path:
+                return {"cancelled": True}
+            with open(save_path, "w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False, indent=2)
+            return {"ok": True, "path": save_path}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    def pick_sync_file(self):
+        try:
+            open_path = self._ask_open_path("Sync files (*.json)")
+            if not open_path:
+                return {"cancelled": True}
+            with open(open_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return {"ok": True, "data": data, "path": open_path}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
     def _ask_save_path(self, default_name, file_filter):
         result = webview.windows[0].create_file_dialog(
             webview.SAVE_DIALOG,
-            directory="",
+            directory=self._default_dir(),
             save_filename=default_name,
             file_types=(file_filter, "All files (*.*)"),
         )
@@ -454,7 +503,7 @@ class Api:
     def _ask_open_path(self, file_filter):
         result = webview.windows[0].create_file_dialog(
             webview.OPEN_DIALOG,
-            directory="",
+            directory=self._default_dir(),
             file_types=(file_filter, "All files (*.*)"),
         )
         if not result:

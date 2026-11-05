@@ -912,6 +912,17 @@
   .grp-sub{display:flex; gap:6px; align-items:center; margin-top:6px;}
   .grp-sub .num{width:34px; font-size:12px; color:var(--ui-muted); text-align:right;}
   .grp-sub select{flex:1;}
+  .lump-box{margin:6px 0 2px 40px; padding:10px 12px; border:1px dashed #8d97b5; border-radius:8px; background:#f6f8fd;}
+  .lump-box label{margin-top:6px;}
+  .lump-row{display:grid; grid-template-columns:1.3fr auto 0.8fr; gap:10px; align-items:end;}
+  .lump-amt input{font-weight:700; text-align:right;}
+  .seg-mini{display:flex; border:1.5px solid var(--ui-navy); border-radius:7px; overflow:hidden;}
+  .seg-mini button{padding:6px 10px; border:none; background:#fff; color:var(--ui-navy); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;}
+  .seg-mini button + button{border-left:1.5px solid var(--ui-navy);}
+  .seg-mini button.on{background:var(--ui-navy); color:#fff;}
+  .lump-info{margin-top:8px; font-size:12.5px; color:var(--ui-muted);}
+  .lump-info strong{color:var(--ui-navy);}
+  .grp-adds{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
   .grp-sub .del{border:none; background:none; color:#a33; cursor:pointer;}
   .grp-flags{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
   .flag{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--ui-line); border-radius:14px; background:#fff; font-size:12px; color:var(--ui-ink); cursor:pointer; margin:0 !important;}
@@ -1120,6 +1131,24 @@
   .panel .pane-title .btn-f, .panel .pane-actions .btn-f{background:#fff; color:#1b2a5e; border-color:#fff;}
   .panel .pane-title .btn-o, .panel .pane-title .btn-g, .panel .pane-actions .btn-o{border-color:#fff;}
   .panel .pane-title .btn-danger-o{background:#fff;}
+
+  /* ===== v15 ===== */
+  .savedir-path{display:flex; align-items:center; gap:8px; padding:9px 12px; border:1px solid var(--ui-line); border-radius:8px; background:#f5f7fc; font-size:13px; font-weight:600; color:var(--ui-navy); min-width:0;}
+  .savedir-path .ell{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .savedir-path.empty{font-weight:400; color:var(--ui-muted); border-style:dashed;}
+  .savedir-path.bad{border-color:#e0a39a; background:#fdf1ef; color:#9b2c2c;}
+  .savedir-warn{margin-top:6px; font-size:12px; color:#9b2c2c;}
+  .sync-choice{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:6px;}
+  .sync-big{display:flex; flex-direction:column; gap:6px; text-align:left; padding:16px; border:1.5px solid var(--ui-line); border-radius:10px; background:#fff; cursor:pointer; font-family:Arial, sans-serif;}
+  .sync-big:hover{border-color:var(--ui-navy); background:#f5f7fc;}
+  .sync-big .t{font-size:14.5px; font-weight:700; color:var(--ui-navy);}
+  .sync-big .d{font-size:12.5px; color:var(--ui-muted); line-height:1.45;}
+  .sync-list{display:grid; grid-template-columns:1fr 1fr; gap:4px 14px; padding:10px 12px; border:1px solid var(--ui-line-soft); border-radius:8px; background:#fafbfe; max-height:330px; overflow-y:auto;}
+  .sync-item{display:flex !important; align-items:flex-start; gap:8px; margin:0 !important; padding:5px 2px; font-size:13px !important; color:var(--ui-ink) !important; cursor:pointer; line-height:1.4;}
+  .sync-item input{width:auto; margin-top:2px;}
+  .sync-item .muted{font-size:11.5px;}
+  .sync-n{display:inline-block; font-size:11px; font-weight:700; color:#fff; background:#3a4a8c; border-radius:9px; padding:0 7px; margin-left:4px;}
+  .sync-note{margin-top:10px; padding:8px 12px; border-radius:8px; background:#f3f5fb; font-size:12.5px; line-height:1.6; color:var(--ui-ink);}
 </style>
 </head>
 <body>
@@ -1438,6 +1467,30 @@
         <div class="inline-input" style="margin-top:8px;">
           <input type="text" id="newFieldCatInput" placeholder="Tên lĩnh vực mới..." onkeydown="if(event.key==='Enter'){event.preventDefault();addFieldCat();}">
           <button type="button" class="btn-o" onclick="addFieldCat()">+ Thêm lĩnh vực</button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Thư mục lưu báo giá mặc định</span>
+          <span class="head-actions"><span class="muted" style="font-size:11.5px;">Tự lưu</span></span>
+        </div>
+        <p class="hint" style="margin:0 0 8px;font-size:12.5px;">Khi lưu báo giá, xuất Excel/Word hoặc mở file, hộp chọn vị trí sẽ mở sẵn ở thư mục này. Cần lưu chỗ khác thì chuyển thư mục ngay trong hộp chọn.</p>
+        <div id="saveDirBox"></div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button type="button" class="btn-o" onclick="chooseSaveDir()">Chọn thư mục…</button>
+          <button type="button" class="btn-g" onclick="clearSaveDir()">Bỏ đặt</button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Đồng bộ dữ liệu với máy khác</span>
+        </div>
+        <p class="hint" style="margin:0 0 8px;font-size:12.5px;">Chuyển sổ Quản lý báo giá và tham số, thiết lập chung sang máy khác để các máy cấp số báo giá liên tục, không trùng lặp.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="btn-f" onclick="openSyncExport()">Xuất file đồng bộ…</button>
+          <button type="button" class="btn-o" onclick="startSyncImport()">Nhập file đồng bộ…</button>
         </div>
       </div>
 
@@ -2530,9 +2583,46 @@ function removeSubItem(gi, si){
   render();
 }
 function updateSubItemLink(gi, si, detailId){
-  quoteGroups[gi].subItems[si].detailId = detailId;
+  if (detailId === '__lump'){ quoteGroups[gi].subItems[si] = newLumpItem(); renderItems(); render(); return; }
+  const wasLump = isLump(quoteGroups[gi].subItems[si]);
+  quoteGroups[gi].subItems[si] = { detailId };
+  if (wasLump) renderItems();
   render();
 }
+
+// ---------- Dòng "trọn gói" nhập trực tiếp tại bảng báo giá chính (không cần hạng mục diễn giải) ----------
+// Dữ liệu: { kind:'lump', name, amount, vatMode:'incl' (giá đã gồm VAT) | 'excl' (giá chưa gồm VAT), vatPct (null = theo % VAT chung) }
+function isLump(it){ return !!(it && it.kind === 'lump'); }
+function lumpTotals(it, defaultVat){
+  const v = (it.vatPct != null && it.vatPct !== '') ? (parseFloat(it.vatPct) || 0) : (parseFloat(defaultVat) || 0);
+  const a = Math.round(parseFloat(it.amount) || 0);
+  if (it.vatMode === 'excl'){ const base = a, vat = Math.round(base * v / 100); return { roundedTotal: base + vat, mainVatBase: base, mainVatAmount: vat, vatPct: v }; }
+  const base = Math.round(a / (1 + v / 100)); return { roundedTotal: a, mainVatBase: base, mainVatAmount: a - base, vatPct: v };
+}
+// Giá trị + tên của 1 dòng con trên bảng báo giá chính (hạng mục diễn giải HOẶC dòng trọn gói)
+function subItemResolve(it, sheets, defaultVat){
+  if (isLump(it)) return { name: (it.name || '').trim() || '(chưa nhập nội dung)', t: lumpTotals(it, defaultVat), lump: true };
+  const s = (sheets || detailSheets).find(x => x.id === it.detailId);
+  return { name: s ? s.name : '(chưa chọn hạng mục)', t: s ? computeDetailTotal(s) : { roundedTotal: 0, mainVatBase: 0, mainVatAmount: 0 }, lump: false };
+}
+function newLumpItem(){ return { kind: 'lump', name: '', amount: 0, vatMode: 'incl', vatPct: null }; }
+function addLumpSubItem(gi){ quoteGroups[gi].subItems.push(newLumpItem()); renderItems(); render(); }
+function updateLumpField(gi, si, field, val){
+  const it = quoteGroups[gi].subItems[si];
+  if (!isLump(it)) return;
+  if (field === 'amount') it.amount = parseFloat(String(val).replace(/[^\d.-]/g, '')) || 0;
+  else if (field === 'vatPct') it.vatPct = (val === '' || val == null) ? null : (parseFloat(val) || 0);
+  else it[field] = val;
+  if (field === 'vatMode'){ renderItems(); render(); return; }
+  const el = document.getElementById(`lumpInfo_${gi}_${si}`);
+  if (el) el.innerHTML = lumpInfoHtml(it);
+  render();
+}
+function lumpInfoHtml(it){
+  const t = lumpTotals(it, globalVatPct);
+  return `Trước VAT <strong>${fmt(t.mainVatBase)}</strong> + VAT ${t.vatPct}% <strong>${fmt(t.mainVatAmount)}</strong> = Sau VAT <strong>${fmt(t.roundedTotal)}</strong> đ`;
+}
+function formatAmountInput(el){ const n = parseFloat(String(el.value).replace(/[^\d.-]/g, '')) || 0; el.value = n ? fmt(n) : ''; }
 
 function totalLeafCount(){
   return quoteGroups.reduce((s,g)=>s+g.subItems.length,0);
@@ -2554,8 +2644,23 @@ function renderItems(){
       <div class="grp-head"><strong>${head}</strong>${quoteGroups.length>1 ? `<button type="button" class="del" onclick="removeGroup(${gi})">✕ Xoá</button>` : ''}</div>
       <div class="checkbox-line" style="margin-top:0;"><input type="checkbox" ${g.showMain?'checked':''} onchange="toggleGroupShowMain(${gi})"><label style="margin:0;">Có dòng cha (nhóm nhiều hạng mục con, đánh số 1.1, 1.2…)</label></div>
       ${g.showMain ? `<label>Nội dung dòng cha</label><textarea class="autowrap" rows="1" oninput="updateGroupContent(${gi}, this.value)">${esc(g.mainContent)}</textarea>` : ''}
-      ${g.subItems.map((it, si) => `<div class="grp-sub"><span class="num">${gn.subNums[si]}</span><select onchange="updateSubItemLink(${gi},${si}, this.value)">${detailOptions(it.detailId)}</select>${g.subItems.length>1 ? `<button type="button" class="del" title="Bỏ hạng mục này" onclick="removeSubItem(${gi},${si})">✕</button>` : ''}</div>`).join('')}
-      <button class="add-btn" style="margin-top:6px;padding:5px;font-size:12px;" onclick="addSubItem(${gi})">+ Thêm hạng mục${g.showMain?' con':''} vào dòng này</button>
+      ${g.subItems.map((it, si) => `<div class="grp-sub"><span class="num">${gn.subNums[si]}</span><select onchange="updateSubItemLink(${gi},${si}, this.value)">${detailOptions(isLump(it) ? null : it.detailId)}<option value="__lump" ${isLump(it) ? 'selected' : ''}>▸ Trọn gói — nhập nội dung và giá trị trực tiếp</option></select>${g.subItems.length>1 ? `<button type="button" class="del" title="Bỏ hạng mục này" onclick="removeSubItem(${gi},${si})">✕</button>` : ''}</div>
+        ${isLump(it) ? `<div class="lump-box">
+          <label>Nội dung chào giá</label>
+          <textarea class="autowrap" rows="1" placeholder="VD: Cung cấp dịch vụ tư vấn lập hồ sơ mời thầu gói thầu..." oninput="updateLumpField(${gi},${si},'name',this.value)">${esc(it.name)}</textarea>
+          <div class="lump-row">
+            <div class="lump-amt"><label>Giá trị chào giá (đ)</label><input type="text" inputmode="numeric" value="${it.amount ? fmt(it.amount) : ''}" placeholder="0" oninput="updateLumpField(${gi},${si},'amount',this.value)" onblur="formatAmountInput(this)"></div>
+            <div><label>Giá nhập vào là</label><div class="seg-mini">
+              <button type="button" class="${it.vatMode !== 'excl' ? 'on' : ''}" onclick="updateLumpField(${gi},${si},'vatMode','incl')">Đã gồm VAT</button>
+              <button type="button" class="${it.vatMode === 'excl' ? 'on' : ''}" onclick="updateLumpField(${gi},${si},'vatMode','excl')">Chưa gồm VAT</button></div></div>
+            <div class="lump-vat"><label>% VAT</label><input type="number" step="0.1" value="${it.vatPct != null ? it.vatPct : ''}" placeholder="${globalVatPct} (chung)" oninput="updateLumpField(${gi},${si},'vatPct',this.value)"></div>
+          </div>
+          <div class="lump-info" id="lumpInfo_${gi}_${si}">${lumpInfoHtml(it)}</div>
+        </div>` : ''}`).join('')}
+      <div class="grp-adds">
+        <button class="add-btn" style="margin-top:6px;padding:5px;font-size:12px;" onclick="addSubItem(${gi})">+ Thêm hạng mục${g.showMain?' con':''} vào dòng này</button>
+        <button class="add-btn" style="margin-top:6px;padding:5px;font-size:12px;" onclick="addLumpSubItem(${gi})">+ Thêm dòng trọn gói (nhập giá trực tiếp)</button>
+      </div>
       <div class="grp-flags">
         ${g.showMain ? `<span class="flag auto">Dòng cha in đậm tự động</span>
           <label class="flag"><input type="checkbox" ${g.subItemsItalic?'checked':''} onchange="toggleGroupSubItemsItalic(${gi})"> In nghiêng dòng con</label>
@@ -2696,13 +2801,12 @@ function renderNow(){
       // hien gia tri = tong cac hang muc con. Khong cong gop vao "subtotal" lan nua (tranh tinh trung).
       let sumAmt = 0, sumBeforeVat = 0, sumVat = 0;
       const subRows = g.subItems.map((it, si) => {
-        const s = detailSheets.find(s=>s.id===it.detailId);
-        const t = s ? computeDetailTotal(s) : {roundedTotal:0, mainVatBase:0, mainVatAmount:0};
+        const R0 = subItemResolve(it, detailSheets, globalVatPct), t = R0.t;
         const amt = t.roundedTotal;
         if (g.inTotal !== false) subtotal += amt;
         if (g.inDiscount !== false) discountBase += amt;
         sumAmt += amt; sumBeforeVat += t.mainVatBase; sumVat += t.mainVatAmount;
-        return {number: gn.subNums[si], name: s ? s.name : '(chưa chọn hạng mục)', amount: amt, beforeVat: t.mainVatBase, vatAmount: t.mainVatAmount, isMain:false, detailId: it.detailId, italic: !!g.subItemsItalic,
+        return {number: gn.subNums[si], name: R0.name, amount: amt, beforeVat: t.mainVatBase, vatAmount: t.mainVatAmount, isMain:false, detailId: R0.lump ? null : it.detailId, lump: R0.lump, italic: !!g.subItemsItalic,
           inTotal: g.inTotal !== false, inDiscount: g.inDiscount !== false};
       });
       resolvedRows.push({
@@ -2719,12 +2823,11 @@ function renderNow(){
       resolvedRows.push(...subRows);
     } else {
       g.subItems.forEach((it, si)=>{
-        const s = detailSheets.find(s=>s.id===it.detailId);
-        const t = s ? computeDetailTotal(s) : {roundedTotal:0, mainVatBase:0, mainVatAmount:0};
+        const R0 = subItemResolve(it, detailSheets, globalVatPct), t = R0.t;
         const amt = t.roundedTotal;
         if (g.inTotal !== false) subtotal += amt;
         if (g.inDiscount !== false) discountBase += amt;
-        resolvedRows.push({number: gn.subNums[si], name: s ? s.name : '(chưa chọn hạng mục)', amount: amt, beforeVat: t.mainVatBase, vatAmount: t.mainVatAmount, isMain:false, detailId: it.detailId,
+        resolvedRows.push({number: gn.subNums[si], name: R0.name, amount: amt, beforeVat: t.mainVatBase, vatAmount: t.mainVatAmount, isMain:false, detailId: R0.lump ? null : it.detailId, lump: R0.lump,
           bold: !!g.boldRows, inTotal: g.inTotal !== false, inDiscount: g.inDiscount !== false});
       });
     }
@@ -2858,7 +2961,7 @@ function renderNow(){
   // phan xem truoc. Hang muc nao KHONG con duoc bang chinh nao tham chieu toi (vd da tao trong luc
   // soan thao roi bi bo chon/xoa khoi bang chinh) se KHONG duoc dua vao trang/sheet dien giai chi tiet
   // nua - tranh hien thi thua toan bo cac hang muc khac khong lien quan (loi nguoi dung da bao).
-  const orderedDetailIdsForExport = quoteGroups.flatMap(g => g.subItems.map(it => it.detailId));
+  const orderedDetailIdsForExport = quoteGroups.flatMap(g => g.subItems.filter(it => !isLump(it)).map(it => it.detailId));
   const seenDetailIdsForExport = new Set();
   const orderedDetailSheetsForExport = [];
   orderedDetailIdsForExport.forEach(id => {
@@ -3667,7 +3770,7 @@ function renderExtraPages(){
   // ca nhung hang muc da tao/soan thao nhung khong con duoc chon o bang chinh nao) - neu khong loc se
   // hien thi THUA toan bo cac hang muc khong lien quan, sai voi noi dung thuc te cua bao gia (loi nguoi
   // dung da bao: bao gia chi co 1 hang muc nhung phan dien giai lai hien ca cac hang muc khac).
-  const orderedDetailIds = quoteGroups.flatMap(g => g.subItems.map(it => it.detailId));
+  const orderedDetailIds = quoteGroups.flatMap(g => g.subItems.filter(it => !isLump(it)).map(it => it.detailId));
   const seenDetailIds = new Set();
   const orderedDetailSheets = [];
   orderedDetailIds.forEach(id => {
@@ -3940,6 +4043,11 @@ async function saveQuoteFile(asNew, opts){
   render(); flushRender();
   if (!opts.confirmed){
     if (!checkRequiredFields()) return false;
+    const hasFile = !!(currentFilePath || currentFileName);
+    if (!asNew && hasFile && !opts.overwriteChosen){
+      if (!isDirty()){ showToast('Báo giá chưa có thay đổi nào so với file đã lưu.'); return true; }
+      return await showOverwriteWarning();
+    }
     return await showSaveConfirm(!!asNew);
   }
   if (!quoteType){ showTypeDialog(!!asNew); return false; }
@@ -4100,9 +4208,9 @@ function normalizeLoadedData(data){
     boldRows: !!g.boldRows,
     inTotal: g.inTotal !== false,
     inDiscount: g.inDiscount !== false,
-    subItems: (g.subItems && g.subItems.length ? g.subItems : [{detailId: fallbackDetailId}]).map(it=>({
-      detailId: validDetailIds.includes(it.detailId) ? it.detailId : fallbackDetailId,
-    })),
+    subItems: (g.subItems && g.subItems.length ? g.subItems : [{detailId: fallbackDetailId}]).map(it=> (it && it.kind === 'lump')
+      ? { kind: 'lump', name: it.name || '', amount: parseFloat(it.amount) || 0, vatMode: it.vatMode === 'excl' ? 'excl' : 'incl', vatPct: (it.vatPct == null || it.vatPct === '') ? null : (parseFloat(it.vatPct) || 0) }
+      : { detailId: validDetailIds.includes(it.detailId) ? it.detailId : fallbackDetailId }),
   }));
 
   return data;
@@ -4320,6 +4428,7 @@ function setMainTab(tab){
   if (rowModal && tab !== 'items') closeRowModal();
   if (tab !== 'params' && paramsUnlocked){ paramsUnlocked = false; }
   if (tab === 'params' || activeMainTab === 'params') setTimeout(applyParamsLock, 0);
+  if (tab === 'params') renderSaveDir();
   activeMainTab = tab;
   document.querySelectorAll('.tab1').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.dataset.pane === tab));
@@ -5201,6 +5310,7 @@ async function loadAppData(){
   if (activeMainTab === 'registry') renderRegistry();
   if (!quoteLoadedFromFile && !quoteCodeManuallyEdited){ quoteSeq = null; quoteSeqDate = ''; }
   loadFieldCats();
+  renderSaveDir();
   render();
   if (!quoteLoadedFromFile) markClean();
 }
@@ -5334,6 +5444,7 @@ function renderRegistry(){
       <div class="ttl-lg">Quản lý báo giá</div>
       <div class="pane-title-actions">
         <button type="button" class="btn-o" onclick="importQuoteFilesToRegistry()" title="Chọn một hoặc nhiều file báo giá (.json) để đọc và cập nhật vào sổ, không mở lên soạn thảo">Cập nhật từ file báo giá…</button>
+        <button type="button" class="btn-o" onclick="openSyncDialog()" title="Xuất / nhập file đồng bộ sổ Quản lý báo giá và tham số với máy khác">Đồng bộ máy khác…</button>
         <button type="button" class="btn-danger-o" onclick="deleteAllRegistry()" ${registry.length ? '' : 'disabled'}>Xoá toàn bộ sổ</button>
         <button type="button" class="btn-f" onclick="openReportDialog()">Xuất báo cáo…</button>
       </div>
@@ -5432,11 +5543,11 @@ function registryRecordFromQuoteData(raw, filePath, fileName){
     let subtotal = 0, base = 0;
     const items = [];
     data.quoteGroups.forEach(g => g.subItems.forEach(it => {
-      const sh = data.detailSheets.find(x => x.id === it.detailId);
-      const amt = sh ? computeDetailTotal(sh).roundedTotal : 0;
+      const R0 = subItemResolve(it, data.detailSheets, data.globalVatPct);
+      const amt = R0.t.roundedTotal;
       if (g.inTotal !== false) subtotal += amt;
       if (g.inDiscount !== false) base += amt;
-      items.push({ name: sh ? sh.name : '(chưa chọn hạng mục)', value: Math.round(amt || 0) });
+      items.push({ name: R0.name, value: Math.round(amt || 0) });
     }));
     const discEnabled = !!data.discountEnabled && data.mode !== 'multi';
     const baseR = Math.round(base);
@@ -6040,7 +6151,7 @@ function guardUnsaved(context){
       buttons: [
         { label: 'Huỷ', onClick: () => { closeDialog(); finish(false); } },
         { label: 'Không lưu', cls: 'btn-danger', onClick: () => { closeDialog(); finish(true); } },
-        ...(hasFile ? [{ label: 'Lưu đè file gốc', cls: 'btn-o', right: true, onClick: async () => { closeDialog(); finish(await saveQuoteFile(false)); } }] : []),
+        ...(hasFile ? [{ label: 'Lưu đè file gốc', cls: 'btn-o', right: true, onClick: async () => { closeDialog(); finish(await saveQuoteFile(false, { overwriteChosen: true })); } }] : []),
         { label: 'Lưu file mới', cls: 'btn-f', right: !hasFile, onClick: async () => { closeDialog(); finish(await saveQuoteFile(true)); } }
       ],
       onClose: () => finish(false)
@@ -6085,6 +6196,40 @@ function nextSeqForDate(dateKey, excludeUid){
 function autoCodeFor(d, m, y, seq){ return `${padMonth(m)}${padDay(d)}-${seq}.${y}.ITDVN`; }
 function flashFields(ids){
   ids.forEach(id => { const el = document.getElementById(id); if (!el) return; el.classList.remove('flash-edit'); void el.offsetWidth; el.classList.add('flash-edit'); });
+}
+// Bấm "Lưu" trên báo giá đã mở từ file và có chỉnh sửa: hỏi chắc chắn ghi đè hay lưu thành báo giá mới
+function showOverwriteWarning(){
+  return new Promise(resolve => {
+    let settled = false;
+    const finish = v => { if (!settled){ settled = true; resolve(v); } };
+    const d0 = document.getElementById('qDay').value, m0 = document.getElementById('qMonth').value, y0 = document.getElementById('qYear').value;
+    const name = currentQuoteName();
+    const typeOpts = quoteTypes.slice(); if (quoteType && !typeOpts.includes(quoteType)) typeOpts.push(quoteType);
+    const root = openDialog({
+      title: 'Báo giá đã được chỉnh sửa', width: 580,
+      body: `<div class="dlg-warn" style="margin-top:0;"><span>Báo giá <strong>${esc(name)}</strong> đã được chỉnh sửa. Bạn có chắc chắn muốn <strong>lưu đè lên báo giá cũ</strong> không? Nội dung cũ trong file sẽ bị thay thế và không khôi phục được.</span></div>
+        <div class="sc-info">
+          <div><span class="k">Số báo giá</span><span class="v">${esc(document.getElementById('quoteCode').value)}</span></div>
+          <div><span class="k">Ngày báo giá</span><span class="v">${dmyText(d0, m0, y0)}</span></div>
+          <div><span class="k">File</span><span class="v ell" style="font-weight:400;font-size:12.5px;">${esc(currentFilePath || currentFileName)}</span></div>
+        </div>
+        <label>Loại báo giá <span class="req">*</span></label>
+        <select id="owType"><option value="">— Chọn loại báo giá —</option>${typeOpts.map(t => `<option value="${esc(t)}" ${t === quoteType ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
+        <p class="dlg-p muted" style="margin-top:10px;">Muốn giữ nguyên báo giá cũ thì chọn <strong>Lưu thành báo giá mới</strong> (số báo giá mới, chọn nơi lưu).</p>`,
+      buttons: [
+        { label: 'Huỷ', onClick: () => { closeDialog(); finish(false); } },
+        { label: 'Lưu thành báo giá mới', cls: 'btn-f', right: true, onClick: async () => { closeDialog(); finish(await saveQuoteFile(true)); } },
+        { label: 'Ghi đè báo giá cũ', cls: 'btn-danger', onClick: async (r) => {
+          const t = r.querySelector('#owType').value;
+          if (!t){ dlgError(r, 'Vui lòng chọn loại báo giá.'); return; }
+          quoteType = t; typeMissingFlag = false; renderTypeSelect();
+          closeDialog(); finish(await saveQuoteFile(false, { confirmed: true }));
+        } }
+      ],
+      onClose: () => finish(false)
+    });
+    cselAttach(root.querySelector('#owType'));
+  });
 }
 function showSaveConfirm(asNew){
   return new Promise(resolve => {
@@ -6248,6 +6393,215 @@ function reportCellValue(k, r, stt){
     case 'path': return r.filePath || '';
   }
   return '';
+}
+
+// =====================================================================================================
+// v15: Thư mục lưu báo giá mặc định + Đồng bộ dữ liệu sang máy khác (sổ Quản lý báo giá, tham số/cấu hình)
+// =====================================================================================================
+function saveDirValue(){ return (appDefaults && appDefaults.saveDir) || ''; }
+async function renderSaveDir(){
+  const box = document.getElementById('saveDirBox');
+  if (!box) return;
+  const d = saveDirValue();
+  let ok = true;
+  if (d && hasApi('folder_exists')){ try { ok = await window.pywebview.api.folder_exists(d); } catch (e){ ok = true; } }
+  box.innerHTML = d
+    ? `<div class="savedir-path ${ok ? '' : 'bad'}" title="${esc(d)}"><span class="ic">📁</span><span class="ell">${esc(d)}</span></div>${ok ? '' : '<div class="savedir-warn">Không tìm thấy thư mục này trên máy — hộp chọn nơi lưu sẽ mở ở vị trí mặc định của Windows.</div>'}`
+    : `<div class="savedir-path empty"><span class="ic">📁</span><span>Chưa đặt — hộp chọn nơi lưu mở theo vị trí mặc định của Windows</span></div>`;
+}
+async function persistSaveDir(d){
+  appDefaults = Object.assign({}, appDefaults || {}, { saveDir: d });
+  try {
+    if (hasApi('save_defaults')) await window.pywebview.api.save_defaults({ saveDir: d });
+    else lsSet('baogia_defaults', appDefaults);
+  } catch (e){ console.error(e); }
+  renderSaveDir();
+}
+async function chooseSaveDir(){
+  if (!hasApi('pick_folder')){ alert('Chức năng chọn thư mục chỉ dùng được trong phần mềm desktop.'); return; }
+  const r = await window.pywebview.api.pick_folder();
+  if (!r || r.cancelled) return;
+  if (!r.ok){ alert('Không chọn được thư mục: ' + (r.error || '')); return; }
+  await persistSaveDir(r.path);
+  showToast('Đã đặt thư mục lưu báo giá mặc định: ' + r.path);
+}
+async function clearSaveDir(){ await persistSaveDir(''); showToast('Đã bỏ thư mục lưu mặc định.'); }
+
+// ---------- Đồng bộ ----------
+const SYNC_SECTIONS = [
+  { k: 'registry', label: 'Sổ Quản lý báo giá', desc: 'danh sách báo giá đã lập, số báo giá đã cấp — giúp cấp số liên tục, không trùng (chỉ thêm báo giá mới)' },
+  { k: 'vatTn', label: '% VAT và % TN chung' },
+  { k: 'cqlTiers', label: 'Bảng tỷ lệ Cql theo Ccg' },
+  { k: 'salaryTable', label: 'Bảng lương chuyên gia' },
+  { k: 'types', label: 'Danh mục loại báo giá' },
+  { k: 'fieldCats', label: 'Danh mục lĩnh vực' },
+  { k: 'company', label: 'Thông tin công ty' },
+  { k: 'logo', label: 'Logo & chân trang' },
+  { k: 'sign', label: 'Tên công ty ký tên' },
+  { k: 'format', label: 'Định dạng cỡ chữ & trình bày' },
+  { k: 'main', label: 'Nội dung mặc định báo giá chính', desc: 'câu dẫn, ghi chú cuối trang, lời kết, giảm giá, dòng tổng' },
+  { k: 'reportCfg', label: 'Cấu hình xuất báo cáo' }
+];
+const PARAM_SECTION_KEYS = ['vatTn', 'cqlTiers', 'salaryTable', 'types', 'company', 'logo', 'sign', 'format', 'main'];
+function syncSectionData(k){
+  const d = appDefaults || {};
+  if (k === 'registry') return JSON.parse(JSON.stringify(registry || []));
+  if (k === 'fieldCats') return { fieldCats: fieldCats.slice(), fieldRenames: Object.assign({}, fieldRenames) };
+  if (k === 'reportCfg') return reportConfig();
+  if (k === 'types') return (Array.isArray(d.types) ? d.types : quoteTypes).slice();
+  if (d[k] != null) return JSON.parse(JSON.stringify(d[k]));
+  return collectDefaultsSection(k);       // chưa "Lưu làm mặc định" -> lấy theo giá trị đang dùng
+}
+function syncChecklistHtml(keys, present, extra){
+  return `<div class="sync-list">${SYNC_SECTIONS.filter(s => keys.includes(s.k)).map(s => `
+    <label class="sync-item"><input type="checkbox" class="sync-chk" value="${s.k}" checked>
+      <span><strong>${esc(s.label)}</strong>${extra && extra[s.k] ? ` <span class="sync-n">${esc(extra[s.k])}</span>` : ''}${s.desc ? `<br><span class="muted">${esc(s.desc)}</span>` : ''}</span></label>`).join('')}</div>
+    <div class="rp-tools"><button type="button" class="link-btn" data-sync-all>Chọn tất cả</button><button type="button" class="link-btn" data-sync-none>Bỏ chọn tất cả</button></div>`;
+}
+function wireSyncChecklist(root){
+  root.querySelector('[data-sync-all]').addEventListener('click', () => root.querySelectorAll('.sync-chk').forEach(c => c.checked = true));
+  root.querySelector('[data-sync-none]').addEventListener('click', () => root.querySelectorAll('.sync-chk').forEach(c => c.checked = false));
+}
+function openSyncDialog(){
+  openDialog({
+    title: 'Đồng bộ dữ liệu với máy khác', width: 560,
+    body: `<p class="dlg-p">Dùng để chuyển sổ Quản lý báo giá và các tham số, thiết lập chung sang máy khác, giúp các máy cấp số báo giá liên tục, không trùng lặp.</p>
+      <div class="sync-choice">
+        <button type="button" class="sync-big" data-act="export"><span class="t">Xuất file đồng bộ</span><span class="d">Lưu dữ liệu của máy này ra 1 file (.json) để chép sang máy khác</span></button>
+        <button type="button" class="sync-big" data-act="import"><span class="t">Nhập file đồng bộ</span><span class="d">Đọc file đồng bộ từ máy khác và gộp vào máy này</span></button>
+      </div>`,
+    buttons: [{ label: 'Đóng', onClick: closeDialog }],
+    onMount: root => {
+      root.querySelector('[data-act="export"]').addEventListener('click', () => { closeDialog(); openSyncExport(); });
+      root.querySelector('[data-act="import"]').addEventListener('click', () => { closeDialog(); startSyncImport(); });
+    }
+  });
+}
+function openSyncExport(){
+  const keys = SYNC_SECTIONS.map(s => s.k);
+  const extra = { registry: `${(registry || []).length} báo giá` };
+  openDialog({
+    title: 'Xuất file đồng bộ', width: 600,
+    body: `<p class="dlg-p">Chọn các nội dung cần đưa vào file đồng bộ:</p>${syncChecklistHtml(keys, null, extra)}`,
+    buttons: [{ label: 'Huỷ', onClick: closeDialog }, { label: 'Xuất file đồng bộ', cls: 'btn-f', right: true, onClick: async (root) => {
+      const sel = Array.from(root.querySelectorAll('.sync-chk:checked')).map(c => c.value);
+      if (!sel.length){ dlgError(root, 'Chọn ít nhất 1 nội dung để đồng bộ.'); return; }
+      const sections = {};
+      sel.forEach(k => sections[k] = syncSectionData(k));
+      const now = new Date();
+      const payload = { _fileType: 'baogia-itd-sync', _version: 1, exportedAt: now.toISOString(), sections };
+      const fname = `DongBo_BaoGiaITD_${now.getFullYear()}${pad2(now.getMonth() + 1)}${pad2(now.getDate())}_${pad2(now.getHours())}${pad2(now.getMinutes())}.json`;
+      closeDialog();
+      if (hasApi('export_sync')){
+        const r = await window.pywebview.api.export_sync(payload, fname);
+        if (!r || r.cancelled) return;
+        if (!r.ok){ alert('Không xuất được file đồng bộ: ' + (r.error || '')); return; }
+        showToast('Đã xuất file đồng bộ: ' + r.path);
+      } else {
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname;
+        document.body.appendChild(a); a.click(); a.remove();
+        showToast('Đã xuất file đồng bộ');
+      }
+    } }],
+    onMount: wireSyncChecklist
+  });
+}
+async function startSyncImport(){
+  let data = null, path = '';
+  if (hasApi('pick_sync_file')){
+    const r = await window.pywebview.api.pick_sync_file();
+    if (!r || r.cancelled) return;
+    if (!r.ok){ alert('Không đọc được file: ' + (r.error || '')); return; }
+    data = r.data; path = r.path || '';
+  } else {
+    data = await new Promise(res => {
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json';
+      inp.onchange = async () => { const f = inp.files && inp.files[0]; if (!f) return res(null); path = f.name; try { res(JSON.parse(await f.text())); } catch (e){ res({}); } };
+      inp.click();
+    });
+    if (!data) return;
+  }
+  if (!data || data._fileType !== 'baogia-itd-sync' || !data.sections){ alert('File này không phải file đồng bộ của Phần mềm Báo giá.'); return; }
+  openSyncImport(data, path);
+}
+function openSyncImport(data, path){
+  const keys = SYNC_SECTIONS.map(s => s.k).filter(k => data.sections[k] != null);
+  if (!keys.length){ alert('File đồng bộ không có nội dung nào.'); return; }
+  const extra = {};
+  if (data.sections.registry) extra.registry = `${data.sections.registry.length} báo giá trong file`;
+  const when = data.exportedAt ? new Date(data.exportedAt).toLocaleString('vi-VN') : '';
+  openDialog({
+    title: 'Nhập file đồng bộ', width: 620,
+    body: `<p class="dlg-p">File <strong>${esc(fileBase(path))}</strong>${when ? ` (xuất lúc ${esc(when)})` : ''}. Chọn các nội dung cần đồng bộ vào máy này:</p>
+      ${syncChecklistHtml(keys, true, extra)}
+      <div class="sync-note">
+        <div>• <strong>Sổ Quản lý báo giá</strong>: chỉ thêm các báo giá <strong>mới</strong>. Báo giá đã có ở máy này được giữ nguyên, không cập nhật, không xoá.</div>
+        <div>• <strong>Loại báo giá, lĩnh vực</strong>: gộp thêm vào danh mục hiện có.</div>
+        <div>• <strong>Tham số & thiết lập khác</strong>: thay cấu hình mặc định cho báo giá mới trên máy này.</div>
+      </div>
+      <label class="rp-item rp-detail"><input type="checkbox" id="syncApplyNow"> <span>Áp dụng ngay các tham số & thiết lập đã đồng bộ vào <strong>báo giá đang mở</strong></span></label>`,
+    buttons: [{ label: 'Huỷ', onClick: closeDialog }, { label: 'Đồng bộ', cls: 'btn-f', right: true, onClick: async (root) => {
+      const sel = Array.from(root.querySelectorAll('.sync-chk:checked')).map(c => c.value);
+      if (!sel.length){ dlgError(root, 'Chọn ít nhất 1 nội dung để đồng bộ.'); return; }
+      const applyNow = root.querySelector('#syncApplyNow').checked;
+      closeDialog();
+      if (!(await askPassword('Nhập mật khẩu để <strong>đồng bộ dữ liệu</strong> vào máy này.', 'Đồng bộ'))) return;
+      await applySyncImport(data.sections, sel, applyNow);
+    } }],
+    onMount: wireSyncChecklist
+  });
+}
+async function applySyncImport(sec, keys, applyNow){
+  const msgs = [];
+  const partial = {};
+  if (keys.includes('registry') && Array.isArray(sec.registry)){
+    // Chỉ ghi nhận báo giá MỚI. Báo giá đã có ở máy này (trùng mã nội bộ hoặc trùng nội dung) giữ nguyên, không cập nhật.
+    let added = 0, skipped = 0;
+    const codeClash = [];
+    sec.registry.forEach(rec => {
+      if (!rec || !rec.uid) return;
+      const dup = registry.some(r => r.uid === rec.uid || (rec.fp && r.fp && r.fp === rec.fp));
+      if (dup){ skipped++; return; }
+      if (rec.code && registry.some(r => (r.code || '').trim() === rec.code.trim())) codeClash.push(rec.code);
+      registry.push(JSON.parse(JSON.stringify(rec)));
+      added++;
+    });
+    if (added) await persistRegistry();
+    msgs.push(`sổ: thêm ${added} báo giá mới` + (skipped ? `, bỏ qua ${skipped} báo giá đã có (giữ nguyên dữ liệu máy này)` : ''));
+    if (codeClash.length) setTimeout(() => alert(`Lưu ý: ${codeClash.length} báo giá mới nhận về có số trùng với báo giá khác đã có trên máy này:\n` + codeClash.slice(0, 15).join('\n') + (codeClash.length > 15 ? '\n...' : '') + '\n\nCác báo giá này vẫn được thêm vào sổ để không mất dữ liệu — bạn kiểm tra lại số báo giá.'), 50);
+    if (!quoteLoadedFromFile && !quoteCodeManuallyEdited && !currentFilePath){ quoteSeq = null; quoteSeqDate = ''; }
+  }
+  if (keys.includes('types') && Array.isArray(sec.types)){
+    const merged = sec.types.concat(quoteTypes.filter(t => !sec.types.includes(t)));
+    quoteTypes = merged; partial.types = merged.slice();
+    msgs.push('loại báo giá');
+  }
+  if (keys.includes('fieldCats') && sec.fieldCats){
+    const inc = sec.fieldCats.fieldCats || [];
+    fieldRenames = Object.assign({}, fieldRenames, sec.fieldCats.fieldRenames || {});
+    fieldCats = inc.concat(fieldCats.filter(f => !inc.includes(f)));
+    registry.forEach(r => { if (r.field) r.field = resolveFieldName(r.field); });
+    await persistFieldCats();
+    msgs.push('lĩnh vực');
+  }
+  if (keys.includes('reportCfg') && sec.reportCfg){ saveReportConfig(sec.reportCfg); msgs.push('cấu hình báo cáo'); }
+  const paramKeys = keys.filter(k => PARAM_SECTION_KEYS.includes(k) && k !== 'types' && sec[k] != null);
+  paramKeys.forEach(k => { partial[k] = JSON.parse(JSON.stringify(sec[k])); });
+  if (Object.keys(partial).length){
+    appDefaults = Object.assign({}, appDefaults || {}, partial);
+    try {
+      if (hasApi('save_defaults')) await window.pywebview.api.save_defaults(partial);
+      else lsSet('baogia_defaults', appDefaults);
+    } catch (e){ console.error(e); }
+    if (paramKeys.length) msgs.push(paramKeys.length + ' nhóm tham số & thiết lập');
+  }
+  if (applyNow && paramKeys.length) applyDefaults(paramKeys, true);
+  renderTypesList(); renderTypeSelect(); renderFieldCatsList(); renderFieldSelect(); refreshParamChips();
+  if (keys.includes('registry')) persistRegistry();
+  render();
+  if (activeMainTab === 'registry') renderRegistry();
+  showToast('Đã đồng bộ: ' + msgs.join('; ') + (applyNow && paramKeys.length ? ' — đã áp dụng vào báo giá đang mở' : ''));
 }
 
 // init
