@@ -6604,7 +6604,16 @@ async function applySyncImport(sec, keys, applyNow){
   showToast('Đã đồng bộ: ' + msgs.join('; ') + (applyNow && paramKeys.length ? ' — đã áp dụng vào báo giá đang mở' : ''));
 }
 
+// Báo giá mới: ngày báo giá lấy theo ngày hiện tại của máy (mở báo giá đã lưu thì dùng ngày trong file)
+function setQuoteDateToday(){
+  const now = new Date();
+  document.getElementById('qDay').value = padDay(now.getDate());
+  document.getElementById('qMonth').value = padMonth(now.getMonth() + 1);
+  document.getElementById('qYear').value = String(now.getFullYear());
+}
+
 // init
+setQuoteDateToday();
 startAuthGate();
 document.querySelector('.panel').addEventListener('input', (e) => {
   if (e.target.classList && e.target.classList.contains('autowrap')) autoGrow(e.target);
