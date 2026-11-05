@@ -206,6 +206,97 @@ class Api:
                 failed.append({"path": pth, "error": str(e)})
         return {"ok": True, "done": done, "failed": failed}
 
+    # ---- Mat khau dang nhap phan mem (luu dang bam PBKDF2 trong thu muc du lieu, file auth.json) ----
+
+    @staticmethod
+    def _hash(secret, salt):
+        import hashlib
+        return hashlib.pbkdf2_hmac("sha256", secret.encode("utf-8"), bytes.fromhex(salt), 200000).hex()
+
+    @staticmethod
+    def _norm_code(code):
+        return "".join(ch for ch in str(code or "").upper() if ch.isalnum())
+
+    def _new_auth(self, password):
+        import secrets
+        alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+        raw = "".join(secrets.choice(alphabet) for _ in range(12))
+        code = raw[0:4] + "-" + raw[4:8] + "-" + raw[8:12]
+        salt = secrets.token_hex(16)
+        rsalt = secrets.token_hex(16)
+        _write_json("auth.json", {"v": 1, "salt": salt, "hash": self._hash(password, salt),
+                                  "rsalt": rsalt, "rhash": self._hash(self._norm_code(code), rsalt)})
+        return code
+
+    _authed = False
+
+    def auth_status(self):
+        a = _read_json("auth.json", {})
+        return {"hasPassword": bool(a.get("hash")), "authed": bool(Api._authed and a.get("hash"))}
+
+    def auth_setup(self, password):
+        try:
+            if _read_json("auth.json", {}).get("hash"):
+                return {"ok": False, "error": "Mật khẩu đã được đặt trước đó."}
+            if not password or len(password) < 4:
+                return {"ok": False, "error": "Mật khẩu cần ít nhất 4 ký tự."}
+            code = self._new_auth(password)
+            Api._authed = True
+            return {"ok": True, "recovery": code}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    def auth_check(self, password):
+        try:
+            import hmac
+            a = _read_json("auth.json", {})
+            if not a.get("hash"):
+                return False
+            ok = hmac.compare_digest(a["hash"], self._hash(password or "", a["salt"]))
+            if ok:
+                Api._authed = True
+            return ok
+        except Exception:
+            return False
+
+    def auth_recover(self, code, new_password):
+        try:
+            import hmac
+            a = _read_json("auth.json", {})
+            if not a.get("rhash"):
+                return {"ok": False, "error": "Chưa có mã khôi phục."}
+            if not hmac.compare_digest(a["rhash"], self._hash(self._norm_code(code), a["rsalt"])):
+                return {"ok": False, "error": "Mã khôi phục không đúng."}
+            if not new_password or len(new_password) < 4:
+                return {"ok": False, "error": "Mật khẩu cần ít nhất 4 ký tự."}
+            return {"ok": True, "recovery": self._new_auth(new_password)}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    def auth_change(self, old_password, new_password):
+        if not self.auth_check(old_password):
+            return {"ok": False, "error": "Mật khẩu hiện tại không đúng."}
+        if not new_password or len(new_password) < 4:
+            return {"ok": False, "error": "Mật khẩu cần ít nhất 4 ký tự."}
+        try:
+            return {"ok": True, "recovery": self._new_auth(new_password)}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    # ---- Dong cua so: hoi luu bao gia neu co thay doi (xem on_closing o duoi) ----
+    _allow_close = False
+
+    def close_app(self):
+        import threading
+        Api._allow_close = True
+        def _go():
+            try:
+                webview.windows[0].destroy()
+            except Exception:
+                pass
+        threading.Thread(target=_go, daemon=True).start()
+        return True
+
     def reveal_in_folder(self, path):
         """Mo thu muc chua file bao gia (va chon san file do) trong Explorer/Finder."""
         try:
@@ -383,4 +474,26 @@ if __name__ == "__main__":
         height=900,
         min_size=(1000, 700),
     )
+
+    def on_closing(*_args):
+        """Bam X dong cua so: neu bao gia co thay doi chua luu thi de giao dien hoi (Khong luu / Luu de / Luu moi)."""
+        import threading
+        if Api._allow_close:
+            return True
+
+        def ask():
+            try:
+                r = window.evaluate_js("(typeof appCloseRequested === 'function') ? (setTimeout(function(){ appCloseRequested(); }, 0), 'ok') : 'none'")
+            except Exception:
+                r = None
+            if r != "ok":
+                Api._allow_close = True
+                try:
+                    window.destroy()
+                except Exception:
+                    pass
+        threading.Thread(target=ask, daemon=True).start()
+        return False
+
+    window.events.closing += on_closing
     webview.start()

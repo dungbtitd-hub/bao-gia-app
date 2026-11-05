@@ -778,6 +778,9 @@
   .qtitle svg{flex:0 0 auto; opacity:.85;}
   .qtitle .qt-name{overflow:hidden; text-overflow:ellipsis; min-width:0;}
   .qtitle.unsaved{border-style:dashed; color:#c9d0ea; font-weight:600;}
+  .qtitle .qt-x{flex:0 0 auto; display:flex; align-items:center; justify-content:center; width:20px; height:20px; margin:-2px -6px -2px 2px; padding:0;
+    border:none; border-radius:50%; background:transparent; color:#c9d0ea; font-size:12px; line-height:1; cursor:pointer;}
+  .qtitle .qt-x:hover{background:rgba(255,255,255,0.18); color:#fff;}
   .app-name{margin-left:10px; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; font-weight:700; white-space:nowrap;}
   .menu-wrap{position:relative;}
   .menu{display:none; position:absolute; right:0; top:calc(100% + 6px); width:190px; background:#fff; border:1px solid var(--ui-line);
@@ -811,7 +814,7 @@
   .layout{display:flex !important; flex:1; min-height:0 !important; grid-template-columns:none !important;}
   .panel{
     --accent:#1b2a5e; --accent-soft:#e2e7f4; --line:#c5cde0; --panel:#eef1f8; --field-border:#a8b2cb; --muted:#5f6680; --ink:#1a2033;
-    flex:1; min-width:440px; max-height:none !important; height:100%; resize:none !important; padding:16px 20px 40px; background:var(--ui-panel);
+    flex:1; min-width:440px; max-height:none !important; height:100%; resize:none !important; padding:16px 20px 40px; background:#d6dceb;
     border-right:1px solid var(--ui-line);
   }
   .panel input[type=text]:focus, .panel input[type=number]:focus, .panel textarea:focus, .panel select:focus{box-shadow:0 0 0 2px rgba(27,42,94,0.15);}
@@ -835,7 +838,7 @@
   .csel-btn .csel-val.ph{color:#7a8299;}
   .csel-btn:focus{outline:none; border-color:var(--accent, #1b2a5e); box-shadow:0 0 0 2px rgba(27,42,94,0.15);}
   .csel.missing .csel-btn{border-color:#b42318; box-shadow:0 0 0 2px rgba(180,35,24,0.12);}
-  .csel-list{position:fixed; z-index:400; background:#fff; color:#1c2b2d; border:1px solid #a8b2cb; border-radius:6px; box-shadow:0 10px 28px rgba(10,18,48,0.22);
+  .csel-list{position:fixed; z-index:3000; background:#fff; color:#1c2b2d; border:1px solid #a8b2cb; border-radius:6px; box-shadow:0 10px 28px rgba(10,18,48,0.22);
     max-height:320px; overflow-y:auto; padding:4px 0; font-family:Arial, Helvetica, sans-serif; font-size:13px;}
   .csel-opt{padding:7px 12px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#1c2b2d;}
   .csel-opt:hover, .csel-opt.hl{background:#e8ecf7;}
@@ -916,7 +919,7 @@
   .flag.auto{background:var(--ui-soft); color:var(--ui-navy); font-weight:600; cursor:default;}
 
   /* Xem trước + zoom */
-  .preview-col{flex:none; display:flex; flex-direction:column; background:#d8deea; height:100%; min-width:0; max-width:65%;}
+  .preview-col{flex:none; display:flex; flex-direction:column; background:#b8c1d6; height:100%; min-width:0; max-width:65%;}
   .preview-toolbar{flex:none; display:flex; align-items:center; gap:6px; padding:7px 12px; background:#fff; border-bottom:1px solid var(--ui-line);
     font-family:Arial, sans-serif; flex-wrap:wrap;}
   .pt-title{font-size:11px; font-weight:700; color:var(--ui-navy); text-transform:uppercase; letter-spacing:.05em; margin-right:auto;}
@@ -1050,6 +1053,73 @@
   /* Toi uu hieu nang: trang xem truoc nam ngoai vung nhin thay thi trinh duyet bo qua layout/ve */
   #allPages .sheet{content-visibility:auto; contain-intrinsic-size:auto 210mm auto 297mm;}
   @media print{ #allPages .sheet{content-visibility:visible !important; contain-intrinsic-size:none !important;} }
+
+  /* ===== v13 ===== */
+  #dlgRoot .dlg-ov{position:fixed; inset:0; background:rgba(19,29,69,0.42); display:flex; align-items:center; justify-content:center; z-index:600; font-family:Arial, Helvetica, sans-serif;}
+  .modal.dlg{max-width:calc(100% - 32px); max-height:calc(100% - 40px); overflow-y:auto;}
+  .dlg .modal-b label{display:block; margin:10px 0 4px; font-size:12.5px; color:var(--muted);}
+  .dlg .modal-b input[type=text], .dlg .modal-b input[type=password], .dlg .modal-b input[type=number]{width:100%;}
+  .dlg-p{margin:0 0 8px; font-size:13px; line-height:1.5;}
+  .dlg-list{margin:4px 0 0; padding-left:18px; font-size:13px; line-height:1.6;}
+  .dlg-err{display:none; margin-top:10px; padding:7px 10px; border-radius:6px; background:#fdecea; color:#9b2c2c; font-size:12.5px;}
+  .dlg-warn{display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 10px; margin:4px 0 6px; border-radius:7px; background:#fff6e5; border:1px solid #f0d49a; color:#7a4b00; font-size:12.5px;}
+  .dlg-warn.ok{background:#e9f6ec; border-color:#a9d8b4; color:#22663a;}
+  .sc-grid{display:grid; grid-template-columns:1fr 1fr 1.2fr; gap:10px;}
+  .sc-info{border:1px solid var(--ui-line-soft); border-radius:8px; overflow:hidden; margin-bottom:4px;}
+  .sc-info > div{display:grid; grid-template-columns:130px 1fr; gap:10px; padding:8px 12px; border-top:1px solid #eef1f8; font-size:13px; align-items:center;}
+  .sc-info > div:first-child{border-top:none;}
+  .sc-info .k{color:var(--ui-muted); font-size:12px;}
+  .sc-info .v{font-weight:700; color:var(--ui-navy); font-size:14px; min-width:0;}
+  .rp-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px 14px; padding:10px 12px; border:1px solid var(--ui-line-soft); border-radius:8px; background:#fafbfe;}
+  .rp-item{display:flex !important; align-items:center; gap:7px; margin:0 !important; font-size:13px !important; color:var(--ui-ink) !important; cursor:pointer;}
+  .rp-item input{width:auto;}
+  .rp-detail{align-items:flex-start !important; margin-top:12px !important; padding:10px 12px; border:1px solid #c5cde0; border-radius:8px;}
+  .rp-tools{display:flex; gap:14px; margin:6px 2px 0;}
+  .link-btn{background:none; border:none; padding:0; color:var(--ui-navy); text-decoration:underline; font-size:12px; cursor:pointer;}
+  .req-missing-field{border-color:#b42318 !important; box-shadow:0 0 0 2px rgba(180,35,24,0.15) !important;}
+  @keyframes flashEdit{0%,100%{box-shadow:none} 30%,70%{box-shadow:0 0 0 3px rgba(240,170,40,0.75); background:#fff8e6;}}
+  .flash-edit{animation:flashEdit 1.6s ease 2;}
+  /* Đăng nhập */
+  .auth-ov{position:fixed; inset:0; z-index:2000; background:linear-gradient(180deg,#131d45 0%,#1b2a5e 100%); display:flex; align-items:center; justify-content:center; font-family:Arial, Helvetica, sans-serif;}
+  .auth-card{width:420px; max-width:calc(100% - 32px); background:#fff; border-radius:14px; box-shadow:0 20px 60px rgba(0,0,0,0.35); padding:26px 28px; display:flex; flex-direction:column; gap:4px; color:#1c2b2d;}
+  .auth-brand{display:flex; align-items:center; gap:12px; margin-bottom:10px;}
+  .auth-brand img{width:64px; height:auto;}
+  .auth-app{font-size:17px; font-weight:700; color:#1b2a5e;}
+  .auth-co{font-size:12px; color:#5f6680; letter-spacing:.06em; text-transform:uppercase;}
+  .auth-t{font-size:15px; font-weight:700; margin:6px 0 4px; color:#1b2a5e;}
+  .auth-card label{font-size:12.5px; color:#5f6680; margin-top:8px;}
+  .auth-card input[type=password], .auth-card input[type=text]{width:100%; padding:9px 10px; font-size:14px;}
+  .auth-btn{margin-top:14px; padding:10px; font-size:14px;}
+  .auth-link{background:none; border:none; color:#1b2a5e; text-decoration:underline; font-size:12.5px; cursor:pointer; margin-top:8px; align-self:center;}
+  .auth-code{font-family:Consolas, 'Courier New', monospace; font-size:22px; font-weight:700; letter-spacing:.12em; text-align:center; padding:14px; margin:6px 0 8px; border:2px dashed #1b2a5e; border-radius:10px; background:#f3f5fb; color:#1b2a5e;}
+  .auth-chk{display:flex; align-items:center; gap:8px; margin-top:10px !important; color:#1c2b2d !important; font-size:13px !important;}
+  .auth-chk input{width:auto;}
+  /* Khoá Tham số */
+  .lock-bar{display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:12px; border-radius:10px; background:#fff6e5; border:1px solid #f0d49a; color:#7a4b00; font-size:13px; font-family:Arial, sans-serif; position:sticky; top:0; z-index:5;}
+  .lock-bar .lk-ic{font-size:16px;}
+  .lock-bar button{margin-left:auto;}
+  [data-pane="params"]:not(.params-locked) .lock-bar{background:#e9f6ec; border-color:#a9d8b4; color:#22663a;}
+  .params-locked > :not(.lock-bar){opacity:.55; filter:grayscale(.3);}
+  /* Sổ: chọn nhiều */
+  .reg-grid.reg-sel{grid-template-columns:34px 44px 150px 90px 180px minmax(160px,1fr) 120px 60px 130px 70px;}
+  .reg-grid input[type=checkbox]{width:auto; margin:0 auto; display:block;}
+  .reg-selbar{display:flex; align-items:center; gap:10px; padding:8px 14px; background:#fdf1ef; border-bottom:1px solid #f1c9c2; font-size:13px; color:#7a2b22;}
+  .reg-selbar .sp{margin-left:auto;}
+  .btn-danger-o{padding:6px 12px; border:1px solid #b42318; color:#b42318; background:#fff; border-radius:7px; font-size:12.5px; font-weight:600; cursor:pointer;}
+  @media print{ #dlgRoot, #authOverlay{display:none !important;} }
+
+  /* ===== Nền xanh đen cho vùng nhập liệu: các khối nhập liệu sáng nổi hẳn lên ===== */
+  .panel{background:#1e2950 !important; border-right-color:#0f1738 !important;}
+  .panel .card, .panel .settings-group, .panel .stat, .panel .reg-table{
+    border-color:transparent !important; box-shadow:0 8px 22px rgba(4,9,30,0.55), 0 1px 0 rgba(255,255,255,0.06) inset;}
+  .panel .card, .panel .settings-group{margin-bottom:18px;}
+  .panel .pane-title .ttl-lg{color:#fff;}
+  .panel > .pane > .muted, .panel > .pane > .hint, .panel > .pane > p{color:#c9d0ea;}
+  .panel .params-locked > :not(.lock-bar){opacity:.62; filter:grayscale(.2);}
+  .panel .lock-bar{box-shadow:0 6px 16px rgba(4,9,30,0.45);}
+  .panel .pane-title .btn-f, .panel .pane-actions .btn-f{background:#fff; color:#1b2a5e; border-color:#fff;}
+  .panel .pane-title .btn-o, .panel .pane-title .btn-g, .panel .pane-actions .btn-o{border-color:#fff;}
+  .panel .pane-title .btn-danger-o{background:#fff;}
 </style>
 </head>
 <body>
@@ -1069,7 +1139,7 @@
       Quản lý báo giá
     </button>
   </nav>
-  <div class="qtitle-wrap"><div class="qtitle unsaved" id="quoteTitleBox"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path></svg><span class="qt-name">Báo giá mới (chưa lưu)</span></div></div>
+  <div class="qtitle-wrap"><div class="qtitle unsaved" id="quoteTitleBox"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path></svg><span class="qt-name">Báo giá mới (chưa lưu)</span><button type="button" class="qt-x" onclick="closeQuote()" title="Đóng báo giá này (không thoát phần mềm)" aria-label="Đóng báo giá">✕</button></div></div>
   <div class="appbar-right">
     <button type="button" class="tb" onclick="newQuote()" title="Soạn báo giá mới (dùng cấu hình mặc định)">Mới</button>
     <button type="button" class="tb" onclick="openQuoteFile()">Mở</button>
@@ -1123,7 +1193,7 @@
         <select id="quoteType" onchange="onQuoteTypeChange()"></select>
         <div class="row2">
           <div><label>Chủ đầu tư</label><input type="text" id="investorName" placeholder="Để trống = lấy theo Kính gửi"></div>
-          <div><label>Lĩnh vực</label><input type="text" id="fieldName" list="fieldList" placeholder="VD: Chuyển đổi số"><datalist id="fieldList"></datalist></div>
+          <div><label>Lĩnh vực</label><select id="fieldName" onchange="render()"></select></div>
         </div>
       </div>
 
@@ -1163,10 +1233,10 @@
 
       <div class="card">
         <div class="card-head"><div class="ttl">Nội dung soạn thảo</div></div>
-        <label>Kính gửi</label>
-        <textarea id="recipient">Trung tâm Truyền thông, Dữ liệu và Công nghệ số thành phố Hà Nội</textarea>
-        <label>Nội dung mở đầu (phần thay đổi theo từng báo giá)</label>
-        <textarea id="introPrefix">Theo yêu cầu của Quý Ban về việc báo giá thực hiện các dịch vụ tư vấn liên quan đến nhiệm vụ...</textarea>
+        <label class="req-label">Kính gửi <span class="req">*</span></label>
+        <textarea id="recipient" placeholder="VD: Trung tâm Truyền thông, Dữ liệu và Công nghệ số thành phố Hà Nội" oninput="this.classList.remove('req-missing-field')"></textarea>
+        <label class="req-label">Nội dung mở đầu <span class="req">*</span> <span class="muted">(phần thay đổi theo từng báo giá)</span></label>
+        <textarea id="introPrefix" placeholder="VD: Theo yêu cầu của Quý Ban về việc báo giá thực hiện các dịch vụ tư vấn liên quan đến nhiệm vụ..." oninput="this.classList.remove('req-missing-field')"></textarea>
         <div class="fixed-clause-block">
           <label>Câu dẫn cố định</label>
           <div id="fixedClauseDisplay" class="fixed-clause-display" onclick="toggleFixedClauseEdit()">
@@ -1280,6 +1350,7 @@
 
     <!-- ================= THAM SỐ & THIẾT LẬP ================= -->
     <section class="pane" data-pane="params">
+      <div class="lock-bar" id="paramsLockBar"></div>
       <div class="pane-title">
         <div class="ttl-lg">Tham số &amp; thiết lập chung</div>
         <div class="pane-title-actions">
@@ -1356,6 +1427,26 @@
           <input type="text" id="newTypeInput" placeholder="Tên loại báo giá mới...">
           <button type="button" class="btn-o" onclick="addQuoteType()">+ Thêm loại</button>
         </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Danh mục lĩnh vực</span>
+          <span class="head-actions"><span class="muted" style="font-size:11.5px;">Tự lưu — đổi tên thì các báo giá đã lập đổi theo</span></span>
+        </div>
+        <div id="fieldCatsList" class="chips-wrap"></div>
+        <div class="inline-input" style="margin-top:8px;">
+          <input type="text" id="newFieldCatInput" placeholder="Tên lĩnh vực mới..." onkeydown="if(event.key==='Enter'){event.preventDefault();addFieldCat();}">
+          <button type="button" class="btn-o" onclick="addFieldCat()">+ Thêm lĩnh vực</button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title with-lock">
+          <span>Mật khẩu phần mềm</span>
+        </div>
+        <p class="hint" style="margin:0 0 8px;font-size:12.5px;">Dùng để đăng nhập, mở khoá sửa Tham số &amp; thiết lập và xoá báo giá trong sổ Quản lý báo giá.</p>
+        <button type="button" class="btn-o" onclick="changeAppPassword()">Đổi mật khẩu…</button>
       </div>
 
       <div class="settings-group">
@@ -1445,6 +1536,7 @@
 </div>
 
 <div id="modalRoot"></div>
+<div id="dlgRoot"></div>
 <div id="toast" class="toast"></div>
 <div id="reportPrint"></div>
 
@@ -2781,7 +2873,7 @@ function renderNow(){
     detailSheets: JSON.parse(JSON.stringify(orderedDetailSheetsForExport)), salaryTable: JSON.parse(JSON.stringify(salaryTable)),
     cqlTiers: JSON.parse(JSON.stringify(cqlTiers)), globalVatPct, globalTnPct,
     showTotalRow, discountBase: discountBaseR, quoteType,
-    investorName: (document.getElementById('investorName') || {}).value || '', fieldName: (document.getElementById('fieldName') || {}).value || '',
+    investorName: (document.getElementById('investorName') || {}).value || '', fieldName: getFieldName(),
     tableStyles: JSON.parse(JSON.stringify(tableStyles)),
     footerOffsetCm: parseFloat((document.getElementById('footerOffsetCm') || {}).value) || 1,
     showPageNumber: document.getElementById('showPageNumber') ? document.getElementById('showPageNumber').checked : true};
@@ -3779,7 +3871,7 @@ function collectFullState(){
     quoteUid,
     quoteType,
     investorName: document.getElementById('investorName').value,
-    fieldName: document.getElementById('fieldName').value,
+    fieldName: getFieldName(),
     syncAllPcts,
     showTotalRow: document.getElementById('showTotalRow').checked,
     tableStyles: JSON.parse(JSON.stringify(tableStyles)),
@@ -3843,9 +3935,14 @@ function collectFullState(){
   };
 }
 
-async function saveQuoteFile(asNew){
-  render();
-  if (!quoteType){ showTypeDialog(!!asNew); return; }
+async function saveQuoteFile(asNew, opts){
+  opts = opts || {};
+  render(); flushRender();
+  if (!opts.confirmed){
+    if (!checkRequiredFields()) return false;
+    return await showSaveConfirm(!!asNew);
+  }
+  if (!quoteType){ showTypeDialog(!!asNew); return false; }
   const prevUid = quoteUid, prevSeq = quoteSeq, prevSeqDate = quoteSeqDate;
   if (asNew){
     quoteUid = newUid();
@@ -3858,7 +3955,7 @@ async function saveQuoteFile(asNew){
   const dup = codeNow && (registry || []).find(r => r && r.uid !== quoteUid && (r.code || '').trim() === codeNow);
   if (dup && !confirm(`Số báo giá "${codeNow}" đã dùng cho báo giá khác${dup.investor ? ' (' + dup.investor + ')' : ''}. Vẫn lưu với số này?`)){
     quoteUid = prevUid; quoteSeq = prevSeq; quoteSeqDate = prevSeqDate; render();
-    return;
+    return false;
   }
   const restorePrev = () => { quoteUid = prevUid; quoteSeq = prevSeq; quoteSeqDate = prevSeqDate; render(); };
   const state = collectFullState();
@@ -3870,14 +3967,18 @@ async function saveQuoteFile(asNew){
       currentFilePath = result.path;
       upsertRegistry(buildRegistryRecord(result.path));
       updateQuoteTitle();
+      quoteLoadedFromFile = true;
+      originalQuoteDate = quoteDateKey(document.getElementById('qDay').value, document.getElementById('qMonth').value, document.getElementById('qYear').value);
+      markClean();
       showToast('Đã lưu báo giá: ' + result.path + ' — đã cập nhật sổ Quản lý báo giá');
+      return true;
     } else if (result && result.cancelled){
       restorePrev();
     } else {
       restorePrev();
       alert('Có lỗi khi lưu báo giá: ' + ((result && result.error) || 'không rõ nguyên nhân'));
     }
-    return;
+    return false;
   }
 
   // Bản web demo (không có pywebview): tải file kiểu trình duyệt
@@ -3896,6 +3997,10 @@ async function saveQuoteFile(asNew){
   currentFileName = fname;
   upsertRegistry(buildRegistryRecord(''));
   updateQuoteTitle();
+  quoteLoadedFromFile = true;
+  originalQuoteDate = quoteDateKey(document.getElementById('qDay').value, document.getElementById('qMonth').value, document.getElementById('qYear').value);
+  markClean();
+  return true;
   showToast('Đã lưu báo giá — đã cập nhật sổ Quản lý báo giá');
 }
 
@@ -4077,7 +4182,8 @@ function applyLoadedQuoteData(rawData){
     footerNotes = (data.footerNotes && data.footerNotes.length) ? data.footerNotes : footerNotes;
     quoteType = data.quoteType || '';
     document.getElementById('investorName').value = data.investorName || '';
-    document.getElementById('fieldName').value = data.fieldName || '';
+    setFieldName(data.fieldName || '');
+    originalQuoteDate = quoteDateKey(data.qDay, data.qMonth, data.qYear);
     quoteUid = data.quoteUid || newUid();
     syncAllPcts = !!data.syncAllPcts;
     if (data.tableStyles) tableStyles = Object.assign(tableStyles, JSON.parse(JSON.stringify(data.tableStyles)));
@@ -4131,10 +4237,11 @@ function applyLoadedQuoteData(rawData){
 }
 
 async function openQuoteFile(){
+  if (!(await guardUnsaved('open'))) return;
   if (window.pywebview){
     const result = await window.pywebview.api.open_quote_project();
     if (result && result.ok){
-      if (applyLoadedQuoteData(result.data)){ currentFilePath = result.path || ''; currentFileName = ''; updateQuoteTitle(); }
+      if (applyLoadedQuoteData(result.data)){ currentFilePath = result.path || ''; currentFileName = ''; updateQuoteTitle(); markClean(); }
     } else if (result && result.cancelled){
       // người dùng bấm Cancel, không làm gì
     } else {
@@ -4158,7 +4265,7 @@ function loadQuoteFile(file){
       alert('File không đúng định dạng báo giá (không phải JSON hợp lệ).');
       return;
     }
-    if (applyLoadedQuoteData(data)){ currentFilePath = ''; currentFileName = file.name; updateQuoteTitle(); }
+    if (applyLoadedQuoteData(data)){ currentFilePath = ''; currentFileName = file.name; updateQuoteTitle(); markClean(); }
   };
   reader.readAsText(file, 'utf-8');
 }
@@ -4211,6 +4318,8 @@ function newUid(){ return 'q' + Date.now().toString(36) + Math.random().toString
 // ---------- Tab chính ----------
 function setMainTab(tab){
   if (rowModal && tab !== 'items') closeRowModal();
+  if (tab !== 'params' && paramsUnlocked){ paramsUnlocked = false; }
+  if (tab === 'params' || activeMainTab === 'params') setTimeout(applyParamsLock, 0);
   activeMainTab = tab;
   document.querySelectorAll('.tab1').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.dataset.pane === tab));
@@ -4827,13 +4936,13 @@ function cselOpenList(sel){
     const b = sel._csel && sel._csel.querySelector('.csel-btn'); if (b) b.focus();
   });
   const cur = list.querySelector('.sel'); if (cur) cur.scrollIntoView({ block: 'nearest' });
-  _cselOpen = { sel, list };
+  _cselOpen = { sel, list, t: performance.now() };
 }
 function cselClose(){ if (_cselOpen){ _cselOpen.list.remove(); _cselOpen = null; } }
 document.addEventListener('mousedown', (e) => { if (_cselOpen && !e.target.closest('.csel-list') && !(_cselOpen.sel._csel && _cselOpen.sel._csel.contains(e.target))) cselClose(); }, true);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cselClose(); });
 window.addEventListener('resize', cselClose);
-document.addEventListener('scroll', (e) => { if (_cselOpen && !(e.target.closest && e.target.closest('.csel-list'))) cselClose(); }, true);
+document.addEventListener('scroll', (e) => { if (_cselOpen && performance.now() - _cselOpen.t > 300 && !(e.target.closest && e.target.closest('.csel-list'))) cselClose(); }, true);
 
 function renderTypeSelect(){
   const sel = document.getElementById('quoteType');
@@ -4870,13 +4979,7 @@ function removeQuoteType(i){
   renderTypesList();
   renderTypeSelect();
 }
-function renderFieldList(){
-  const dl = document.getElementById('fieldList');
-  if (!dl) return;
-  const set = new Set(['Chuyển đổi số', 'Tư vấn CNTT', 'An toàn thông tin', 'Phần mềm', 'Đào tạo']);
-  registry.forEach(r => { if (r.field) set.add(r.field); });
-  dl.innerHTML = Array.from(set).map(f => `<option value="${esc(f)}">`).join('');
-}
+function renderFieldList(){ renderFieldSelect(); }
 function showTypeDialog(asNew){
   const root = document.getElementById('modalRoot');
   typeMissingFlag = true;
@@ -4904,7 +5007,7 @@ function confirmTypeAndSave(asNew){
   typeMissingFlag = false;
   document.getElementById('modalRoot').innerHTML = '';
   renderTypeSelect();
-  saveQuoteFile(asNew);
+  saveQuoteFile(asNew, { confirmed: true });
 }
 
 // ---------- Menu xuất file / in ----------
@@ -5006,7 +5109,7 @@ function collectDefaultsSection(key){
       return o;
     }
     case 'main': return {
-      recipient: v('recipient'), introPrefix: v('introPrefix'), fixedClause: v('fixedClauseInput'), footerNotes: footerNotes.slice(), closingNote: v('closingNote'),
+      fixedClause: v('fixedClauseInput'), footerNotes: footerNotes.slice(), closingNote: v('closingNote'),
       discountEnabled: c('discountEnabled'), discountMode, discountPct: v('discountPct'), discountFixed: v('discountFixed'),
       showTotalRow: c('showTotalRow'), showVatBreakdown: c('showVatBreakdown') };
   }
@@ -5069,7 +5172,6 @@ function applyDefaults(keys, silent){
   }
   if (want('main')){
     const m = d.main;
-    setV('recipient', m.recipient); setV('introPrefix', m.introPrefix);
     if (m.fixedClause != null){ setV('fixedClauseInput', m.fixedClause); document.getElementById('fixedClauseText').textContent = m.fixedClause; }
     if (Array.isArray(m.footerNotes)) footerNotes = m.footerNotes.slice();
     setV('closingNote', m.closingNote);
@@ -5098,14 +5200,13 @@ async function loadAppData(){
   refreshParamChips();
   if (activeMainTab === 'registry') renderRegistry();
   if (!quoteLoadedFromFile && !quoteCodeManuallyEdited){ quoteSeq = null; quoteSeqDate = ''; }
+  loadFieldCats();
   render();
+  if (!quoteLoadedFromFile) markClean();
 }
 let appDataLoaded = false;
 function initAppDataOnce(){ if (appDataLoaded) return; appDataLoaded = true; loadAppData(); }
-function newQuote(){
-  if (!confirm('Soạn báo giá mới? Nội dung chưa lưu của báo giá đang mở sẽ mất.')) return;
-  location.reload();
-}
+
 
 // ---------- Sổ Quản lý báo giá ----------
 async function persistRegistry(){
@@ -5122,7 +5223,7 @@ function buildRegistryRecord(filePath){
   const investor = (document.getElementById('investorName').value || '').trim() || (st.recipient || '').trim();
   return {
     uid: quoteUid, code: st.quoteCode || '', date: `${st.qYear || ''}-${mm}-${dd}`, type: quoteType || '',
-    investor, field: (document.getElementById('fieldName').value || '').trim(),
+    investor, field: getFieldName(),
     items, discount: Math.round(st.discountEnabled ? (st.discountAmount || 0) : 0), total: Math.round(st.grandTotal || 0),
     filePath: filePath || currentFilePath || '', savedAt: new Date().toISOString(),
     fp: quoteFingerprint(collectFullState())
@@ -5195,7 +5296,8 @@ function renderRegistry(){
     stt++;
     const open = !!regOpen[r.uid];
     return `<div class="reg-row ${r.uid === quoteUid ? 'cur' : ''}">
-      <div class="reg-grid">
+      <div class="reg-grid reg-sel">
+        <div><input type="checkbox" ${regSel.has(r.uid) ? 'checked' : ''} onchange="toggleRegSel('${r.uid}', this.checked)" aria-label="Chọn báo giá ${esc(r.code)}"></div>
         <div style="text-align:center;">${stt}</div>
         <div><button type="button" class="reg-code" onclick="toggleRegRow('${r.uid}')"><span style="display:inline-block;transform:rotate(${open ? 90 : 0}deg);">›</span>${esc(r.code)}</button></div>
         <div>${regDmy(r.date)}</div>
@@ -5232,8 +5334,8 @@ function renderRegistry(){
       <div class="ttl-lg">Quản lý báo giá</div>
       <div class="pane-title-actions">
         <button type="button" class="btn-o" onclick="importQuoteFilesToRegistry()" title="Chọn một hoặc nhiều file báo giá (.json) để đọc và cập nhật vào sổ, không mở lên soạn thảo">Cập nhật từ file báo giá…</button>
-        <button type="button" class="btn-o" onclick="exportRegistryExcel()">Xuất báo cáo Excel</button>
-        <button type="button" class="btn-f" onclick="printRegistryReport()">In / Xuất PDF báo cáo</button>
+        <button type="button" class="btn-danger-o" onclick="deleteAllRegistry()" ${registry.length ? '' : 'disabled'}>Xoá toàn bộ sổ</button>
+        <button type="button" class="btn-f" onclick="openReportDialog()">Xuất báo cáo…</button>
       </div>
     </div>
     <div class="card reg-filters">
@@ -5270,25 +5372,22 @@ function renderRegistry(){
       <div class="stat"><div class="k">Số chủ đầu tư</div><div class="v">${new Set(list.map(r => r.investor)).size}</div></div>
     </div>
     <div class="reg-table">
-      <div class="reg-grid reg-h"><div style="text-align:center;">STT</div><div>Số báo giá</div><div>Ngày</div><div>Loại báo giá</div><div>Chủ đầu tư</div><div>Lĩnh vực</div><div style="text-align:center;">Hạng mục</div><div style="text-align:right;">Giá trị (đ)</div><div></div></div>
+      ${(() => { const n = list.filter(r => regSel.has(r.uid)).length; return n ? `<div class="reg-selbar"><strong>Đã chọn ${n} báo giá</strong><button type="button" class="link-btn" onclick="regSel.clear(); renderRegistry();">Bỏ chọn</button><span class="sp"></span><button type="button" class="btn-danger" onclick="deleteSelectedRegistry()">Xoá ${n} báo giá đã chọn khỏi sổ</button></div>` : ''; })()}
+      <div class="reg-grid reg-sel reg-h"><div><input type="checkbox" ${list.length && list.every(r => regSel.has(r.uid)) ? 'checked' : ''} onchange="toggleRegSelAll(this.checked)" aria-label="Chọn tất cả" title="Chọn tất cả báo giá đang hiển thị"></div><div style="text-align:center;">STT</div><div>Số báo giá</div><div>Ngày</div><div>Loại báo giá</div><div>Chủ đầu tư</div><div>Lĩnh vực</div><div style="text-align:center;">Hạng mục</div><div style="text-align:right;">Giá trị (đ)</div><div></div></div>
       ${groups.map(g => `${g.title ? `<div class="reg-grp"><strong style="color:var(--ui-navy);">${esc(g.title)}</strong><span class="muted">${g.rows.length} báo giá</span><strong style="margin-left:auto;">${fmt(g.subtotal)}</strong></div>` : ''}${g.rows.map(rowHtml).join('')}`).join('')}
       ${list.length ? '' : '<div style="padding:24px;text-align:center;color:var(--ui-muted);">Chưa có báo giá nào trong kỳ / bộ lọc đã chọn. Báo giá sẽ tự vào sổ khi bấm “Lưu” hoặc “Lưu bản mới”.</div>'}
       <div class="reg-total"><span>Tổng cộng ${regPeriodLabel()} — ${list.length} báo giá</span><span>${fmt(total)} đ</span></div>
     </div>`;
 }
-async function deleteRegistryRecord(uid){
-  if (!confirm('Xoá báo giá này khỏi sổ Quản lý báo giá? (File báo giá đã lưu trên máy không bị xoá.)')) return;
-  registry = registry.filter(r => r.uid !== uid);
-  await persistRegistry();
-  renderRegistry();
-}
+
 async function openRegistryFile(uid){
   const r = registry.find(x => x.uid === uid);
   if (!r) return;
+  if (!(await guardUnsaved('open'))) return;
   if (!(window.pywebview && window.pywebview.api && window.pywebview.api.open_quote_path)){ alert('Chức năng mở file chỉ dùng được trong phần mềm desktop.'); return; }
   const res = await window.pywebview.api.open_quote_path(r.filePath);
   if (res && res.ok){
-    if (applyLoadedQuoteData(res.data)){ currentFilePath = res.path; currentFileName = ''; updateQuoteTitle(); setMainTab('items'); }
+    if (applyLoadedQuoteData(res.data)){ currentFilePath = res.path; currentFileName = ''; updateQuoteTitle(); setMainTab('items'); markClean(); }
   } else alert((res && res.error) || 'Không mở được file.');
 }
 async function revealRegistryFile(uid){
@@ -5298,16 +5397,19 @@ async function revealRegistryFile(uid){
   const res = await window.pywebview.api.reveal_in_folder(r.filePath);
   if (!res || !res.ok) alert((res && res.error) || 'Không mở được thư mục.');
 }
-function registryPayload(){
+function registryPayload(cfg){
+  cfg = cfg || reportConfig();
   const list = regFilteredList();
-  const groups = regGroups(list).map(g => ({ title: g.title, subtotal: g.subtotal, rows: g.rows.map(r => Object.assign({}, r, { dateText: regDmy(r.date) })) }));
+  const groups = regGroups(list).map(g => ({ title: g.title, subtotal: g.subtotal, rows: g.rows.map(r => Object.assign({}, r, { dateText: regDmy(r.date), fileName: fileBase(r.filePath || '') })) }));
   const F = regFilter;
   const parts = [];
   if (F.type !== 'all') parts.push('Loại: ' + F.type);
   if (F.investor !== 'all') parts.push('Chủ đầu tư: ' + F.investor);
   if (F.field !== 'all') parts.push('Lĩnh vực: ' + F.field);
+  const columns = REPORT_FIELDS.filter(f => cfg.cols.includes(f.k)).map(f => ({ k: f.k, label: f.label }));
   return { title: 'BÁO CÁO TỔNG HỢP BÁO GIÁ', subtitle: 'Kỳ báo cáo: ' + regPeriodLabel() + (parts.length ? ' — ' + parts.join('; ') : ''),
-    slug: regPeriodLabel().replace(/[\s\/–]+/g, '_'), groups, total: list.reduce((s, r) => s + (r.total || 0), 0), count: list.length };
+    slug: regPeriodLabel().replace(/[\s\/–]+/g, '_'), groups, total: list.reduce((s, r) => s + (r.total || 0), 0), count: list.length,
+    columns, detail: !!cfg.detail };
 }
 // ---------- Cập nhật sổ Quản lý báo giá từ nhiều file báo giá (chỉ đọc, không mở lên soạn thảo) ----------
 // Tính giá trị đúng như khi mở báo giá: dùng bảng lương, bảng tỷ lệ Cql, % VAT/TN, giảm giá, cờ "Cộng vào
@@ -5346,7 +5448,7 @@ function registryRecordFromQuoteData(raw, filePath, fileName){
     return {
       uid: data.quoteUid || ('f' + _hashStr(String(filePath || fileName || '') + '|' + (data.quoteCode || ''))),
       code: data.quoteCode || '', date: quoteDateKey(data.qDay, data.qMonth, data.qYear), type: data.quoteType || '',
-      investor, field: String(data.fieldName || '').trim(), items, discount, total,
+      investor, field: resolveFieldName(data.fieldName), items, discount, total,
       filePath: filePath || '', savedAt: new Date().toISOString()
     };
   } finally {
@@ -5535,27 +5637,621 @@ async function importQuoteFilesToRegistry(){
   inp.click();
 }
 
-async function exportRegistryExcel(){
+async function exportRegistryExcel(cfg){
   if (!(window.pywebview && window.pywebview.api && window.pywebview.api.export_registry_excel)){ alert('Chức năng xuất file chỉ hoạt động trong ứng dụng desktop.'); return; }
-  const res = await window.pywebview.api.export_registry_excel(registryPayload());
+  const res = await window.pywebview.api.export_registry_excel(registryPayload(cfg));
   showExportResult(res);
 }
-function printRegistryReport(){
-  const p = registryPayload();
+function printRegistryReport(cfg){
+  const p = registryPayload(cfg);
+  const cols = p.columns;
+  const numK = new Set(['discount', 'total']);
+  const totalIdx = cols.findIndex(c => c.k === 'total');
+  const span = totalIdx >= 0 ? totalIdx : cols.length;
+  const cell = (k, r, stt) => { const v = reportCellValue(k, r, stt); return numK.has(k) ? fmt(v) : esc(String(v)); };
+  const tailCells = (val) => totalIdx >= 0 ? `<td style="text-align:right;"><strong>${fmt(val)}</strong></td>` + '<td></td>'.repeat(cols.length - totalIdx - 1) : '';
   let stt = 0;
   document.getElementById('reportPrint').innerHTML = `
     <h2 style="text-align:center;margin:0 0 4px;">${esc(p.title)}</h2>
     <div style="text-align:center;font-style:italic;margin-bottom:12px;">${esc(p.subtitle)}</div>
-    <table><thead><tr><th>STT</th><th>Số báo giá</th><th>Ngày</th><th>Loại báo giá</th><th>Chủ đầu tư</th><th>Lĩnh vực</th><th>Hạng mục</th><th>Giá trị (đ)</th></tr></thead><tbody>
-    ${p.groups.map(g => `${g.title ? `<tr><td colspan="7"><strong>${esc(g.title)}</strong></td><td style="text-align:right;"><strong>${fmt(g.subtotal)}</strong></td></tr>` : ''}${g.rows.map(r => { stt++; return `<tr><td style="text-align:center;">${stt}</td><td>${esc(r.code)}</td><td>${r.dateText}</td><td>${esc(r.type)}</td><td>${esc(r.investor)}</td><td>${esc(r.field)}</td><td>${(r.items || []).map(i => esc(i.name) + ': ' + fmt(i.value || 0)).join('<br>')}</td><td style="text-align:right;">${fmt(r.total || 0)}</td></tr>`; }).join('')}`).join('')}
-    <tr><td colspan="7"><strong>TỔNG CỘNG (${p.count} báo giá)</strong></td><td style="text-align:right;"><strong>${fmt(p.total)}</strong></td></tr>
+    <table><thead><tr>${cols.map(c => `<th>${esc(c.label)}</th>`).join('')}</tr></thead><tbody>
+    ${p.groups.map(g => `${g.title ? `<tr><td colspan="${Math.max(span, 1)}"><strong>${esc(g.title)}</strong></td>${tailCells(g.subtotal)}</tr>` : ''}${g.rows.map(r => { stt++;
+      const main = `<tr>${cols.map(c => `<td style="${numK.has(c.k) ? 'text-align:right;' : (c.k === 'stt' || c.k === 'count' ? 'text-align:center;' : '')}">${cell(c.k, r, stt)}</td>`).join('')}</tr>`;
+      const detList = p.detail ? (r.items || []).map((it, ii) => [(ii + 1) + '. ' + it.name, it.value || 0]).concat(r.discount ? [['Giảm giá', -Math.abs(r.discount)]] : []) : [];
+      const det = detList.map(([lb, v]) => `<tr class="rp-det"><td colspan="${Math.max(span, 1)}" style="padding-left:24px;font-style:italic;">${esc(lb)}</td>${totalIdx >= 0 ? `<td style="text-align:right;font-style:italic;">${fmt(v)}</td>` + '<td></td>'.repeat(cols.length - totalIdx - 1) : ''}</tr>`).join('');
+      return main + det; }).join('')}`).join('')}
+    <tr><td colspan="${Math.max(span, 1)}"><strong>TỔNG CỘNG (${p.count} báo giá)</strong></td>${tailCells(p.total)}</tr>
     </tbody></table>`;
   document.body.classList.add('printing-report');
   window.print();
   setTimeout(() => document.body.classList.remove('printing-report'), 500);
 }
 
+
+// =====================================================================================================
+// v13: Mật khẩu đăng nhập, khoá Tham số, xác nhận khi lưu, hỏi lưu khi đóng, đóng báo giá,
+//      danh mục lĩnh vực, chọn nhiều để xoá trong sổ, báo cáo tuỳ chọn trường.
+// =====================================================================================================
+const hasApi = (fn) => !!(window.pywebview && window.pywebview.api && window.pywebview.api[fn]);
+function lsGet(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e){ return null; } }
+function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e){} }
+function ssGet(k){ try { return sessionStorage.getItem(k); } catch (e){ return null; } }
+function ssSet(k, v){ try { sessionStorage.setItem(k, v); } catch (e){} }
+const pad2 = n => String(n).padStart(2, '0');
+function dmyText(d, m, y){ return `${pad2(parseInt(d, 10) || 0)}/${pad2(parseInt(m, 10) || 0)}/${y || ''}`; }
+
+// ---------- Hộp thoại dùng chung (lớp riêng #dlgRoot, nằm trên mọi thứ) ----------
+function openDialog(opts){
+  const root = document.getElementById('dlgRoot');
+  root.innerHTML = `<div class="dlg-ov"><div class="modal dlg" role="dialog" aria-modal="true" style="width:${opts.width || 520}px;">
+    <div class="modal-h">${esc(opts.title)}${opts.closable === false ? '' : '<button type="button" class="x" data-dlg-x aria-label="Đóng">✕</button>'}</div>
+    <div class="modal-b">${opts.body}<div class="dlg-err"></div></div>
+    <div class="modal-f">${(opts.buttons || []).map((b, i) => `<button type="button" class="${b.cls || 'btn-g'}${b.right ? ' right' : ''}" data-dlg-b="${i}">${esc(b.label)}</button>`).join('')}</div>
+  </div></div>`;
+  root.querySelectorAll('[data-dlg-b]').forEach(el => el.addEventListener('click', () => { const b = opts.buttons[+el.dataset.dlgB]; if (b && b.onClick) b.onClick(root); }));
+  const x = root.querySelector('[data-dlg-x]');
+  if (x) x.addEventListener('click', () => { closeDialog(); if (opts.onClose) opts.onClose(); });
+  root.querySelector('.dlg').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.tagName === 'INPUT' && opts.onEnter){ e.preventDefault(); opts.onEnter(root); }
+  });
+  if (opts.onMount) opts.onMount(root);
+  const f = root.querySelector('[data-autofocus]') || root.querySelector('.modal-b input:not([type=checkbox]):not([disabled]), .modal-b textarea');
+  if (f) setTimeout(() => f.focus(), 30);
+  return root;
+}
+function closeDialog(){ cselClose(); document.getElementById('dlgRoot').innerHTML = ''; }
+function dialogOpen(){ return !!document.querySelector('#dlgRoot .dlg-ov'); }
+function dlgError(root, msg){ const e = root.querySelector('.dlg-err'); if (e){ e.textContent = msg || ''; e.style.display = msg ? 'block' : 'none'; } }
+
+// ---------- Mật khẩu phần mềm (lưu dạng băm ở máy, trong thư mục dữ liệu của phần mềm) ----------
+async function sha256Hex(text){
+  try {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (e){ return _hashStr(text); }
+}
+function randomCode(){
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const a = new Uint32Array(12);
+  try { crypto.getRandomValues(a); } catch (e){ for (let i = 0; i < 12; i++) a[i] = Math.floor(Math.random() * 1e9); }
+  const s = Array.from(a).map(v => A[v % A.length]).join('');
+  return s.slice(0, 4) + '-' + s.slice(4, 8) + '-' + s.slice(8, 12);
+}
+const authApi = {
+  async status(){
+    if (hasApi('auth_status')) return await window.pywebview.api.auth_status();
+    const a = lsGet('bg_auth'); return { hasPassword: !!(a && a.hash) };
+  },
+  async setup(pw){
+    if (hasApi('auth_setup')) return await window.pywebview.api.auth_setup(pw);
+    const code = randomCode(), salt = randomCode();
+    lsSet('bg_auth', { salt, hash: await sha256Hex(salt + pw), rhash: await sha256Hex(salt + code.replace(/-/g, '')) });
+    return { ok: true, recovery: code };
+  },
+  async check(pw){
+    if (hasApi('auth_check')) return !!(await window.pywebview.api.auth_check(pw));
+    const a = lsGet('bg_auth'); return !!(a && a.hash === await sha256Hex(a.salt + pw));
+  },
+  async recover(code, pw){
+    if (hasApi('auth_recover')) return await window.pywebview.api.auth_recover(code, pw);
+    const a = lsGet('bg_auth');
+    if (!a || a.rhash !== await sha256Hex(a.salt + String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, ''))) return { ok: false, error: 'Mã khôi phục không đúng.' };
+    return await authApi.setup(pw);
+  },
+  async change(oldPw, pw){
+    if (hasApi('auth_change')) return await window.pywebview.api.auth_change(oldPw, pw);
+    if (!(await authApi.check(oldPw))) return { ok: false, error: 'Mật khẩu hiện tại không đúng.' };
+    return await authApi.setup(pw);
+  }
+};
+function authValidateNew(p1, p2){
+  if (!p1 || p1.length < 4) return 'Mật khẩu cần ít nhất 4 ký tự.';
+  if (p1 !== p2) return 'Hai lần nhập mật khẩu không khớp.';
+  return '';
+}
+// Hỏi mật khẩu để xác nhận 1 thao tác (xoá trong sổ, sửa Tham số...). Trả về true nếu đúng mật khẩu.
+function askPassword(reason, okLabel){
+  return new Promise(resolve => {
+    let done = false;
+    const finish = v => { if (done) return; done = true; resolve(v); };
+    const submit = async (root) => {
+      const pw = root.querySelector('#dlgPw').value;
+      if (!pw){ dlgError(root, 'Vui lòng nhập mật khẩu.'); return; }
+      if (!(await authApi.check(pw))){ dlgError(root, 'Mật khẩu không đúng.'); root.querySelector('#dlgPw').select(); return; }
+      closeDialog(); finish(true);
+    };
+    openDialog({
+      title: 'Xác nhận mật khẩu', width: 460,
+      body: `<p class="dlg-p">${reason}</p><label>Mật khẩu đăng nhập phần mềm</label><input type="password" id="dlgPw" autocomplete="current-password">`,
+      buttons: [{ label: 'Huỷ', onClick: () => { closeDialog(); finish(false); } }, { label: okLabel || 'Xác nhận', cls: 'btn-f', right: true, onClick: submit }],
+      onEnter: submit, onClose: () => finish(false)
+    });
+  });
+}
+
+// ---------- Màn hình đăng nhập / đặt mật khẩu lần đầu ----------
+function authScreen(inner){
+  let ov = document.getElementById('authOverlay');
+  if (!ov){ ov = document.createElement('div'); ov.id = 'authOverlay'; ov.className = 'auth-ov'; document.body.appendChild(ov); }
+  ov.innerHTML = `<div class="auth-card"><div class="auth-brand"><img src="${logoDataUri}" alt="ITD Việt Nam"><div><div class="auth-app">Phần mềm Báo giá</div><div class="auth-co">ITD Việt Nam</div></div></div>${inner}</div>`;
+  const f = ov.querySelector('input'); if (f) setTimeout(() => f.focus(), 30);
+  return ov;
+}
+function authErr(ov, msg){ const e = ov.querySelector('.dlg-err'); if (e){ e.textContent = msg || ''; e.style.display = msg ? 'block' : 'none'; } }
+function authDone(){
+  ssSet('bg_auth_ok', '1');
+  const ov = document.getElementById('authOverlay'); if (ov) ov.remove();
+}
+function showAuthLoading(){ authScreen(`<div class="auth-t">Đang khởi động…</div>`); }
+function showSetupScreen(){
+  const ov = authScreen(`<div class="auth-t">Đặt mật khẩu lần đầu</div>
+    <p class="dlg-p">Phần mềm được bảo vệ bằng mật khẩu. Mật khẩu này dùng để đăng nhập, mở khoá sửa Tham số & thiết lập và xoá báo giá trong sổ Quản lý báo giá.</p>
+    <label>Mật khẩu mới</label><input type="password" id="auNew1" autocomplete="new-password">
+    <label>Nhập lại mật khẩu mới</label><input type="password" id="auNew2" autocomplete="new-password">
+    <div class="dlg-err"></div>
+    <button type="button" class="btn-f auth-btn" id="auGo">Đặt mật khẩu</button>`);
+  const go = async () => {
+    const p1 = ov.querySelector('#auNew1').value, p2 = ov.querySelector('#auNew2').value;
+    const err = authValidateNew(p1, p2); if (err){ authErr(ov, err); return; }
+    const r = await authApi.setup(p1);
+    if (!r || !r.ok){ authErr(ov, (r && r.error) || 'Không đặt được mật khẩu.'); return; }
+    showRecoveryScreen(r.recovery, true);
+  };
+  ov.querySelector('#auGo').addEventListener('click', go);
+  ov.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+}
+function showRecoveryScreen(code, enterAfter){
+  const ov = authScreen(`<div class="auth-t">Mã khôi phục mật khẩu</div>
+    <p class="dlg-p">Hãy chép hoặc ghi lại mã dưới đây và cất ở nơi an toàn. Khi quên mật khẩu, nhập mã này để đặt mật khẩu mới. Mã chỉ hiện <strong>một lần</strong>.</p>
+    <div class="auth-code" id="auCode">${esc(code)}</div>
+    <button type="button" class="btn-o" id="auCopy" style="align-self:center;">Chép mã</button>
+    <label class="auth-chk"><input type="checkbox" id="auSaved"> Tôi đã ghi lại mã khôi phục</label>
+    <div class="dlg-err"></div>
+    <button type="button" class="btn-f auth-btn" id="auGo">${enterAfter ? 'Vào phần mềm' : 'Xong'}</button>`);
+  ov.querySelector('#auCopy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(code); showToast('Đã chép mã khôi phục'); } catch (e){ showToast('Không chép được — hãy ghi tay mã này'); }
+  });
+  ov.querySelector('#auGo').addEventListener('click', () => {
+    if (!ov.querySelector('#auSaved').checked){ authErr(ov, 'Hãy ghi lại mã khôi phục rồi tích "Tôi đã ghi lại mã khôi phục".'); return; }
+    authDone();
+  });
+}
+function showLoginScreen(){
+  const ov = authScreen(`<div class="auth-t">Đăng nhập</div>
+    <label>Mật khẩu</label><input type="password" id="auPw" autocomplete="current-password">
+    <div class="dlg-err"></div>
+    <button type="button" class="btn-f auth-btn" id="auGo">Đăng nhập</button>
+    <button type="button" class="auth-link" id="auForgot">Quên mật khẩu?</button>`);
+  const go = async () => {
+    const pw = ov.querySelector('#auPw').value;
+    if (!pw){ authErr(ov, 'Vui lòng nhập mật khẩu.'); return; }
+    if (!(await authApi.check(pw))){ authErr(ov, 'Mật khẩu không đúng.'); ov.querySelector('#auPw').select(); return; }
+    authDone();
+  };
+  ov.querySelector('#auGo').addEventListener('click', go);
+  ov.querySelector('#auPw').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  ov.querySelector('#auForgot').addEventListener('click', showRecoverScreen);
+}
+function showRecoverScreen(){
+  const ov = authScreen(`<div class="auth-t">Đặt lại mật khẩu bằng mã khôi phục</div>
+    <label>Mã khôi phục</label><input type="text" id="auCodeIn" placeholder="XXXX-XXXX-XXXX" autocomplete="off" style="text-transform:uppercase;letter-spacing:.08em;">
+    <label>Mật khẩu mới</label><input type="password" id="auNew1" autocomplete="new-password">
+    <label>Nhập lại mật khẩu mới</label><input type="password" id="auNew2" autocomplete="new-password">
+    <div class="dlg-err"></div>
+    <button type="button" class="btn-f auth-btn" id="auGo">Đặt lại mật khẩu</button>
+    <button type="button" class="auth-link" id="auBack">‹ Quay lại đăng nhập</button>`);
+  ov.querySelector('#auBack').addEventListener('click', showLoginScreen);
+  ov.querySelector('#auGo').addEventListener('click', async () => {
+    const code = ov.querySelector('#auCodeIn').value, p1 = ov.querySelector('#auNew1').value, p2 = ov.querySelector('#auNew2').value;
+    if (!code.trim()){ authErr(ov, 'Nhập mã khôi phục.'); return; }
+    const err = authValidateNew(p1, p2); if (err){ authErr(ov, err); return; }
+    const r = await authApi.recover(code, p1);
+    if (!r || !r.ok){ authErr(ov, (r && r.error) || 'Mã khôi phục không đúng.'); return; }
+    showRecoveryScreen(r.recovery, true);
+  });
+}
+function waitApiReady(){
+  return new Promise(res => {
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.load_app_data) return res();
+    let done = false;
+    window.addEventListener('pywebviewready', () => { if (!done){ done = true; res(); } });
+    setTimeout(() => { if (!done && !window.pywebview){ done = true; res(); } }, 900);
+  });
+}
+async function startAuthGate(){
+  if (ssGet('bg_auth_ok') === '1') return;
+  showAuthLoading();
+  await waitApiReady();
+  let st = { hasPassword: false };
+  try { st = await authApi.status(); } catch (e){ console.error(e); }
+  if (st && st.authed){ authDone(); return; }
+  if (st && st.hasPassword) showLoginScreen(); else showSetupScreen();
+}
+function authLocked(){ return !!document.getElementById('authOverlay'); }
+// Đổi mật khẩu / tạo mã khôi phục mới (trong Tham số & thiết lập)
+function changeAppPassword(){
+  const submit = async (root) => {
+    const o = root.querySelector('#cpOld').value, p1 = root.querySelector('#cpNew1').value, p2 = root.querySelector('#cpNew2').value;
+    if (!o){ dlgError(root, 'Nhập mật khẩu hiện tại.'); return; }
+    const err = authValidateNew(p1, p2); if (err){ dlgError(root, err); return; }
+    const r = await authApi.change(o, p1);
+    if (!r || !r.ok){ dlgError(root, (r && r.error) || 'Không đổi được mật khẩu.'); return; }
+    closeDialog();
+    showRecoveryDialog(r.recovery, 'Đã đổi mật khẩu. Mã khôi phục cũ không còn dùng được — đây là mã khôi phục mới:');
+  };
+  openDialog({
+    title: 'Đổi mật khẩu phần mềm', width: 460,
+    body: `<label>Mật khẩu hiện tại</label><input type="password" id="cpOld" autocomplete="current-password">
+      <label>Mật khẩu mới</label><input type="password" id="cpNew1" autocomplete="new-password">
+      <label>Nhập lại mật khẩu mới</label><input type="password" id="cpNew2" autocomplete="new-password">`,
+    buttons: [{ label: 'Huỷ', onClick: closeDialog }, { label: 'Đổi mật khẩu', cls: 'btn-f', right: true, onClick: submit }],
+    onEnter: submit
+  });
+}
+function showRecoveryDialog(code, msg){
+  openDialog({
+    title: 'Mã khôi phục mật khẩu', width: 480,
+    body: `<p class="dlg-p">${esc(msg)}</p><div class="auth-code">${esc(code)}</div><p class="dlg-p muted">Mã chỉ hiện một lần — hãy chép hoặc ghi lại.</p>`,
+    buttons: [{ label: 'Chép mã', onClick: async () => { try { await navigator.clipboard.writeText(code); showToast('Đã chép mã khôi phục'); } catch (e){} } },
+      { label: 'Đã ghi lại', cls: 'btn-f', right: true, onClick: closeDialog }],
+    closable: false
+  });
+}
+
+// ---------- Khoá tab Tham số & thiết lập ----------
+let paramsUnlocked = false;
+function applyParamsLock(){
+  const pane = document.querySelector('[data-pane="params"]');
+  if (!pane) return;
+  const bar = document.getElementById('paramsLockBar');
+  pane.classList.toggle('params-locked', !paramsUnlocked);
+  Array.from(pane.children).forEach(ch => { if (ch !== bar){ if (paramsUnlocked) ch.removeAttribute('inert'); else ch.setAttribute('inert', ''); } });
+  if (bar) bar.innerHTML = paramsUnlocked
+    ? `<span class="lk-ic">🔓</span><span>Đang mở khoá — có thể sửa tham số & thiết lập. Rời khỏi tab này sẽ tự khoá lại.</span><button type="button" class="btn-g" onclick="lockParams()">Khoá lại</button>`
+    : `<span class="lk-ic">🔒</span><span>Tham số & thiết lập đang khoá. Nhập mật khẩu để sửa.</span><button type="button" class="btn-f" onclick="unlockParams()">Mở khoá để sửa</button>`;
+}
+async function unlockParams(){
+  if (await askPassword('Nhập mật khẩu để mở khoá sửa <strong>Tham số &amp; thiết lập</strong>.', 'Mở khoá')){ paramsUnlocked = true; applyParamsLock(); }
+}
+function lockParams(){ paramsUnlocked = false; applyParamsLock(); }
+
+// ---------- Danh mục lĩnh vực ----------
+const DEFAULT_FIELD_CATS = ['Chuyển đổi số', 'Tư vấn CNTT', 'An toàn thông tin', 'Phần mềm', 'Đào tạo'];
+let fieldCats = DEFAULT_FIELD_CATS.slice();
+let fieldRenames = {};
+function resolveFieldName(n){ let x = String(n || '').trim(), g = 0; while (x && fieldRenames[x] && g++ < 20) x = fieldRenames[x]; return x; }
+function loadFieldCats(){
+  const d = appDefaults || {};
+  fieldRenames = (d.fieldRenames && typeof d.fieldRenames === 'object') ? Object.assign({}, d.fieldRenames) : {};
+  if (Array.isArray(d.fieldCats)) fieldCats = d.fieldCats.slice();
+  else {
+    const set = new Set(DEFAULT_FIELD_CATS);
+    (registry || []).forEach(r => { if (r.field) set.add(resolveFieldName(r.field)); });
+    fieldCats = Array.from(set);
+  }
+  renderFieldCatsList(); renderFieldSelect();
+}
+async function persistFieldCats(){
+  appDefaults = Object.assign({}, appDefaults || {}, { fieldCats: fieldCats.slice(), fieldRenames: Object.assign({}, fieldRenames) });
+  try {
+    if (hasApi('save_defaults')) await window.pywebview.api.save_defaults({ fieldCats: fieldCats.slice(), fieldRenames: Object.assign({}, fieldRenames) });
+    else lsSet('baogia_defaults', appDefaults);
+  } catch (e){ console.error(e); }
+}
+function getFieldName(){ const el = document.getElementById('fieldName'); return el ? (el.value || '').trim() : ''; }
+function setFieldName(v){ const el = document.getElementById('fieldName'); if (!el) return; el.dataset.cur = resolveFieldName(v); renderFieldSelect(); }
+function renderFieldSelect(){
+  const sel = document.getElementById('fieldName');
+  if (!sel) return;
+  const cur = sel.dataset.cur != null ? sel.dataset.cur : (sel.value || '');
+  const opts = fieldCats.slice();
+  if (cur && !opts.includes(cur)) opts.push(cur);
+  sel.innerHTML = `<option value="">— Chọn lĩnh vực —</option>` + opts.map(f => `<option value="${esc(f)}" ${f === cur ? 'selected' : ''}>${esc(f)}</option>`).join('');
+  sel.value = cur;
+  delete sel.dataset.cur;
+  cselAttach(sel); cselSync(sel);
+}
+function renderFieldCatsList(){
+  const c = document.getElementById('fieldCatsList');
+  if (!c) return;
+  c.innerHTML = fieldCats.map((f, i) => `<span class="type-chip">${esc(f)}<button type="button" title="Đổi tên" onclick="renameFieldCat(${i})">✎</button><button type="button" title="Xoá khỏi danh mục" onclick="removeFieldCat(${i})">✕</button></span>`).join('') || '<span class="muted">Chưa có lĩnh vực nào.</span>';
+}
+function addFieldCat(){
+  const inp = document.getElementById('newFieldCatInput');
+  const v = (inp.value || '').trim();
+  if (!v) return;
+  if (fieldCats.includes(v)){ showToast('Lĩnh vực này đã có trong danh mục.'); return; }
+  fieldCats.push(v); inp.value = '';
+  renderFieldCatsList(); renderFieldSelect(); persistFieldCats();
+}
+function renameFieldCat(i){
+  const old = fieldCats[i];
+  const submit = async (root) => {
+    const v = (root.querySelector('#fcName').value || '').trim();
+    if (!v){ dlgError(root, 'Nhập tên lĩnh vực.'); return; }
+    if (v !== old && fieldCats.includes(v)){ dlgError(root, 'Tên này đã có trong danh mục.'); return; }
+    closeDialog();
+    if (v === old) return;
+    fieldCats[i] = v;
+    Object.keys(fieldRenames).forEach(k => { if (fieldRenames[k] === old) fieldRenames[k] = v; });
+    fieldRenames[old] = v;
+    delete fieldRenames[v];
+    let n = 0;
+    registry.forEach(r => { if (r.field === old){ r.field = v; n++; } });
+    if (n) persistRegistry();
+    const cur = getFieldName();
+    setFieldName(cur === old ? v : cur);
+    renderFieldCatsList(); persistFieldCats(); render();
+    if (activeMainTab === 'registry') renderRegistry();
+    showToast(`Đã đổi tên lĩnh vực "${old}" thành "${v}"` + (n ? ` — cập nhật ${n} báo giá trong sổ` : ''));
+  };
+  openDialog({
+    title: 'Đổi tên lĩnh vực', width: 460,
+    body: `<p class="dlg-p">Các báo giá đã lập thuộc lĩnh vực <strong>${esc(old)}</strong> sẽ tự đổi theo tên mới.</p><label>Tên lĩnh vực</label><input type="text" id="fcName" value="${esc(old)}">`,
+    buttons: [{ label: 'Huỷ', onClick: closeDialog }, { label: 'Đổi tên', cls: 'btn-f', right: true, onClick: submit }],
+    onEnter: submit
+  });
+}
+function removeFieldCat(i){
+  const name = fieldCats[i];
+  openDialog({
+    title: 'Xoá lĩnh vực khỏi danh mục', width: 460,
+    body: `<p class="dlg-p">Xoá <strong>${esc(name)}</strong> khỏi danh mục chọn khi lập báo giá? Các báo giá đã lập vẫn giữ nguyên lĩnh vực này.</p>`,
+    buttons: [{ label: 'Huỷ', onClick: closeDialog }, { label: 'Xoá', cls: 'btn-danger', right: true, onClick: () => {
+      closeDialog(); fieldCats.splice(i, 1); renderFieldCatsList(); renderFieldSelect(); persistFieldCats();
+    } }]
+  });
+}
+
+// ---------- Theo dõi thay đổi chưa lưu ----------
+let _cleanSig = null;
+function stateSignature(){
+  const s = collectFullState();
+  delete s.activeDetailTab; delete s._savedAt;
+  return _hashStr(canonicalJson(s));
+}
+function markClean(){ try { flushRender(); _cleanSig = stateSignature(); } catch (e){ console.error(e); } }
+function isDirty(){
+  if (_cleanSig === null) return false;
+  try { flushRender(); return stateSignature() !== _cleanSig; } catch (e){ return true; }
+}
+let originalQuoteDate = '';   // ngày của báo giá khi vừa mở từ file (để hỏi cập nhật ngày khi "Lưu file mới")
+function currentQuoteName(){
+  const path = currentFilePath || currentFileName || '';
+  return path ? path.split(/[\\/]/).pop().replace(/\.(json|bgitd|baogia)$/i, '') : '';
+}
+// Hỏi lưu khi có thay đổi. Trả về true = được phép tiếp tục (đã lưu hoặc chọn không lưu).
+function guardUnsaved(context){
+  return new Promise(async resolve => {
+    if (!isDirty()) return resolve(true);
+    const what = { close: 'đóng báo giá này', app: 'thoát phần mềm', 'new': 'soạn báo giá mới', open: 'mở báo giá khác' }[context] || 'tiếp tục';
+    const name = currentQuoteName();
+    const hasFile = !!currentFilePath || !!currentFileName;
+    let settled = false;
+    const finish = v => { if (!settled){ settled = true; resolve(v); } };
+    openDialog({
+      title: 'Báo giá có thay đổi chưa lưu', width: 560,
+      body: `<p class="dlg-p">Báo giá <strong>${esc(name || 'mới (chưa lưu)')}</strong> có thay đổi chưa được lưu. Bạn muốn làm gì trước khi ${what}?</p>
+        <ul class="dlg-list">
+          <li><strong>Không lưu</strong> — bỏ các thay đổi vừa sửa.</li>
+          ${hasFile ? `<li><strong>Lưu đè file gốc</strong> — ghi các thay đổi vào chính file ${esc(name)}.</li>` : ''}
+          <li><strong>Lưu file mới</strong> — lưu thành báo giá mới (số báo giá mới, chọn nơi lưu), file gốc giữ nguyên.</li>
+        </ul>`,
+      buttons: [
+        { label: 'Huỷ', onClick: () => { closeDialog(); finish(false); } },
+        { label: 'Không lưu', cls: 'btn-danger', onClick: () => { closeDialog(); finish(true); } },
+        ...(hasFile ? [{ label: 'Lưu đè file gốc', cls: 'btn-o', right: true, onClick: async () => { closeDialog(); finish(await saveQuoteFile(false)); } }] : []),
+        { label: 'Lưu file mới', cls: 'btn-f', right: !hasFile, onClick: async () => { closeDialog(); finish(await saveQuoteFile(true)); } }
+      ],
+      onClose: () => finish(false)
+    });
+  });
+}
+function reloadAsNewQuote(){ ssSet('bg_auth_ok', '1'); location.reload(); }
+async function newQuote(){ if (await guardUnsaved('new')) reloadAsNewQuote(); }
+async function closeQuote(){
+  if (!quoteLoadedFromFile && !currentFilePath && !isDirty()){ showToast('Đang ở báo giá mới — không có báo giá nào cần đóng.'); return; }
+  if (await guardUnsaved('close')) reloadAsNewQuote();
+}
+// Gọi từ Python khi bấm nút X của cửa sổ phần mềm
+let _appClosing = false;
+async function appCloseRequested(){
+  if (_appClosing) return;
+  _appClosing = true;
+  try {
+    const ok = authLocked() ? true : await guardUnsaved('app');
+    if (ok && hasApi('close_app')) await window.pywebview.api.close_app();
+  } finally { _appClosing = false; }
+}
+
+// ---------- Bắt buộc nhập Kính gửi + Nội dung mở đầu ----------
+function checkRequiredFields(){
+  const req = [['recipient', 'Kính gửi'], ['introPrefix', 'Nội dung mở đầu']];
+  const missing = req.filter(([id]) => !(document.getElementById(id).value || '').trim());
+  req.forEach(([id]) => document.getElementById(id).classList.toggle('req-missing-field', missing.some(m => m[0] === id)));
+  if (!missing.length) return true;
+  setMainTab('main');
+  const el = document.getElementById(missing[0][0]);
+  el.scrollIntoView({ block: 'center' }); el.focus();
+  showToast('Vui lòng nhập ' + missing.map(m => '"' + m[1] + '"').join(' và ') + ' trước khi lưu báo giá.');
+  return false;
+}
+
+// ---------- Hộp xác nhận số báo giá + ngày trước khi lưu ----------
+function nextSeqForDate(dateKey, excludeUid){
+  const others = (registry || []).filter(r => r && r.uid !== excludeUid && r.date === dateKey);
+  return Math.max(others.reduce((mx, r) => Math.max(mx, seqFromCode(r.code)), 0), others.length) + 1;
+}
+function autoCodeFor(d, m, y, seq){ return `${padMonth(m)}${padDay(d)}-${seq}.${y}.ITDVN`; }
+function flashFields(ids){
+  ids.forEach(id => { const el = document.getElementById(id); if (!el) return; el.classList.remove('flash-edit'); void el.offsetWidth; el.classList.add('flash-edit'); });
+}
+function showSaveConfirm(asNew){
+  return new Promise(resolve => {
+    let settled = false;
+    const finish = v => { if (!settled){ settled = true; resolve(v); } };
+    const d0 = document.getElementById('qDay').value, m0 = document.getElementById('qMonth').value, y0 = document.getElementById('qYear').value;
+    const code0 = document.getElementById('quoteCode').value;
+    const name = currentQuoteName();
+    const sameAsOriginal = asNew && originalQuoteDate && quoteDateKey(d0, m0, y0) === originalQuoteDate;
+    const now = new Date();
+    const typeOpts = quoteTypes.slice(); if (quoteType && !typeOpts.includes(quoteType)) typeOpts.push(quoteType);
+    const typeSel = `<select id="scType"><option value="">— Chọn loại báo giá —</option>${typeOpts.map(t => `<option value="${esc(t)}" ${t === quoteType ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>`;
+    const body = asNew ? `
+      <p class="dlg-p">Lưu thành <strong>báo giá mới</strong>${name ? ` từ báo giá <strong>${esc(name)}</strong> (file gốc giữ nguyên)` : ''}. Kiểm tra ngày và số báo giá, sau đó chọn nơi lưu file.</p>
+      ${sameAsOriginal ? `<div class="dlg-warn">Ngày báo giá đang giữ nguyên như báo giá gốc (${dmyText(d0, m0, y0)}). Có cần cập nhật ngày mới không?
+        <button type="button" class="btn-o" id="scToday">Đổi sang hôm nay (${dmyText(now.getDate(), now.getMonth() + 1, now.getFullYear())})</button></div>` : ''}
+      <div class="sc-grid">
+        <div><label>Ngày</label><input type="text" id="scD" value="${esc(d0)}" inputmode="numeric"></div>
+        <div><label>Tháng</label><input type="text" id="scM" value="${esc(m0)}" inputmode="numeric"></div>
+        <div><label>Năm</label><input type="number" id="scY" value="${esc(y0)}"></div>
+      </div>
+      <label>Số báo giá <span class="muted">(tự sinh theo ngày — có thể sửa)</span></label>
+      <div class="inline-input"><input type="text" id="scCode" value=""><button type="button" class="btn-g icon-btn" id="scAuto">↺ Tự động</button></div>
+      <label>Loại báo giá <span class="req">*</span></label>${typeSel}` : `
+      <p class="dlg-p">${currentFilePath ? `Lưu đè vào file <strong>${esc(name)}</strong>.` : 'Lưu báo giá thành file (chọn nơi lưu ở bước tiếp theo).'} Kiểm tra lại số và ngày báo giá:</p>
+      <div class="sc-info">
+        <div><span class="k">Số báo giá</span><span class="v">${esc(code0)}</span></div>
+        <div><span class="k">Ngày báo giá</span><span class="v">${dmyText(d0, m0, y0)}</span></div>
+        <div><span class="k">Kính gửi</span><span class="v ell">${esc((document.getElementById('recipient').value || '').trim())}</span></div>
+      </div>
+      <label>Loại báo giá <span class="req">*</span></label>${typeSel}`;
+    let codeManual = !!quoteCodeManuallyEdited;   // số đang sửa tay thì giữ nguyên, trừ khi bấm "Tự động"
+    const refreshCode = (root) => {
+      if (!asNew) return;
+      const d = root.querySelector('#scD').value, m = root.querySelector('#scM').value, y = root.querySelector('#scY').value;
+      root.querySelector('#scCode').value = codeManual ? (root.querySelector('#scCode').value || code0) : autoCodeFor(d, m, y, nextSeqForDate(quoteDateKey(d, m, y), null));
+    };
+    const confirm = async (root) => {
+      const t = root.querySelector('#scType').value;
+      if (!t){ dlgError(root, 'Vui lòng chọn loại báo giá.'); return; }
+      quoteType = t; typeMissingFlag = false; renderTypeSelect();
+      if (asNew){
+        const d = root.querySelector('#scD').value.trim(), m = root.querySelector('#scM').value.trim(), y = root.querySelector('#scY').value.trim();
+        if (!(parseInt(d, 10) >= 1 && parseInt(d, 10) <= 31 && parseInt(m, 10) >= 1 && parseInt(m, 10) <= 12 && parseInt(y, 10) > 2000)){ dlgError(root, 'Ngày tháng năm không hợp lệ.'); return; }
+        document.getElementById('qDay').value = padDay(d); document.getElementById('qMonth').value = padMonth(m); document.getElementById('qYear').value = y;
+        const code = root.querySelector('#scCode').value.trim();
+        if (codeManual){ document.getElementById('quoteCode').value = code; quoteCodeManuallyEdited = true; }
+        else quoteCodeManuallyEdited = false;
+        render(); flushRender();
+      }
+      closeDialog();
+      finish(await saveQuoteFile(asNew, { confirmed: true }));
+    };
+    const root = openDialog({
+      title: asNew ? 'Lưu thành báo giá mới' : (currentFilePath ? 'Xác nhận lưu đè báo giá' : 'Xác nhận lưu báo giá'),
+      width: 560, body,
+      buttons: [
+        { label: 'Chỉnh sửa', onClick: () => {
+          closeDialog(); finish(false);
+          setMainTab('main');
+          const el = document.getElementById('qDay'); el.scrollIntoView({ block: 'center' }); el.focus(); el.select && el.select();
+          flashFields(['qDay', 'qMonth', 'qYear', 'quoteCode']);
+        } },
+        { label: asNew ? 'Xác nhận & chọn nơi lưu' : 'Xác nhận lưu', cls: 'btn-f', right: true, onClick: confirm }
+      ],
+      onClose: () => finish(false)
+    });
+    cselAttach(root.querySelector('#scType'));
+    if (asNew){
+      refreshCode(root);
+      ['#scD', '#scM', '#scY'].forEach(s => root.querySelector(s).addEventListener('input', () => refreshCode(root)));
+      root.querySelector('#scCode').addEventListener('input', () => { codeManual = true; });
+      root.querySelector('#scAuto').addEventListener('click', () => { codeManual = false; refreshCode(root); });
+      const td = root.querySelector('#scToday');
+      if (td) td.addEventListener('click', () => {
+        root.querySelector('#scD').value = padDay(now.getDate()); root.querySelector('#scM').value = padMonth(now.getMonth() + 1); root.querySelector('#scY').value = now.getFullYear();
+        codeManual = false; refreshCode(root);
+        td.closest('.dlg-warn').classList.add('ok'); td.disabled = true; td.textContent = 'Đã đổi sang hôm nay';
+      });
+    }
+  });
+}
+
+// ---------- Sổ Quản lý báo giá: chọn nhiều để xoá, xoá toàn bộ sổ ----------
+let regSel = new Set();
+function toggleRegSel(uid, on){ if (on) regSel.add(uid); else regSel.delete(uid); renderRegistry(); }
+function toggleRegSelAll(on){ const list = regFilteredList(); list.forEach(r => on ? regSel.add(r.uid) : regSel.delete(r.uid)); renderRegistry(); }
+async function deleteRegistryUids(uids, label){
+  if (!uids.length) return;
+  const ok = await askPassword(`Xoá <strong>${label}</strong> khỏi sổ Quản lý báo giá. File báo giá đã lưu trên máy <strong>không bị xoá</strong>.<br>Nhập mật khẩu đăng nhập để xác nhận.`, 'Xoá khỏi sổ');
+  if (!ok) return;
+  const set = new Set(uids);
+  registry = registry.filter(r => !set.has(r.uid));
+  uids.forEach(u => regSel.delete(u));
+  await persistRegistry();
+  if (!quoteLoadedFromFile && !quoteCodeManuallyEdited && !currentFilePath){ quoteSeq = null; quoteSeqDate = ''; render(); markClean(); }
+  renderFieldList(); renderRegistry();
+  showToast(`Đã xoá ${uids.length} báo giá khỏi sổ.`);
+}
+async function deleteRegistryRecord(uid){ const r = registry.find(x => x.uid === uid); await deleteRegistryUids([uid], 'báo giá ' + (r ? r.code : '')); }
+async function deleteSelectedRegistry(){ const uids = Array.from(regSel).filter(u => registry.some(r => r.uid === u)); await deleteRegistryUids(uids, uids.length + ' báo giá đã chọn'); }
+async function deleteAllRegistry(){ await deleteRegistryUids(registry.map(r => r.uid), 'TOÀN BỘ ' + registry.length + ' báo giá trong sổ'); }
+
+// ---------- Báo cáo: chọn trường cần xuất ----------
+const REPORT_FIELDS = [
+  { k: 'stt', label: 'STT', on: true }, { k: 'code', label: 'Số báo giá', on: true }, { k: 'date', label: 'Ngày', on: true },
+  { k: 'type', label: 'Loại báo giá', on: true }, { k: 'investor', label: 'Chủ đầu tư / Kính gửi', on: true }, { k: 'field', label: 'Lĩnh vực', on: true },
+  { k: 'count', label: 'Số hạng mục', on: true }, { k: 'discount', label: 'Giảm giá', on: false }, { k: 'total', label: 'Giá trị báo giá', on: true },
+  { k: 'file', label: 'Tên file', on: false }, { k: 'path', label: 'Thư mục / đường dẫn file', on: false }
+];
+function reportConfig(){
+  const d = (appDefaults && appDefaults.reportCfg) || lsGet('bg_report_cfg') || {};
+  const cols = Array.isArray(d.cols) ? d.cols : REPORT_FIELDS.filter(f => f.on).map(f => f.k);
+  return { cols, detail: !!d.detail };
+}
+function saveReportConfig(cfg){
+  appDefaults = Object.assign({}, appDefaults || {}, { reportCfg: cfg });
+  lsSet('bg_report_cfg', cfg);
+  try { if (hasApi('save_defaults')) window.pywebview.api.save_defaults({ reportCfg: cfg }); } catch (e){}
+}
+function openReportDialog(){
+  const cfg = reportConfig();
+  const list = regFilteredList();
+  const go = (root, fmtKind) => {
+    const cols = Array.from(root.querySelectorAll('.rp-col:checked')).map(c => c.value);
+    if (!cols.length){ dlgError(root, 'Chọn ít nhất 1 trường thông tin.'); return; }
+    const detail = root.querySelector('#rpDetail').checked;
+    saveReportConfig({ cols, detail });
+    closeDialog();
+    if (fmtKind === 'xlsx') exportRegistryExcel({ cols, detail }); else printRegistryReport({ cols, detail });
+  };
+  openDialog({
+    title: 'Xuất báo cáo Quản lý báo giá', width: 600,
+    body: `<p class="dlg-p">Báo cáo gồm <strong>${list.length} báo giá</strong> theo kỳ và bộ lọc đang chọn (${esc(regPeriodLabel())}). Chọn các trường thông tin cần đưa vào báo cáo:</p>
+      <div class="rp-grid">${REPORT_FIELDS.map(f => `<label class="rp-item"><input type="checkbox" class="rp-col" value="${f.k}" ${cfg.cols.includes(f.k) ? 'checked' : ''}> ${esc(f.label)}</label>`).join('')}</div>
+      <div class="rp-tools"><button type="button" class="link-btn" id="rpAll">Chọn tất cả</button><button type="button" class="link-btn" id="rpNone">Bỏ chọn tất cả</button></div>
+      <label class="rp-item rp-detail"><input type="checkbox" id="rpDetail" ${cfg.detail ? 'checked' : ''}> <span><strong>Xuất chi tiết các hạng mục</strong> của từng báo giá (tên hạng mục và giá trị, liệt kê ngay dưới mỗi báo giá)</span></label>`,
+    buttons: [
+      { label: 'Huỷ', onClick: closeDialog },
+      { label: 'In / Xuất PDF', cls: 'btn-o', right: true, onClick: root => go(root, 'pdf') },
+      { label: 'Xuất Excel', cls: 'btn-f', onClick: root => go(root, 'xlsx') }
+    ],
+    onMount: root => {
+      root.querySelector('#rpAll').addEventListener('click', () => root.querySelectorAll('.rp-col').forEach(c => c.checked = true));
+      root.querySelector('#rpNone').addEventListener('click', () => root.querySelectorAll('.rp-col').forEach(c => c.checked = false));
+    }
+  });
+}
+function reportCellValue(k, r, stt){
+  switch (k){
+    case 'stt': return stt;
+    case 'code': return r.code || '';
+    case 'date': return regDmy(r.date);
+    case 'type': return r.type || '';
+    case 'investor': return r.investor || '';
+    case 'field': return r.field || '';
+    case 'count': return (r.items || []).length;
+    case 'discount': return r.discount || 0;
+    case 'total': return r.total || 0;
+    case 'file': return fileBase(r.filePath || '');
+    case 'path': return r.filePath || '';
+  }
+  return '';
+}
+
 // init
+startAuthGate();
 document.querySelector('.panel').addEventListener('input', (e) => {
   if (e.target.classList && e.target.classList.contains('autowrap')) autoGrow(e.target);
   render();
@@ -5570,6 +6266,8 @@ renderTypesList();
 renderTypeSelect();
 setMainTab('items');
 setLayout('default');
+applyParamsLock();
+renderFieldSelect();
 render();
 autoGrowAll();
 if (window.pywebview && window.pywebview.api) initAppDataOnce();

@@ -2314,9 +2314,26 @@ def parse_salary_excel(path):
 
 
 def export_registry_report(payload, save_path):
-    """Xuat bao cao tu so Quan ly bao gia (da loc/nhom tren giao dien) ra file Excel."""
+    """Xuat bao cao tu so Quan ly bao gia (da loc/nhom tren giao dien) ra file Excel.
+    payload["columns"]: cac truong nguoi dung chon (k, label); payload["detail"]: liet ke hang muc duoi tung bao gia."""
+    import os as _os
     from openpyxl import Workbook
     from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
+    from openpyxl.utils import get_column_letter
+    default_cols = [{"k": "stt", "label": "STT"}, {"k": "code", "label": "Số báo giá"}, {"k": "date", "label": "Ngày"},
+                    {"k": "type", "label": "Loại báo giá"}, {"k": "investor", "label": "Chủ đầu tư"}, {"k": "field", "label": "Lĩnh vực"},
+                    {"k": "count", "label": "Số hạng mục"}, {"k": "total", "label": "Giá trị (đ)"}]
+    cols = payload.get("columns") or default_cols
+    detail = bool(payload.get("detail"))
+    keys = [c.get("k") for c in cols]
+    ncol = len(cols)
+    total_idx = keys.index("total") + 1 if "total" in keys else None
+    span_end = (total_idx - 1) if total_idx else ncol
+    widths = {"stt": 6, "code": 20, "date": 12, "type": 30, "investor": 40, "field": 22, "count": 11,
+              "discount": 16, "total": 18, "file": 34, "path": 60}
+    money = {"discount", "total"}
+    center = {"stt", "date", "count"}
+
     wb = Workbook()
     ws = wb.active
     ws.title = "Tong hop"
@@ -2324,81 +2341,121 @@ def export_registry_report(payload, save_path):
     border = Border(left=thin, right=thin, top=thin, bottom=thin)
     bold = Font(bold=True, name="Times New Roman", size=12)
     normal = Font(name="Times New Roman", size=12)
+    ital = Font(italic=True, name="Times New Roman", size=11)
     head_fill = PatternFill("solid", fgColor="E2E7F4")
     grp_fill = PatternFill("solid", fgColor="F5F7FC")
     tot_fill = PatternFill("solid", fgColor="D9DEEA")
     ws.cell(row=1, column=1, value=payload.get("title") or "BÁO CÁO TỔNG HỢP BÁO GIÁ").font = Font(bold=True, name="Times New Roman", size=14)
     ws.cell(row=2, column=1, value=payload.get("subtitle") or "").font = Font(italic=True, name="Times New Roman", size=11)
-    headers = ["STT", "Số báo giá", "Ngày", "Loại báo giá", "Chủ đầu tư", "Lĩnh vực", "Số hạng mục", "Giá trị (đ)", "File báo giá (đường dẫn)"]
     hr = 4
-    for ci, h in enumerate(headers, start=1):
-        c = ws.cell(row=hr, column=ci, value=h)
-        c.font = bold
-        c.fill = head_fill
-        c.border = border
-        c.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    for ci, c in enumerate(cols, start=1):
+        cell = ws.cell(row=hr, column=ci, value=c.get("label", ""))
+        cell.font = bold
+        cell.fill = head_fill
+        cell.border = border
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+
+    def value_of(k, rec, stt):
+        if k == "stt":
+            return stt
+        if k == "code":
+            return rec.get("code", "")
+        if k == "date":
+            return rec.get("dateText", "")
+        if k == "type":
+            return rec.get("type", "")
+        if k == "investor":
+            return rec.get("investor", "")
+        if k == "field":
+            return rec.get("field", "")
+        if k == "count":
+            return len(rec.get("items", []) or [])
+        if k == "discount":
+            return rec.get("discount", 0) or 0
+        if k == "total":
+            return rec.get("total", 0) or 0
+        if k == "file":
+            return rec.get("fileName") or _os.path.basename(rec.get("filePath", "") or "")
+        if k == "path":
+            return rec.get("filePath", "")
+        return ""
+
+    def band_row(r, label, amount, fill, font):
+        ws.cell(row=r, column=1, value=label).font = font
+        if span_end > 1:
+            ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=span_end)
+        if total_idx:
+            c = ws.cell(row=r, column=total_idx, value=amount)
+            c.font = font
+            c.number_format = "#,##0"
+        for ci in range(1, ncol + 1):
+            ws.cell(row=r, column=ci).fill = fill
+            ws.cell(row=r, column=ci).border = border
+
     r = hr + 1
     stt = 0
     for grp in payload.get("groups", []):
         if grp.get("title"):
-            ws.cell(row=r, column=1, value=grp.get("title")).font = bold
-            ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=7)
-            c = ws.cell(row=r, column=8, value=grp.get("subtotal", 0))
-            c.font = bold
-            c.number_format = "#,##0"
-            for ci in range(1, 10):
-                ws.cell(row=r, column=ci).fill = grp_fill
-                ws.cell(row=r, column=ci).border = border
+            band_row(r, grp.get("title"), grp.get("subtotal", 0), grp_fill, bold)
             r += 1
         for rec in grp.get("rows", []):
             stt += 1
-            vals = [stt, rec.get("code", ""), rec.get("dateText", ""), rec.get("type", ""), rec.get("investor", ""),
-                    rec.get("field", ""), len(rec.get("items", [])), rec.get("total", 0), rec.get("filePath", "")]
-            for ci, v in enumerate(vals, start=1):
-                c = ws.cell(row=r, column=ci, value=v)
+            for ci, k in enumerate(keys, start=1):
+                c = ws.cell(row=r, column=ci, value=value_of(k, rec, stt))
                 c.font = normal
                 c.border = border
-                c.alignment = Alignment(vertical="top", wrap_text=True, horizontal="center" if ci in (1, 3, 7) else None)
-            ws.cell(row=r, column=8).number_format = "#,##0"
+                c.alignment = Alignment(vertical="top", wrap_text=True, horizontal="center" if k in center else None)
+                if k in money:
+                    c.number_format = "#,##0"
             r += 1
-    ws.cell(row=r, column=1, value="TỔNG CỘNG").font = bold
-    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=7)
-    c = ws.cell(row=r, column=8, value=payload.get("total", 0))
-    c.font = bold
-    c.number_format = "#,##0"
-    for ci in range(1, 10):
-        ws.cell(row=r, column=ci).fill = tot_fill
-        ws.cell(row=r, column=ci).border = border
-    for col, w in zip("ABCDEFGHI", (6, 20, 12, 30, 40, 20, 12, 18, 60)):
-        ws.column_dimensions[col].width = w
+            if detail:
+                det_items = [("      %d. %s" % (ii, it.get("name", "")), it.get("value", 0) or 0) for ii, it in enumerate(rec.get("items", []) or [], start=1)]
+                if rec.get("discount"):
+                    det_items.append(("      Giảm giá", -abs(rec.get("discount", 0))))
+                for label_txt, amount in det_items:
+                    ws.cell(row=r, column=1, value=label_txt).font = ital
+                    if span_end > 1:
+                        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=span_end)
+                    if total_idx:
+                        c = ws.cell(row=r, column=total_idx, value=amount)
+                        c.font = ital
+                        c.number_format = "#,##0"
+                    for ci in range(1, ncol + 1):
+                        ws.cell(row=r, column=ci).border = border
+                    r += 1
+    band_row(r, "TỔNG CỘNG (%s báo giá)" % payload.get("count", stt), payload.get("total", 0), tot_fill, bold)
+    for ci, k in enumerate(keys, start=1):
+        ws.column_dimensions[get_column_letter(ci)].width = widths.get(k, 16)
 
-    ws2 = wb.create_sheet("Chi tiet hang muc")
-    headers2 = ["Số báo giá", "Ngày", "Loại báo giá", "Chủ đầu tư", "TT", "Hạng mục", "Giá trị (đ)"]
-    for ci, h in enumerate(headers2, start=1):
-        c = ws2.cell(row=1, column=ci, value=h)
-        c.font = bold
-        c.fill = head_fill
-        c.border = border
-    r2 = 2
-    for grp in payload.get("groups", []):
-        for rec in grp.get("rows", []):
-            items = rec.get("items", []) or [{"name": "", "value": rec.get("total", 0)}]
-            for ii, it in enumerate(items, start=1):
-                vals = [rec.get("code", ""), rec.get("dateText", ""), rec.get("type", ""), rec.get("investor", ""), ii, it.get("name", ""), it.get("value", 0)]
-                for ci, v in enumerate(vals, start=1):
-                    c = ws2.cell(row=r2, column=ci, value=v)
-                    c.font = normal
-                    c.border = border
-                ws2.cell(row=r2, column=7).number_format = "#,##0"
-                r2 += 1
-            if rec.get("discount"):
-                ws2.cell(row=r2, column=1, value=rec.get("code", "")).font = normal
-                ws2.cell(row=r2, column=6, value="Giảm giá").font = Font(italic=True, name="Times New Roman", size=12)
-                c = ws2.cell(row=r2, column=7, value=-abs(rec.get("discount", 0)))
-                c.number_format = "#,##0"
-                for ci in range(1, 8):
-                    ws2.cell(row=r2, column=ci).border = border
-                r2 += 1
-    for col, w in zip("ABCDEFG", (20, 12, 30, 40, 6, 50, 18)):
-        ws2.column_dimensions[col].width = w
+    if detail:
+        ws2 = wb.create_sheet("Chi tiet hang muc")
+        headers2 = ["Số báo giá", "Ngày", "Loại báo giá", "Chủ đầu tư", "TT", "Hạng mục", "Giá trị (đ)"]
+        for ci, h in enumerate(headers2, start=1):
+            c = ws2.cell(row=1, column=ci, value=h)
+            c.font = bold
+            c.fill = head_fill
+            c.border = border
+        r2 = 2
+        for grp in payload.get("groups", []):
+            for rec in grp.get("rows", []):
+                items = rec.get("items", []) or [{"name": "", "value": rec.get("total", 0)}]
+                for ii, it in enumerate(items, start=1):
+                    vals = [rec.get("code", ""), rec.get("dateText", ""), rec.get("type", ""), rec.get("investor", ""), ii, it.get("name", ""), it.get("value", 0)]
+                    for ci, v in enumerate(vals, start=1):
+                        c = ws2.cell(row=r2, column=ci, value=v)
+                        c.font = normal
+                        c.border = border
+                    ws2.cell(row=r2, column=7).number_format = "#,##0"
+                    r2 += 1
+                if rec.get("discount"):
+                    vals = [rec.get("code", ""), rec.get("dateText", ""), rec.get("type", ""), rec.get("investor", ""), "", "Giảm giá", -abs(rec.get("discount", 0))]
+                    for ci, v in enumerate(vals, start=1):
+                        c = ws2.cell(row=r2, column=ci, value=v)
+                        c.font = ital if ci == 6 else normal
+                        c.border = border
+                    ws2.cell(row=r2, column=7).number_format = "#,##0"
+                    r2 += 1
+        for col, w in zip("ABCDEFG", (20, 12, 30, 40, 6, 60, 18)):
+            ws2.column_dimensions[col].width = w
     wb.save(save_path)
+    return save_path
